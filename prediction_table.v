@@ -40,4 +40,3 @@ module prediction_table #(
     end
   end
 endmodule
-

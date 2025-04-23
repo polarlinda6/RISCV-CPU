@@ -42,26 +42,30 @@ module history_predictor #(
 
   assign HP_count_id = count_reg_id;
   assign HP_count_ex = count_reg_ex;  
+  
 ////////////////////////////////////////////////////////////////////////////////
 
   always @(posedge clk)
   begin
     if (!rst_n)
-    begin
-      count_reg_id <= ZERO;
-      count_reg_ex <= ZERO;
-      history_reg <= {HR_DEPTH{1'b0}};
-    end
+      begin
+        count_reg_id <= ZERO;
+        count_reg_ex <= ZERO;
+        history_reg <= {HR_DEPTH{1'b0}};
+      end
     else
-    begin
-      if(PL_stall) count_reg_id <= HP_count;
-      count_reg_ex <= count_reg_id;
-      
-      if (rollback_en_ex)
-        history_reg <= history_reg >> (rollback_en_id ? 2 : 1);
-      else if (corrected_en)
-        history_reg <= (history_reg << 1) | corrected_result;
-    end 
+      begin
+        if(!PL_stall) 
+        begin   
+          count_reg_id <= HP_count;
+          count_reg_ex <= count_reg_id;
+        end
+
+        if (rollback_en_ex)
+          history_reg <= history_reg >> (rollback_en_id ? 2 : 1);
+        else if (corrected_en)
+          history_reg <= (history_reg << 1) | corrected_result;
+      end 
   end
 
 

@@ -69,6 +69,8 @@ module branch_predictor(
 
 
 	wire SP_prediction_result;
+	wire SP_prediction_result_id;
+	wire SP_prediction_result_ex;
 
 	wire [JUMP_STATUS_COUNTER_WIDTH_UB:0]GHP_count;
 	wire [JUMP_STATUS_COUNTER_WIDTH_UB:0]GHP_count_id;
@@ -109,6 +111,7 @@ module branch_predictor(
 	) MP_inst(
 		.clk(clk),
 		.rst_n(rst_n),
+		.PL_stall(PL_stall),
 
 		.prediction_result(B_type_prediction_result),
 		.prediction_result_id(B_type_prediction_result_id), 
@@ -140,6 +143,8 @@ module branch_predictor(
 
 
 		.SP_prediction_result(SP_prediction_result),
+		.SP_prediction_result_id(SP_prediction_result_id),
+		.SP_prediction_result_ex(SP_prediction_result_ex),
 
 		.GHP_count(GHP_count),
 		.GHP_count_id(GHP_count_id),
@@ -171,8 +176,14 @@ module branch_predictor(
 
 	//SP
 	static_predictor SP_inst(
+		.clk(clk),
+		.rst_n(rst_n),
+		.PL_stall(PL_stall),
+
 		.imme_sig(imme[31]),
-		.SP_prediction(SP_prediction_result)
+		.SP_prediction_result(SP_prediction_result),
+		.SP_prediction_result_id(SP_prediction_result_id),
+		.SP_prediction_result_ex(SP_prediction_result_ex)
 	);
 
 
@@ -388,9 +399,35 @@ endmodule
 
 
 module static_predictor(
-	input imme_sig,
-	output SP_prediction
-);
+	input clk,
+	input rst_n,
+	input PL_stall,
 
-	assign SP_prediction = imme_sig;
+	input imme_sig,
+	output SP_prediction_result, 
+	output SP_prediction_result_id,
+	output SP_prediction_result_ex
+);
+	reg prediciont_result_reg_id, prediciont_result_reg_ex;
+
+	always @(posedge clk)
+	begin
+		if (!rst_n)
+			begin
+				prediciont_result_reg_id <= `zero;
+				prediciont_result_reg_ex <= `zero;
+			end
+		else
+			begin
+				if(!PL_stall)
+				begin
+					prediciont_result_reg_id <= SP_prediction_result;
+					prediciont_result_reg_ex <= prediciont_result_reg_id;
+				end
+			end
+	end	
+
+	assign SP_prediction_result_id = prediciont_result_reg_id;
+	assign SP_prediction_result_ex = prediciont_result_reg_ex;
+	assign SP_prediction_result = imme_sig;
 endmodule
