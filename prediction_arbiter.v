@@ -5,9 +5,9 @@ module prediction_arbiter #(
   input LHP_prediction_result,
   input GHP_prediction_result,
 
-  input [3:0]SP_trend,
-  input [3:0]LHP_trend,
-  input [3:0]GHP_trend,
+  input [3:0]SP_trend_decode,
+  input [3:0]LHP_trend_decode,
+  input [3:0]GHP_trend_decode,
 
   input [STAT_COUNTER_WIDTH - 1:0]SP_stat_count,
   input [STAT_COUNTER_WIDTH - 1:0]LHP_stat_count,
@@ -20,9 +20,9 @@ module prediction_arbiter #(
   localparam [STAT_COUNTER_WIDTH_UB:0]ZERO = {STAT_COUNTER_WIDTH{1'b0}};
   
   wire [STAT_COUNTER_WIDTH_UB:0]corrected_SP_count, corrected_LHP_count, corrected_GHP_count;
-  assign corrected_SP_count  = SP_trend[0] ? ZERO : SP_stat_count;
-  assign corrected_LHP_count = LHP_trend[0] ? ZERO : LHP_stat_count;
-  assign corrected_GHP_count = GHP_trend[0] ? ZERO : GHP_stat_count;
+  assign corrected_SP_count  = SP_trend_decode[0] ? ZERO : SP_stat_count;
+  assign corrected_LHP_count = LHP_trend_decode[0] ? ZERO : LHP_stat_count;
+  assign corrected_GHP_count = GHP_trend_decode[0] ? ZERO : GHP_stat_count;
 
 
   wire SP_LHP_conflict, SP_GHP_conflict;
@@ -34,7 +34,6 @@ module prediction_arbiter #(
   assign SP_only     =  SP_LHP_conflict &&  SP_GHP_conflict;
   assign LHP_only    =  SP_LHP_conflict && !SP_GHP_conflict;
   assign GHP_only    = !SP_LHP_conflict &&  SP_GHP_conflict;
-
 
 
 ///////////////////////////////////////////////////////////////////////////
@@ -59,7 +58,7 @@ module prediction_arbiter #(
   assign stat_sum = stat_A + stat_B;
 
   parallel_comparator #(
-    .WIDTH(STAT_COUNTER_WIDTH)
+    .WIDTH(STAT_COUNTER_WIDTH + 1)
   ) stat_arbiter_inst (
     .data1(stat_sum),
     .data2(stat_only),
@@ -76,21 +75,28 @@ module prediction_arbiter #(
     .WIDTH(4),
     .MUX_QUANTITY(3)
   ) trend_only_inst(
-    .data({SP_trend, LHP_trend, GHP_trend}),
+    .data({SP_trend_decode, LHP_trend_decode, GHP_trend_decode}),
     .signal({SP_only, LHP_only, GHP_only}),
     .dout(trend_only)
   ); 
 
   assign double_arbitrate_result = trend_only[3] | trend_only[2]|;
 
-////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////
 
-  parallel_mux #(
-    .WIDTH(1),
-    .MUX_QUANTITY(3)
-  ) prediction_result_inst(
-    .data({SP_prediction_result, LHP_prediction_result, GHP_prediction_result}),
-    .signal({no_conflict, LHP_only, GHP_only}),
+  wire only_arbitrate_result;
+  assign only_arbitrate_result = once_arbitrate_result || (double_arbitrate_signal && double_arbitrate_result);
+
+  wire LHP_sel, GHP_sel;
+  assign LHP_sel = (LHP_only && only_arbitrate_result) || (GHP_only && !only_arbitrate_result) || (SP_only  && !only_arbitrate_result);
+  assign GHP_sel = (GHP_only && only_arbitrate_result) || (LHP_only && !only_arbitrate_result);
+
+
+  mux3 prediction_result_inst(
+    .data1(LHP_prediction_result),
+    .data2(GHP_prediction_result),
+    .data3(SP_prediction_result),
+    .signal({no_conflict || LHP_sel, GHP_sel}),
     .dout(prediction_result)
   );
 endmodule
