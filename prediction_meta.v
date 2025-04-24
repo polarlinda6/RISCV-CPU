@@ -10,9 +10,38 @@ module meta_predictor #(
 
   output prediction_result,
   input  prediction_result_id, 
-  input  prediction_result_branch_failed,
   
   input  prediction_en,
+  
+  input  GHP_beq_rollback_en_id, 
+  input  GHP_bne_rollback_en_id,
+  input  GHP_blt_rollback_en_id,
+  input  GHP_bge_rollback_en_id,
+  input  GHP_bltu_rollback_en_id,
+  input  GHP_bgeu_rollback_en_id,
+  
+  input  GHP_beq_rollback_en_ex, 
+  input  GHP_bne_rollback_en_ex,
+  input  GHP_blt_rollback_en_ex,
+  input  GHP_bge_rollback_en_ex,
+  input  GHP_bltu_rollback_en_ex,
+  input  LHP_bgeu_rollback_en_ex,
+
+  input  LHP_beq_rollback_en_id, 
+  input  LHP_bne_rollback_en_id,
+  input  LHP_blt_rollback_en_id,
+  input  LHP_bge_rollback_en_id,
+  input  LHP_bltu_rollback_en_id,
+  input  LHP_bgeu_rollback_en_id,
+  
+  input  LHP_beq_rollback_en_ex, 
+  input  LHP_bne_rollback_en_ex,
+  input  LHP_blt_rollback_en_ex,
+  input  LHP_bge_rollback_en_ex,
+  input  LHP_bltu_rollback_en_ex,
+  input  LHP_bgeu_rollback_en_ex,
+
+
   input  beq,
   input  bne,
   input  blt,
@@ -20,7 +49,6 @@ module meta_predictor #(
   input  bltu,
   input  bgeu,
 
-  input  rollback_en_id, 
   input  beq_id, 
   input  bne_id,
   input  blt_id,
@@ -28,14 +56,12 @@ module meta_predictor #(
   input  bltu_id,
   input  bgeu_id,
 
-  input  rollback_en_ex,
   input  beq_ex, 
   input  bne_ex,
   input  blt_ex,
   input  bge_ex,
   input  bltu_ex,
   input  bgeu_ex,
-
 
   input  SP_prediction_result,
   input  SP_prediction_result_id,
@@ -137,7 +163,7 @@ module meta_predictor #(
   wire clear_en, clear_en_id, clear_en_ex;
   wire WR_SP_en1, WR_SP_en2, WR_LHP_en1, WR_LHP_en2, WR_GHP_en1, WR_GHP_en2;
   wire [STAT_COUNTER_WIDTH - 1:0]LHP_GHP_index1, LHP_GHP_index2;
-  wire [2 + STAT_COUNTER_WIDTH:0]WR_SP_data1, WR_SP_data2, WR_LHP_data1, WR_LHP_data2, WR_GHP_data1, WR_GHP_data2;
+  
 
  always @(posedge clk)
   begin
@@ -156,9 +182,13 @@ module meta_predictor #(
         SP_trend_stat_counter_regs[0][1] <= SP_TREND_STAT_COUNTER_INIT_VALUE;
         SP_trend_stat_counter_regs[0][0] <= SP_TREND_STAT_COUNTER_INIT_VALUE;
       end
-
-    if(WR_en1) regs[WR_index1] <= WR_count1;
-    if(WR_en2) regs[WR_index2] <= WR_count2;
+    else
+      begin
+        if(WR_SP_en1) regs[WR_index1] <= WR_count1;
+        if(WR_SP_en2) 
+        if(WR_LHP_)
+        if(WR_en2) regs[WR_index2] <= WR_count2;       
+      end
   end
 
   prediction_writer #(
@@ -221,25 +251,31 @@ module meta_predictor #(
     .clear_en_id(clear_en_id),
     .clear_en_ex(clear_en_ex),
 
-    .SP_index1(SP_index1),
-    .SP_index2(SP_index2),
-    .LHP_GHP_index1(LHP_GHP_index1),
-    .LHP_GHP_index2(LHP_GHP_index2),
-
     .WR_SP_en1(WR_SP_en1),
-    .WR_SP_en2(WR_SP_en2),
-    .WR_SP_data1(WR_SP_data1),
-    .WR_SP_data2(WR_SP_data2),
-
+    .WR_SP_en2(WR_SP_en2),    
     .WR_LHP_en1(WR_LHP_en1),
-    .WR_LHP_en2(WR_LHP_en2),
-    .WR_LHP_data1(WR_LHP_data1),
-    .WR_LHP_data2(WR_LHP_data2),
-
+    .WR_LHP_en2(WR_LHP_en2),   
     .WR_GHP_en1(WR_GHP_en1),
     .WR_GHP_en2(WR_GHP_en2),
-    .WR_GHP_data1(WR_GHP_data1),
-    .WR_GHP_data2(WR_GHP_data2)
+  
+    .SP_index1(SP_index1),
+    .SP_index2(SP_index2),    
+    .LHP_GHP_index1(LHP_GHP_index1),
+    .LHP_GHP_index2(LHP_GHP_index2),
+      
+    .WR_SP_trend_count1(WR_SP_trend_count1),
+    .WR_SP_trend_count2(WR_SP_trend_count2),
+    .WR_LHP_trend_count1(WR_LHP_trend_count1),
+    .WR_LHP_trend_count2(WR_LHP_trend_count2),
+    .WR_GHP_trend_count1(WR_GHP_trend_count1),
+    .WR_GHP_trend_count2(WR_GHP_trend_count2),
+
+    .WR_SP_stat_count1(WR_SP_stat_count1),
+    .WR_SP_stat_count2(WR_SP_stat_count2),
+    .WR_LHP_stat_count1(WR_LHP_stat_count1),
+    .WR_LHP_stat_count2(WR_LHP_stat_count2),
+    .WR_GHP_stat_count1(WR_GHP_stat_count1),
+    .WR_GHP_stat_count2(WR_GHP_stat_count2)
   );
 
 /////////////////////////////////////////////////////////////////////////////////

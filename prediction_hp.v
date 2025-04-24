@@ -8,7 +8,6 @@ module history_predictor #(
   input  PL_stall,
 
   input  corrected_result,
-  input  prediction_result_branch_failed,
 
   input  corrected_en,
   input  rollback_en_id,
@@ -23,7 +22,6 @@ module history_predictor #(
   output [JUMP_STATUS_COUNTER_WIDTH - 1: 0]HP_count_ex
 );
 
-
   localparam HR_DEPTH = INDEX_HR_WIDTH + 2;
   localparam HR_DEPTH_UB = HR_DEPTH - 1;
 
@@ -34,7 +32,6 @@ module history_predictor #(
   localparam [JUMP_STATUS_COUNTER_WIDTH_UB:0]N_ONE  = {JUMP_STATUS_COUNTER_WIDTH{1'b1}};  
   localparam [JUMP_STATUS_COUNTER_WIDTH_UB:0]ZERO   = {JUMP_STATUS_COUNTER_WIDTH{1'b0}};  
   localparam [JUMP_STATUS_COUNTER_WIDTH_UB:0]P_ONE  = {ZERO[JUMP_STATUS_COUNTER_WIDTH_UB: 1], 1'b1};
-
 
 
   reg [JUMP_STATUS_COUNTER_WIDTH_UB:0]count_reg_id, count_reg_ex;
@@ -61,13 +58,14 @@ module history_predictor #(
           count_reg_ex <= count_reg_id;
         end
 
-        if (rollback_en_ex)
-          history_reg <= history_reg >> (rollback_en_id ? 2 : 1);
+        if (rollback_en_id || rollback_en_ex)
+          history_reg <= history_reg >> (rollback_en_id && rollback_en_ex ? 2 : 1);
         else if (corrected_en)
           history_reg <= (history_reg << 1) | corrected_result;
       end 
   end
 
+////////////////////////////////////////////////////////////////////////////////////
 
 
   wire [INDEX_WIDTH_UB:0]index, index_id, index_ex;  
@@ -80,10 +78,10 @@ module history_predictor #(
   assign count_offset = corrected_en ? (corrected_result ? N_ONE : P_ONE) : ZERO;
 
   wire [JUMP_STATUS_COUNTER_WIDTH_UB:0]counter_offset_ex;
-  assign count_offset_ex = prediction_result_branch_failed ? P_ONE : N_ONE;
+  assign count_offset_ex = HP_count_ex[JUMP_STATUS_COUNTER_CAPACITY_UB] ? P_ONE : N_ONE;
   
   wire [JUMP_STATUS_COUNTER_WIDTH_UB:0]A, B;
-  assign A = rollback_en_ex ? HP_count_ex : HP_count;
+  assign A = rollback_en_ex ? HP_count_ex     : HP_count;
   assign B = rollback_en_ex ? count_offset_ex : count_offset;
 
   wire [JUMP_STATUS_COUNTER_WIDTH_UB:0]result;

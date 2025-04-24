@@ -24,7 +24,7 @@ module no_overflow_adder #(
   wire PO, NO;
   assign PO = !Asig && !Bsig && Rsig;
   assign NO = Asig && Bsig && !Rsig;
-
+  
   assign result = PO ? P_MAX : 
                   NO ? N_MAX : add_result;
 endmodule

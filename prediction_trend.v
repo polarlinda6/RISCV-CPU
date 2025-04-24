@@ -17,7 +17,7 @@ endmodule
 
 module trend_counter_operator(
   input  [2:0]count,
-  input  true_down_false_up, 
+  input  true_up_false_down, 
   output [2:0]new_count
 );
 
@@ -32,9 +32,9 @@ module trend_counter_operator(
   
   wire [2:0]B;
   mux3 B_inst(
-    .data1(true_down_false_up ? N_THREE : P_TWO),
-    .data2(true_down_false_up ? N_TWO   : P_ONE),
-    .data3(true_down_false_up ? N_TWO   : P_TWO),
+    .data1(true_up_false_down ? P_TWO : N_THREE),
+    .data2(true_up_false_down ? P_ONE : N_TWO),
+    .data3(true_up_false_down ? P_TWO : N_TWO),
     .signal({upward_trend_signal, downward_trend_signal}),
     .dout(B)
   );
