@@ -62,7 +62,7 @@ module branch_predictor(
 	localparam GHP_INDEX_PC_WIDTH = 4;
 	localparam LHP_INDEX_HR_WIDTH = 5;
 	localparam LHP_INDEX_PC_WIDTH = 3;
-	localparam STAT_COUNTER_WIDTH = 4;
+	localparam STAT_COUNTER_WIDTH = 5;
 
 	localparam JUMP_STATUS_COUNTER_WIDTH = 2;
 	localparam JUMP_STATUS_COUNTER_WIDTH_UB = JUMP_STATUS_COUNTER_WIDTH - 1;
@@ -98,36 +98,9 @@ module branch_predictor(
 	wire [JUMP_STATUS_COUNTER_WIDTH_UB:0]LHP_bgeu_count_ex;
 
 
-	wire GHP_rollback_en_id;
-	wire GHP_rollback_en_ex;
-
-	wire GHP_beq_rollback_en_id;
-	wire GHP_bne_rollback_en_id;
-	wire GHP_blt_rollback_en_id;
-	wire GHP_bge_rollback_en_id;
-	wire GHP_bltu_rollback_en_id;
-	wire GHP_bgeu_rollback_en_id;
-
-	wire GHP_beq_rollback_en_ex;
-	wire GHP_bne_rollback_en_ex;
-	wire GHP_blt_rollback_en_ex;
-	wire GHP_bge_rollback_en_ex;
-	wire GHP_bltu_rollback_en_ex;
-	wire GHP_bgeu_rollback_en_ex;
-
-	wire LHP_beq_rollback_en_id;
-	wire LHP_bne_rollback_en_id;
-	wire LHP_blt_rollback_en_id;
-	wire LHP_bge_rollback_en_id;
-	wire LHP_bltu_rollback_en_id;
-	wire LHP_bgeu_rollback_en_id;
-
-	wire LHP_beq_rollback_en_ex;
-	wire LHP_bne_rollback_en_ex;
-	wire LHP_blt_rollback_en_ex;
-	wire LHP_bge_rollback_en_ex;
-	wire LHP_bltu_rollback_en_ex;
-	wire LHP_bgeu_rollback_en_ex;
+	wire rollback_en_id, rollback_en_ex;
+	assign rollback_en_id = PL_flush && B_type_id;
+	assign rollback_en_ex = PL_flush && B_type_branch_failed;
 
 
 	//MP
@@ -140,37 +113,13 @@ module branch_predictor(
 		.PL_stall(PL_stall),
 
 		.prediction_result(B_type_prediction_result),
-		.prediction_result_id(B_type_prediction_result_id), 
-
+		.prediction_result_id(B_type_prediction_result_id),
+		.prediction_result_ex(B_type_prediction_result_branch_failed),
+		
 		.prediction_en(B_type_prediction_en),
+		.rollback_en_id(rollback_en_id),
+		.rollback_en_ex(rollback_en_ex),
 
-		.GHP_beq_rollback_en_id(GHP_beq_rollback_en_id),
-		.GHP_bne_rollback_en_id(GHP_bne_rollback_en_id),
-		.GHP_blt_rollback_en_id(GHP_blt_rollback_en_id),
-		.GHP_bge_rollback_en_id(GHP_bge_rollback_en_id),
-		.GHP_bltu_rollback_en_id(GHP_bltu_rollback_en_id),
-		.GHP_bgeu_rollback_en_id(GHP_bgeu_rollback_en_id),
-
-		.GHP_beq_rollback_en_ex(GHP_beq_rollback_en_ex),
-		.GHP_bne_rollback_en_ex(GHP_bne_rollback_en_ex),
-		.GHP_blt_rollback_en_ex(GHP_blt_rollback_en_ex),
-		.GHP_bge_rollback_en_ex(GHP_bge_rollback_en_ex),
-		.GHP_bltu_rollback_en_ex(GHP_bltu_rollback_en_ex),
-		.GHP_bgeu_rollback_en_ex(GHP_bgeu_rollback_en_ex),
-
-		.LHP_beq_rollback_en_id(LHP_beq_rollback_en_id),
-		.LHP_bne_rollback_en_id(LHP_bne_rollback_en_id),
-		.LHP_blt_rollback_en_id(LHP_blt_rollback_en_id),
-		.LHP_bge_rollback_en_id(LHP_bge_rollback_en_id),
-		.LHP_bltu_rollback_en_id(LHP_bltu_rollback_en_id),
-		.LHP_bgeu_rollback_en_id(LHP_bgeu_rollback_en_id),
-
-		.LHP_beq_rollback_en_ex(LHP_beq_rollback_en_ex),
-		.LHP_bne_rollback_en_ex(LHP_bne_rollback_en_ex),
-		.LHP_blt_rollback_en_ex(LHP_blt_rollback_en_ex),
-		.LHP_bge_rollback_en_ex(LHP_bge_rollback_en_ex),
-		.LHP_bltu_rollback_en_ex(LHP_bltu_rollback_en_ex),
-		.LHP_bgeu_rollback_en_ex(LHP_bgeu_rollback_en_ex),
 
 		.beq(beq),
 		.bne(bne),
@@ -186,12 +135,12 @@ module branch_predictor(
 		.bltu_id(bltu_id),
 		.bgeu_id(bgeu_id),
 
-		.beq_ex(beq_ex),
-		.bne_ex(bne_ex),
-		.blt_ex(blt_ex),
-		.bge_ex(bge_ex),
-		.bltu_ex(bltu_ex),
-		.bgeu_ex(bgeu_ex),
+		.beq_ex(beq_branch_failed),
+		.bne_ex(bne_branch_failed),
+		.blt_ex(blt_branch_failed),
+		.bge_ex(bge_branch_failed),
+		.bltu_ex(bltu_branch_failed),
+		.bgeu_ex(bgeu_branch_failed),
 
 		.SP_prediction_result(SP_prediction_result),
 		.SP_prediction_result_id(SP_prediction_result_id),
@@ -249,10 +198,11 @@ module branch_predictor(
 		.PL_stall(PL_stall),
 
 		.corrected_result(corrected_result),
+    .prediction_result_branch_failed(B_type_prediction_result_branch_failed),
 
 		.corrected_en(B_type),
-		.rollback_en_id(GHP_rollback_en_id),
-		.rollback_en_ex(GHP_rollback_en_ex),
+		.rollback_en_id(rollback_en_id),
+		.rollback_en_ex(rollback_en_ex),
 
 		.pc(pc),
 		.pc_id(pc_id),
@@ -275,10 +225,11 @@ module branch_predictor(
 		.PL_stall(PL_stall),
 
 		.corrected_result(corrected_result),
+		.prediction_result_branch_failed(B_type_prediction_result_branch_failed),
 
 		.corrected_en(beq),
-		.rollback_en_id(LHP_beq_rollback_en_id),
-		.rollback_en_ex(LHP_beq_rollback_en_ex),
+		.rollback_en_id(beq_id && PL_flush),
+		.rollback_en_ex(beq_branch_failed && PL_flush),
 
 		.pc(pc),
 		.pc_id(pc_id),
@@ -301,10 +252,11 @@ module branch_predictor(
 		.PL_stall(PL_stall),
 
 		.corrected_result(corrected_result),
+		.prediction_result_branch_failed(B_type_prediction_result_branch_failed),
 
 		.corrected_en(bne),
-		.rollback_en_id(LHP_bne_rollback_en_id),
-		.rollback_en_ex(LHP_bne_rollback_en_ex),
+		.rollback_en_id(bne_id && PL_flush),
+		.rollback_en_ex(bne_branch_failed && PL_flush),
 
 		.pc(pc),
 		.pc_id(pc_id),
@@ -327,10 +279,11 @@ module branch_predictor(
 		.PL_stall(PL_stall),
 
 		.corrected_result(corrected_result),
+		.prediction_result_branch_failed(B_type_prediction_result_branch_failed),
 
 		.corrected_en(blt),
-		.rollback_en_id(LHP_blt_rollback_en_id),
-		.rollback_en_ex(LHP_blt_rollback_en_ex),
+		.rollback_en_id(blt_id && PL_flush),
+		.rollback_en_ex(blt_branch_failed && PL_flush),
 
 		.pc(pc),
 		.pc_id(pc_id),
@@ -353,10 +306,11 @@ module branch_predictor(
 		.PL_stall(PL_stall),
 
 		.corrected_result(corrected_result),
+		.prediction_result_branch_failed(B_type_prediction_result_branch_failed),
 
 		.corrected_en(bge),
-		.rollback_en_id(LHP_bge_rollback_en_id),
-		.rollback_en_ex(LHP_bge_rollback_en_ex),
+		.rollback_en_id(bge_id && PL_flush),
+		.rollback_en_ex(bge_branch_failed && PL_flush),
 
 		.pc(pc),
 		.pc_id(pc_id),
@@ -379,10 +333,11 @@ module branch_predictor(
 		.PL_stall(PL_stall),
 
 		.corrected_result(corrected_result),
+		.prediction_result_branch_failed(B_type_prediction_result_branch_failed),
 
 		.corrected_en(bltu),
-		.rollback_en_id(LHP_bltu_rollback_en_id),
-		.rollback_en_ex(LHP_bgeu_rollback_en_ex),
+		.rollback_en_id(bltu_id && PL_flush),
+		.rollback_en_ex(bltu_branch_failed && PL_flush),
 
 		.pc(pc),
 		.pc_id(pc_id),
@@ -405,10 +360,11 @@ module branch_predictor(
 		.PL_stall(PL_stall),
 
 		.corrected_result(corrected_result),
+		.prediction_result_branch_failed(B_type_prediction_result_branch_failed),
 
 		.corrected_en(bgeu),
-		.rollback_en_id(LHP_bgeu_rollback_en_id),
-		.rollback_en_ex(LHP_bgeu_rollback_en_ex),
+		.rollback_en_id(bgeu_id && PL_flush),
+		.rollback_en_ex(bgeu_branch_failed && PL_flush),
 
 		.pc(pc),
 		.pc_id(pc_id),
@@ -439,43 +395,6 @@ module branch_predictor(
 		.Rs1_is_ra_id(Rs1_id == `ra),
 		.jalr_pc_prediction(jalr_pc_prediction)
 	);
-
-/////////////////////////////////////////////////////////////////////////////////
-
-	wire GHP_failed_en;
-	assign GHP_failed_en = B_type_prediction_result_branch_failed == GHP_count_ex[JUMP_STATUS_COUNTER_CAPACITY_UB];
-
-	assign GHP_rollback_en_id = PL_flush && B_type_id;
-	assign GHP_rollback_en_ex = PL_flush && B_type_branch_failed && GHP_failed_en;
-
-	assign GHP_beq_rollback_en_id  = PL_flush && beq_id;
-	assign GHP_bne_rollback_en_id  = PL_flush && bne_ex;
-	assign GHP_blt_rollback_en_id  = PL_flush && blt_id;
-	assign GHP_bge_rollback_en_id  = PL_flush && bge_id;
-	assign GHP_bltu_rollback_en_id = PL_flush && bltu_id;
-	assign GHP_bgeu_rollback_en_id = PL_flush && bgeu_id;
-
-	assign GHP_beq_rollback_en_ex  = PL_flush && beq_ex  && GHP_failed_en;
-	assign GHP_bne_rollback_en_ex  = PL_flush && bne_ex  && GHP_failed_en;
-	assign GHP_blt_rollback_en_ex  = PL_flush && blt_ex  && GHP_failed_en;
-	assign GHP_bge_rollback_en_ex  = PL_flush && bge_ex  && GHP_failed_en;
-	assign GHP_bltu_rollback_en_ex = PL_flush && bltu_ex && GHP_failed_en;
-	assign GHP_bgeu_rollback_en_ex = PL_flush && bgeu_ex && GHP_failed_en;
-
-
-	assign LHP_beq_rollback_en_id  = PL_flush && beq_id;
-	assign LHP_bne_rollback_en_id  = PL_flush && bne_id;
-	assign LHP_blt_rollback_en_id  = PL_flush && blt_id;
-	assign LHP_bge_rollback_en_id  = PL_flush && bge_id;
-	assign LHP_bltu_rollback_en_id = PL_flush && bltu_id;
-	assign LHP_bgeu_rollback_en_id = PL_flush && bgeu_id;
-
-	assign LHP_beq_rollback_en_ex  = PL_flush && beq_ex  && (B_type_prediction_result_branch_failed == LHP_beq_count_ex[JUMP_STATUS_COUNTER_CAPACITY_UB]);
-	assign LHP_bne_rollback_en_ex  = PL_flush && bne_ex  && (B_type_prediction_result_branch_failed == LHP_bne_count_ex[JUMP_STATUS_COUNTER_CAPACITY_UB]);
-	assign LHP_blt_rollback_en_ex  = PL_flush && blt_ex  && (B_type_prediction_result_branch_failed == LHP_blt_count_ex[JUMP_STATUS_COUNTER_CAPACITY_UB]);
-	assign LHP_bge_rollback_en_ex  = PL_flush && bge_ex  && (B_type_prediction_result_branch_failed == LHP_bge_count_ex[JUMP_STATUS_COUNTER_CAPACITY_UB]);
-	assign LHP_bltu_rollback_en_ex = PL_flush && bltu_ex && (B_type_prediction_result_branch_failed == LHP_bltu_count_ex[JUMP_STATUS_COUNTER_CAPACITY_UB]);
-	assign LHP_bgeu_rollback_en_ex = PL_flush && bgeu_ex && (B_type_prediction_result_branch_failed == LHP_bgeu_count_ex[JUMP_STATUS_COUNTER_CAPACITY_UB]);
 endmodule
 
 

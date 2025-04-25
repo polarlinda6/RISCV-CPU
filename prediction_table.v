@@ -25,12 +25,6 @@ module prediction_table #(
   reg [JUMP_STATUS_COUNTER_WIDTH - 1:0]regs[TABLE_DEPTH - 1:0];  
   assign RD_count = regs[RD_index];
 
-
-	integer i;
-  initial begin
-    for (i = 0; i < JUMP_STATUS_COUNTER_WIDTH; i = i + 1) regs[i]=`zeroword;  
-  end
-
   always @(posedge clk)
   begin
     if(rst_n) 

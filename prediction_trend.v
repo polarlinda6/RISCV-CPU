@@ -1,3 +1,5 @@
+`include "define.v"
+
 `define high_confidence (count == 3'b001) || (count == 3'b010) || (count == 3'b011)
 `define upward_trend    (count == 3'b000) || (count == 3'b010)
 `define downward_trend  (count == 3'b001) || (count == 3'b111) || (count == 3'b101)
@@ -17,7 +19,7 @@ endmodule
 
 module trend_counter_operator(
   input  [2:0]count,
-  input  true_up_false_down, 
+  input  true_down_false_up, 
   output [2:0]new_count
 );
 
@@ -31,10 +33,12 @@ module trend_counter_operator(
   assign downward_trend_signal = `downward_trend;
   
   wire [2:0]B;
-  mux3 B_inst(
-    .data1(true_up_false_down ? P_TWO : N_THREE),
-    .data2(true_up_false_down ? P_ONE : N_TWO),
-    .data3(true_up_false_down ? P_TWO : N_TWO),
+  mux3 #(
+    .WIDTH(3)
+  ) B_inst(
+    .data1(true_down_false_up ? N_THREE : P_TWO),
+    .data2(true_down_false_up ? N_TWO   : P_ONE),
+    .data3(true_down_false_up ? N_TWO   : P_TWO),
     .signal({upward_trend_signal, downward_trend_signal}),
     .dout(B)
   );
@@ -45,4 +49,37 @@ module trend_counter_operator(
     .B(B),
     .result(new_count)
   );
+endmodule 
+
+
+module stat_count_operator #(
+  parameter STAT_COUNTER_WIDTH = 5
+)(
+  input  [STAT_COUNTER_WIDTH - 1:0]A, 
+  input  [2:0]B,
+  output OF,
+  output [STAT_COUNTER_WIDTH - 1:0]result
+);
+  
+
+  localparam SUB = STAT_COUNTER_WIDTH - 2;
+  localparam STAT_COUNTER_WIDTH_UB = STAT_COUNTER_WIDTH - 1;
+
+  wire NO;
+  wire [STAT_COUNTER_WIDTH:0]result_inner;
+
+  overflow_adder #(
+    .WIDTH(STAT_COUNTER_WIDTH + 1)
+  ) adder_inst(
+    .A({`zero, A}),
+    .B({{SUB{B[2]}}, B}),
+
+    .PO(OF),
+    .NO(NO),
+    .result(result_inner)
+  );
+
+
+  localparam [STAT_COUNTER_WIDTH_UB:0]ZERO = {STAT_COUNTER_WIDTH{1'b0}};
+  assign result = NO ? ZERO : result_inner[STAT_COUNTER_WIDTH_UB:0];
 endmodule 

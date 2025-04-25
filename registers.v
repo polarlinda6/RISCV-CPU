@@ -19,18 +19,13 @@ module registers(
 	output [31:0]prediction_Rs2_data
     );
 	
-	reg [31:0] regs[31:1]; //x0 is a dedicated zero register.
-	                       //Not implemented to save resources.
-	
-	integer i;
+	reg [31:0]regs[31:1]; //x0 is a dedicated zero register.
+	                      //Not implemented to save resources.
+
 	always@(negedge clk)
 	begin
-		if(!rst_n)
-			for (i = 1; i < 32; i = i + 1) regs[i] <= `zeroword;
-		else if(RegWrite)
-			regs[Rd] <= Wr_data;
+		if(rst_n && RegWrite) regs[Rd] <= Wr_data;
 	end
-
 
 	assign Rs1_data=(Rs1==`zeroreg) ? `zeroword : regs[Rs1];
 	assign Rs2_data=(Rs2==`zeroreg) ? `zeroword : regs[Rs2];

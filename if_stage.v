@@ -268,7 +268,7 @@ module if_stage(
         .bltu_id(bltu_id_o),
         .bgeu_id(bgeu_id_o),
         .pc_id(pc_if_id_o),
-        .B_type_prediction_result_id(B_type_prediction_result_id_o),
+        .B_type_prediction_result_id(B_type_prediction_result_if_id_o),
 
         .B_type_branch_failed(B_type_branch_failed),
         .beq_branch_failed(beq_branch_failed),

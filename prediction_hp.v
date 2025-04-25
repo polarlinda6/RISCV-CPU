@@ -8,6 +8,7 @@ module history_predictor #(
   input  PL_stall,
 
   input  corrected_result,
+  input  prediction_result_branch_failed,
 
   input  corrected_en,
   input  rollback_en_id,
@@ -58,54 +59,20 @@ module history_predictor #(
           count_reg_ex <= count_reg_id;
         end
 
-        if (rollback_en_id || rollback_en_ex)
-          history_reg <= history_reg >> (rollback_en_id && rollback_en_ex ? 2 : 1);
+        if (rollback_en_ex)
+          history_reg <= history_reg >> (rollback_en_id ? 2 : 1);        
         else if (corrected_en)
-          history_reg <= (history_reg << 1) | corrected_result;
+          history_reg <= (history_reg << 1) | corrected_result;  
       end 
   end
 
 ////////////////////////////////////////////////////////////////////////////////////
 
-
-  wire [INDEX_WIDTH_UB:0]index, index_id, index_ex;  
-  localparam INDEX_PC_TOP_POSITION = INDEX_PC_WIDTH + 1;
-  assign index    = {pc[INDEX_PC_TOP_POSITION: 2], history_reg[INDEX_HR_WIDTH - 1: 0]};
-  assign index_id = {pc_id[INDEX_PC_TOP_POSITION: 2], history_reg[INDEX_HR_WIDTH: 1]};
-  assign index_ex = {pc_ex[INDEX_PC_TOP_POSITION: 2], history_reg[INDEX_HR_WIDTH + 1: 2]};
-
-  wire [JUMP_STATUS_COUNTER_WIDTH_UB:0]count_offset;
-  assign count_offset = corrected_en ? (corrected_result ? N_ONE : P_ONE) : ZERO;
-
-  wire [JUMP_STATUS_COUNTER_WIDTH_UB:0]counter_offset_ex;
-  assign count_offset_ex = HP_count_ex[JUMP_STATUS_COUNTER_CAPACITY_UB] ? P_ONE : N_ONE;
-  
-  wire [JUMP_STATUS_COUNTER_WIDTH_UB:0]A, B;
-  assign A = rollback_en_ex ? HP_count_ex     : HP_count;
-  assign B = rollback_en_ex ? count_offset_ex : count_offset;
-
-  wire [JUMP_STATUS_COUNTER_WIDTH_UB:0]result;
-  no_overflow_adder #(
-    .WIDTH(JUMP_STATUS_COUNTER_WIDTH)
-  ) adder_inst(
-    .A(A),
-    .B(B),
-    .result(result)
-  );
-
-
-  wire [INDEX_WIDTH_UB:0]WR_index2;
-  assign WR_index2 = rollback_en_ex ? index_ex : index;
-
-
   wire index_conflict;
-  parallel_unsig_comparator_eq #(
-    .WIDTH(INDEX_WIDTH)
-  ) eq_inst(
-    .data1(index_id),
-    .data2(index_ex),
-    .compare_result(index_conflict)
-  );
+  wire [INDEX_WIDTH_UB:0]index;
+  wire [INDEX_WIDTH_UB:0]index_id;
+  wire [INDEX_WIDTH_UB:0]WR_index2;
+  wire [JUMP_STATUS_COUNTER_WIDTH_UB:0]WR_data2;
 
   prediction_table #(
     .INDEX_WIDTH(INDEX_WIDTH), 
@@ -123,6 +90,45 @@ module history_predictor #(
 
     .WR_en2(rollback_en_ex || corrected_en),
     .WR_index2(WR_index2),
-    .WR_count2(result)
+    .WR_count2(WR_data2)
+  );
+
+/////////////////////////////////////////////////////////////////////////////////////
+
+  wire [INDEX_WIDTH_UB:0]index_ex;
+
+  localparam INDEX_PC_TOP_POSITION = INDEX_PC_WIDTH + 1;
+  assign index    = {pc[INDEX_PC_TOP_POSITION: 2], history_reg[INDEX_HR_WIDTH - 1: 0]};
+  assign index_id = {pc_id[INDEX_PC_TOP_POSITION: 2], history_reg[INDEX_HR_WIDTH: 1]};
+  assign index_ex = {pc_ex[INDEX_PC_TOP_POSITION: 2], history_reg[INDEX_HR_WIDTH + 1: 2]};
+
+  assign WR_index2 = rollback_en_ex ? index_ex : index;
+
+  parallel_unsig_comparator_eq #(
+    .WIDTH(INDEX_WIDTH)
+  ) eq_inst(
+    .data1(index_id),
+    .data2(index_ex),
+    .compare_result(index_conflict)
+  );
+
+//////////////////////////////////////////////////////////////////////////////////////
+
+  wire [JUMP_STATUS_COUNTER_WIDTH_UB:0]count_offset;
+  assign count_offset = corrected_result ? N_ONE : P_ONE;
+
+  wire [JUMP_STATUS_COUNTER_WIDTH_UB:0]counter_offset_ex;
+  assign count_offset_ex = prediction_result_branch_failed ? P_ONE : N_ONE;
+  
+  wire [JUMP_STATUS_COUNTER_WIDTH_UB:0]A, B;
+  assign A = rollback_en_ex ? HP_count_ex     : HP_count;
+  assign B = rollback_en_ex ? count_offset_ex : count_offset;
+
+  no_overflow_adder #(
+    .WIDTH(JUMP_STATUS_COUNTER_WIDTH)
+  ) adder_inst(
+    .A(A),
+    .B(B),
+    .result(WR_data2)
   );
 endmodule

@@ -72,17 +72,17 @@ module parallel_unsig_comparator_lt #(
   input  [WIDTH - 1:0]data2,
   output compare_result
 );
-  
+
   localparam PARALLEL_DEGREE = 4;
   localparam PARALLEL_DEGREE_UB = PARALLEL_DEGREE - 1;
 
-  localparam CORRECTED_WIDTH = PARALLEL_DEGREE > WIDTH ? PARALLEL_DEGREE : WIDTH;
-  localparam CORRECTED_WIDTH_UB = CORRECTED_WIDTH - 1;
-
-  localparam BASE_COMPARATOR_WIDTH = CORRECTED_WIDTH / PARALLEL_DEGREE + (WIDTH % PARALLEL_DEGREE ? 1 : 0);
+  localparam BASE_COMPARATOR_WIDTH = WIDTH / PARALLEL_DEGREE + (WIDTH % PARALLEL_DEGREE ? 1 : 0);  
   localparam BASE_COMPARATOR_WIDTH_UB = BASE_COMPARATOR_WIDTH - 1;   
 
-  localparam SUB = WIDTH >= PARALLEL_DEGREE ? 0 : PARALLEL_DEGREE - WIDTH;
+  localparam CORRECTED_WIDTH = PARALLEL_DEGREE * BASE_COMPARATOR_WIDTH;
+  localparam CORRECTED_WIDTH_UB = CORRECTED_WIDTH - 1;
+
+  localparam SUB = CORRECTED_WIDTH - WIDTH;
   wire [CORRECTED_WIDTH_UB:0]corrected_data1, corrected_data2;
   assign corrected_data1 = {{SUB{1'b0}}, data1};
   assign corrected_data2 = {{SUB{1'B0}}, data2};
@@ -94,9 +94,7 @@ module parallel_unsig_comparator_lt #(
     for(i = 0; i < PARALLEL_DEGREE; i = i + 1) 
     begin
       localparam lb = i * BASE_COMPARATOR_WIDTH;
-      
-      localparam value = lb + BASE_COMPARATOR_WIDTH_UB;
-      localparam ub = value > CORRECTED_WIDTH_UB ? CORRECTED_WIDTH_UB : value;
+      localparam ub = lb + BASE_COMPARATOR_WIDTH_UB;
 
       assign result[i] = corrected_data1[ub:lb] < corrected_data2[ub:lb];
     end
