@@ -3,7 +3,7 @@ module riscv_top(
 	input rst_n
     );
 
-	wire [7:0]rom_addr;
+	wire [31:0]rom_addr;
 	wire [31:0]ram_addr;
 	wire [31:0]instr;
 	wire [31:0]load_data;

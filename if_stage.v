@@ -3,7 +3,7 @@
 module if_stage(
 	input  clk,
 	input  rst_n,
-	output [7:0]rom_addr,
+	output [31:0]rom_addr,
 
 	input  [31:0]instr_if_i,
     output [31:0]instr_if_o,
@@ -69,7 +69,7 @@ module if_stage(
     wire [31:0]pc;
     wire PL_stall_inner;
 
-	assign rom_addr = pc[9:2];
+	assign rom_addr = pc;
     assign instr_if_o = PL_stall_inner ? `nop : instr_if_i;
 
 ////////////////////////////////////////////////////////////////////////

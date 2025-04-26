@@ -3,36 +3,36 @@ module no_overflow_adder #(
 )(
   input  [WIDTH - 1:0]A,
   input  [WIDTH - 1:0]B,
+
+  output PO,
+  output NO,
   output [WIDTH - 1:0]result
 );
 
   localparam UB = WIDTH - 1;
-  localparam [UB:1]FULL_1 = {UB{1'b1}};
-  localparam [UB:1]FULL_0 = {UB{1'b0}};
-  localparam [UB:0]P_MAX  = {1'b0, FULL_1};
-  localparam [UB:0]N_MAX  = {1'b1, FULL_0};
+  localparam [UB:0]P_MAX  = {1'b0, {UB{1'b1}}};
+  localparam [UB:0]N_MAX  = {1'b1, {UB{1'b0}}};
 
+  wire [UB:0]result_inner;
+  assign result_inner = A + B; 
 
-  wire PO, NO;
-  wire [UB:0]add_result;
+  wire Asig, Bsig, Rsig;
+  assign Asig = A[UB];
+  assign Bsig = B[UB];
+  assign Rsig = result_inner[UB];
 
-  overflow_adder #(
-    .WIDTH(WIDTH)
-  ) overflow_adder_inst (
-    .A(A),
-    .B(B),
-    .PO(PO),
-    .NO(NO),
-    .result(add_result)
-  );
+  assign PO = !Asig && !Bsig && Rsig;
+  assign NO = Asig && Bsig && !Rsig;
   
   assign result = PO ? P_MAX : 
-                  NO ? N_MAX : add_result;
+                  NO ? N_MAX : result_inner;
 endmodule
 
 
-module overflow_adder #(
-  parameter WIDTH = 4
+module no_overflow_unsig_adder #(
+  parameter WIDTH = 4,
+  parameter ALLOW_PO = 1,
+  parameter ALLOW_NO = 1
 )(
   input  [WIDTH - 1:0]A,
   input  [WIDTH - 1:0]B,
@@ -43,14 +43,27 @@ module overflow_adder #(
 );
   
   localparam UB = WIDTH - 1;
+  localparam P_MAX = {WIDTH{1'b1}};
+  localparam ZERO  = {WIDTH{1'b0}};
 
-  assign result = A + B; 
 
-  wire Asig, Bsig, Rsig;
-  assign Asig = A[UB];
-  assign Bsig = B[UB];
-  assign Rsig = result[UB];
+  wire [UB:0]result_inner;
+  assign result_inner = A + B; 
 
-  assign PO = !Asig && !Bsig && Rsig;
-  assign NO = Asig && Bsig && !Rsig;
+  parallel_unsig_comparator_lt #(
+    .WIDTH(WIDTH)
+  ) comparator_inst(
+    .data1(result_inner),
+    .data2(A),
+    .compare_result(ltu)
+  );
+
+  assign PO = !B[UB] && ltu;
+  assign NO = B[UB] && !ltu;
+
+
+  if(ALLOW_PO && ALLOW_NO) assign result = result_inner;
+  if(ALLOW_PO && !ALLOW_NO) assign result = NO ? ZERO : result_inner;
+  if(!ALLOW_PO && ALLOW_NO) assign result = PO ? P_MAX : result_inner;
+  if(!ALLOW_PO && !ALLOW_NO) assign result = PO ? P_MAX : (NO ? ZERO : result_inner);
 endmodule

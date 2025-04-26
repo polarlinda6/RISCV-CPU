@@ -82,56 +82,56 @@ module meta_predictor #(
   wire [2:0]addr, addr_id, addr_ex;
   wire [JUMP_STATUS_COUNTER_WIDTH_UB:0]LHP_count, LHP_count_id, LHP_count_ex;
 
+  wire [2:0]SP_trend_count, LHP_trend_count, GHP_trend_count;  
+  wire [2:0]SP_trend_count_id, LHP_trend_count_id, GHP_trend_count_id;
+  wire [2:0]SP_trend_count_ex, LHP_trend_count_ex, GHP_trend_count_ex;
+  wire [STAT_COUNTER_WIDTH_UB:0]SP_stat_count, LHP_stat_count, GHP_stat_count;
+  wire [STAT_COUNTER_WIDTH_UB:0]SP_stat_count_id, LHP_stat_count_id, GHP_stat_count_id;
+  wire [STAT_COUNTER_WIDTH_UB:0]SP_stat_count_ex, LHP_stat_count_ex, GHP_stat_count_ex;
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  wire [3 + STAT_COUNTER_WIDTH_UB:0]SP_trend_stat_count, LHP_trend_stat_count, GHP_trend_stat_count;
-  assign SP_trend_stat_count  = SP_trend_stat_counter_regs[addr][SP_prediction_result];
-  assign LHP_trend_stat_count = LHP_trend_stat_counter_regs[addr][LHP_count];
-  assign GHP_trend_stat_count = GHP_trend_stat_counter_regs[addr][GHP_count];
+  localparam SP_TREND_STAT_COUNTER_INIT_VALUE = {3'b000, SP_STAT_COUNTER_INIT_VALUE};
+  localparam LHP_GHP_TREND_STAT_COUNTER_INIT_VALUE = {3'b000, {STAT_COUNTER_WIDTH{1'b0}}};
 
-  wire [STAT_COUNTER_WIDTH_UB:0]SP_stat_count, LHP_stat_count, GHP_stat_count;
-  assign SP_stat_count  = SP_trend_stat_count [STAT_COUNTER_WIDTH_UB:0];
-  assign LHP_stat_count = LHP_trend_stat_count[STAT_COUNTER_WIDTH_UB:0];
-  assign GHP_stat_count = GHP_trend_stat_count[STAT_COUNTER_WIDTH_UB:0];
+   always @(posedge clk) 
+  begin 
+    if(!rst_n)
+    begin  
+      SP_trend_stat_counter_regs[5][1] <= SP_TREND_STAT_COUNTER_INIT_VALUE;
+      SP_trend_stat_counter_regs[5][0] <= SP_TREND_STAT_COUNTER_INIT_VALUE;
+      SP_trend_stat_counter_regs[4][1] <= SP_TREND_STAT_COUNTER_INIT_VALUE;
+      SP_trend_stat_counter_regs[4][0] <= SP_TREND_STAT_COUNTER_INIT_VALUE;
+      SP_trend_stat_counter_regs[3][1] <= SP_TREND_STAT_COUNTER_INIT_VALUE;
+      SP_trend_stat_counter_regs[3][0] <= SP_TREND_STAT_COUNTER_INIT_VALUE;        
+      SP_trend_stat_counter_regs[2][1] <= SP_TREND_STAT_COUNTER_INIT_VALUE;
+      SP_trend_stat_counter_regs[2][0] <= SP_TREND_STAT_COUNTER_INIT_VALUE;
+      SP_trend_stat_counter_regs[1][1] <= SP_TREND_STAT_COUNTER_INIT_VALUE;
+      SP_trend_stat_counter_regs[1][0] <= SP_TREND_STAT_COUNTER_INIT_VALUE;
+      SP_trend_stat_counter_regs[0][1] <= SP_TREND_STAT_COUNTER_INIT_VALUE;
+      SP_trend_stat_counter_regs[0][0] <= SP_TREND_STAT_COUNTER_INIT_VALUE;
+    end
+  end 
+  
+  generate
+    genvar i, j;
+    for (i = 0; i < 6; i = i + 1)
+    begin
+      for(j = 0; j < JUMP_STATUS_COUNTER_CAPACITY; j = j + 1) 
+      begin
+        always @(posedge clk)
+        begin
+          if(!rst_n)
+          begin
+            LHP_trend_stat_counter_regs[i][j] <= LHP_GHP_TREND_STAT_COUNTER_INIT_VALUE;
+            GHP_trend_stat_counter_regs[i][j] <= LHP_GHP_TREND_STAT_COUNTER_INIT_VALUE;
+          end
+        end
+      end
+    end
+  endgenerate
 
-  wire [2:0]SP_trend_count, LHP_trend_count, GHP_trend_count;
-  assign SP_trend_count  = SP_trend_stat_count [2 + STAT_COUNTER_WIDTH:STAT_COUNTER_WIDTH];
-  assign LHP_trend_count = LHP_trend_stat_count[2 + STAT_COUNTER_WIDTH:STAT_COUNTER_WIDTH];
-  assign GHP_trend_count = GHP_trend_stat_count[2 + STAT_COUNTER_WIDTH:STAT_COUNTER_WIDTH];
-
-
-  wire [3 + STAT_COUNTER_WIDTH_UB:0]SP_trend_stat_count_id, LHP_trend_stat_count_id, GHP_trend_stat_count_id;
-  assign SP_trend_stat_count_id  = SP_trend_stat_counter_regs[addr][SP_prediction_result_id];
-  assign LHP_trend_stat_count_id = LHP_trend_stat_counter_regs[addr][LHP_count_id];
-  assign GHP_trend_stat_count_id = GHP_trend_stat_counter_regs[addr][GHP_count_id];
-
-  wire [STAT_COUNTER_WIDTH_UB:0]SP_stat_count_id, LHP_stat_count_id, GHP_stat_count_id;
-  assign SP_stat_count_id  = SP_trend_stat_count_id [STAT_COUNTER_WIDTH_UB:0];
-  assign LHP_stat_count_id = LHP_trend_stat_count_id[STAT_COUNTER_WIDTH_UB:0];
-  assign GHP_stat_count_id = GHP_trend_stat_count_id[STAT_COUNTER_WIDTH_UB:0];
-
-  wire [2:0]SP_trend_count_id, LHP_trend_count_id, GHP_trend_count_id;
-  assign SP_trend_count_id  = SP_trend_stat_count_id [2 + STAT_COUNTER_WIDTH:STAT_COUNTER_WIDTH];
-  assign LHP_trend_count_id = LHP_trend_stat_count_id[2 + STAT_COUNTER_WIDTH:STAT_COUNTER_WIDTH];
-  assign GHP_trend_count_id = GHP_trend_stat_count_id[2 + STAT_COUNTER_WIDTH:STAT_COUNTER_WIDTH];
-
-
-  wire [3 + STAT_COUNTER_WIDTH_UB:0]SP_trend_stat_count_ex, LHP_trend_stat_count_ex, GHP_trend_stat_count_ex;
-  assign SP_trend_stat_count_ex  = SP_trend_stat_counter_regs[addr][SP_prediction_result_ex];
-  assign LHP_trend_stat_count_ex = LHP_trend_stat_counter_regs[addr][LHP_count_ex];
-  assign GHP_trend_stat_count_ex = GHP_trend_stat_counter_regs[addr][GHP_count_ex];
-
-  wire [STAT_COUNTER_WIDTH_UB:0]SP_stat_count_ex, LHP_stat_count_ex, GHP_stat_count_ex;
-  assign SP_stat_count_ex  = SP_trend_stat_count_ex [STAT_COUNTER_WIDTH_UB:0];
-  assign LHP_stat_count_ex = LHP_trend_stat_count_ex[STAT_COUNTER_WIDTH_UB:0];
-  assign GHP_stat_count_ex = GHP_trend_stat_count_ex[STAT_COUNTER_WIDTH_UB:0];
-
-  wire [2:0]SP_trend_count_ex, LHP_trend_count_ex, GHP_trend_count_ex;
-  assign SP_trend_count_ex  = SP_trend_stat_count_ex [2 + STAT_COUNTER_WIDTH:STAT_COUNTER_WIDTH];
-  assign LHP_trend_count_ex = LHP_trend_stat_count_ex[2 + STAT_COUNTER_WIDTH:STAT_COUNTER_WIDTH];
-  assign GHP_trend_count_ex = GHP_trend_stat_count_ex[2 + STAT_COUNTER_WIDTH:STAT_COUNTER_WIDTH];
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////
 
   wire clear_en1, clear_en2;
   wire WR_SP_en1, WR_SP_en2, WR_LHP_en1, WR_LHP_en2, WR_GHP_en1, WR_GHP_en2;
@@ -152,76 +152,10 @@ module meta_predictor #(
 
   localparam STAT_COUNTER_CLEAR_BITS_UB = STAT_COUNTER_CLEAR_BITS - 1;
   localparam [STAT_COUNTER_CLEAR_BITS_UB:0]ZERO = {STAT_COUNTER_CLEAR_BITS{1'b0}};
-  localparam SP_TREND_STAT_COUNTER_INIT_VALUE = {3'b000, SP_STAT_COUNTER_INIT_VALUE};
-  localparam LHP_GHP_TREND_STAT_COUNTER_INIT_VALUE = {3'b000, {STAT_COUNTER_WIDTH{1'b0}}};
+
   always @(posedge clk)
   begin
-    if(!rst_n)
-    begin  
-      SP_trend_stat_counter_regs[5][1] <= SP_TREND_STAT_COUNTER_INIT_VALUE;
-      SP_trend_stat_counter_regs[5][0] <= SP_TREND_STAT_COUNTER_INIT_VALUE;
-      SP_trend_stat_counter_regs[4][1] <= SP_TREND_STAT_COUNTER_INIT_VALUE;
-      SP_trend_stat_counter_regs[4][0] <= SP_TREND_STAT_COUNTER_INIT_VALUE;
-      SP_trend_stat_counter_regs[3][1] <= SP_TREND_STAT_COUNTER_INIT_VALUE;
-      SP_trend_stat_counter_regs[3][0] <= SP_TREND_STAT_COUNTER_INIT_VALUE;        
-      SP_trend_stat_counter_regs[2][1] <= SP_TREND_STAT_COUNTER_INIT_VALUE;
-      SP_trend_stat_counter_regs[2][0] <= SP_TREND_STAT_COUNTER_INIT_VALUE;
-      SP_trend_stat_counter_regs[1][1] <= SP_TREND_STAT_COUNTER_INIT_VALUE;
-      SP_trend_stat_counter_regs[1][0] <= SP_TREND_STAT_COUNTER_INIT_VALUE;
-      SP_trend_stat_counter_regs[0][1] <= SP_TREND_STAT_COUNTER_INIT_VALUE;
-      SP_trend_stat_counter_regs[0][0] <= SP_TREND_STAT_COUNTER_INIT_VALUE;
-
-      LHP_trend_stat_counter_regs[5][3] <= LHP_GHP_TREND_STAT_COUNTER_INIT_VALUE;
-      LHP_trend_stat_counter_regs[5][2] <= LHP_GHP_TREND_STAT_COUNTER_INIT_VALUE;
-      LHP_trend_stat_counter_regs[5][1] <= LHP_GHP_TREND_STAT_COUNTER_INIT_VALUE;
-      LHP_trend_stat_counter_regs[5][0] <= LHP_GHP_TREND_STAT_COUNTER_INIT_VALUE;
-      LHP_trend_stat_counter_regs[4][3] <= LHP_GHP_TREND_STAT_COUNTER_INIT_VALUE;
-      LHP_trend_stat_counter_regs[4][2] <= LHP_GHP_TREND_STAT_COUNTER_INIT_VALUE;
-      LHP_trend_stat_counter_regs[4][1] <= LHP_GHP_TREND_STAT_COUNTER_INIT_VALUE;
-      LHP_trend_stat_counter_regs[4][0] <= LHP_GHP_TREND_STAT_COUNTER_INIT_VALUE;
-      LHP_trend_stat_counter_regs[3][3] <= LHP_GHP_TREND_STAT_COUNTER_INIT_VALUE;
-      LHP_trend_stat_counter_regs[3][2] <= LHP_GHP_TREND_STAT_COUNTER_INIT_VALUE;
-      LHP_trend_stat_counter_regs[3][1] <= LHP_GHP_TREND_STAT_COUNTER_INIT_VALUE;
-      LHP_trend_stat_counter_regs[3][0] <= LHP_GHP_TREND_STAT_COUNTER_INIT_VALUE;
-      LHP_trend_stat_counter_regs[2][3] <= LHP_GHP_TREND_STAT_COUNTER_INIT_VALUE;
-      LHP_trend_stat_counter_regs[2][2] <= LHP_GHP_TREND_STAT_COUNTER_INIT_VALUE;
-      LHP_trend_stat_counter_regs[2][1] <= LHP_GHP_TREND_STAT_COUNTER_INIT_VALUE;
-      LHP_trend_stat_counter_regs[2][0] <= LHP_GHP_TREND_STAT_COUNTER_INIT_VALUE;
-      LHP_trend_stat_counter_regs[1][3] <= LHP_GHP_TREND_STAT_COUNTER_INIT_VALUE;
-      LHP_trend_stat_counter_regs[1][2] <= LHP_GHP_TREND_STAT_COUNTER_INIT_VALUE;
-      LHP_trend_stat_counter_regs[1][1] <= LHP_GHP_TREND_STAT_COUNTER_INIT_VALUE;
-      LHP_trend_stat_counter_regs[1][0] <= LHP_GHP_TREND_STAT_COUNTER_INIT_VALUE;
-      LHP_trend_stat_counter_regs[0][3] <= LHP_GHP_TREND_STAT_COUNTER_INIT_VALUE;
-      LHP_trend_stat_counter_regs[0][2] <= LHP_GHP_TREND_STAT_COUNTER_INIT_VALUE;
-      LHP_trend_stat_counter_regs[0][1] <= LHP_GHP_TREND_STAT_COUNTER_INIT_VALUE;
-      LHP_trend_stat_counter_regs[0][0] <= LHP_GHP_TREND_STAT_COUNTER_INIT_VALUE;
-
-      GHP_trend_stat_counter_regs[5][3] <= LHP_GHP_TREND_STAT_COUNTER_INIT_VALUE;
-      GHP_trend_stat_counter_regs[5][2] <= LHP_GHP_TREND_STAT_COUNTER_INIT_VALUE;
-      GHP_trend_stat_counter_regs[5][1] <= LHP_GHP_TREND_STAT_COUNTER_INIT_VALUE;
-      GHP_trend_stat_counter_regs[5][0] <= LHP_GHP_TREND_STAT_COUNTER_INIT_VALUE;
-      GHP_trend_stat_counter_regs[4][3] <= LHP_GHP_TREND_STAT_COUNTER_INIT_VALUE;
-      GHP_trend_stat_counter_regs[4][2] <= LHP_GHP_TREND_STAT_COUNTER_INIT_VALUE;
-      GHP_trend_stat_counter_regs[4][1] <= LHP_GHP_TREND_STAT_COUNTER_INIT_VALUE;
-      GHP_trend_stat_counter_regs[4][0] <= LHP_GHP_TREND_STAT_COUNTER_INIT_VALUE;
-      GHP_trend_stat_counter_regs[3][3] <= LHP_GHP_TREND_STAT_COUNTER_INIT_VALUE;
-      GHP_trend_stat_counter_regs[3][2] <= LHP_GHP_TREND_STAT_COUNTER_INIT_VALUE;
-      GHP_trend_stat_counter_regs[3][1] <= LHP_GHP_TREND_STAT_COUNTER_INIT_VALUE;
-      GHP_trend_stat_counter_regs[3][0] <= LHP_GHP_TREND_STAT_COUNTER_INIT_VALUE;
-      GHP_trend_stat_counter_regs[2][3] <= LHP_GHP_TREND_STAT_COUNTER_INIT_VALUE;
-      GHP_trend_stat_counter_regs[2][2] <= LHP_GHP_TREND_STAT_COUNTER_INIT_VALUE;
-      GHP_trend_stat_counter_regs[2][1] <= LHP_GHP_TREND_STAT_COUNTER_INIT_VALUE;
-      GHP_trend_stat_counter_regs[2][0] <= LHP_GHP_TREND_STAT_COUNTER_INIT_VALUE;
-      GHP_trend_stat_counter_regs[1][3] <= LHP_GHP_TREND_STAT_COUNTER_INIT_VALUE;
-      GHP_trend_stat_counter_regs[1][2] <= LHP_GHP_TREND_STAT_COUNTER_INIT_VALUE;
-      GHP_trend_stat_counter_regs[1][1] <= LHP_GHP_TREND_STAT_COUNTER_INIT_VALUE;
-      GHP_trend_stat_counter_regs[1][0] <= LHP_GHP_TREND_STAT_COUNTER_INIT_VALUE;
-      GHP_trend_stat_counter_regs[0][3] <= LHP_GHP_TREND_STAT_COUNTER_INIT_VALUE;
-      GHP_trend_stat_counter_regs[0][2] <= LHP_GHP_TREND_STAT_COUNTER_INIT_VALUE;
-      GHP_trend_stat_counter_regs[0][1] <= LHP_GHP_TREND_STAT_COUNTER_INIT_VALUE;
-      GHP_trend_stat_counter_regs[0][0] <= LHP_GHP_TREND_STAT_COUNTER_INIT_VALUE;
-    end
-    else 
+    if(rst_n)
     begin 
       if(clear_en1)
       begin
@@ -235,13 +169,14 @@ module meta_predictor #(
         GHP_trend_stat_counter_regs[WR_addr1][2][STAT_COUNTER_CLEAR_BITS_UB:0] <= ZERO;
         GHP_trend_stat_counter_regs[WR_addr1][1][STAT_COUNTER_CLEAR_BITS_UB:0] <= ZERO;
         GHP_trend_stat_counter_regs[WR_addr1][0][STAT_COUNTER_CLEAR_BITS_UB:0] <= ZERO;
-
+      end
+      else
+      begin
         if(WR_SP_en1)  SP_trend_stat_counter_regs[WR_addr1][WR_SP_index1][STAT_COUNTER_WIDTH_UB:0]   <= WR_SP_stat_count1;
         if(WR_LHP_en1) LHP_trend_stat_counter_regs[WR_addr1][WR_LHP_index1][STAT_COUNTER_WIDTH_UB:0] <= WR_LHP_stat_count1;
         if(WR_GHP_en1) GHP_trend_stat_counter_regs[WR_addr1][WR_GHP_index1][STAT_COUNTER_WIDTH_UB:0] <= WR_GHP_stat_count1;
       end
 
- 
       if(clear_en2)
       begin
         SP_trend_stat_counter_regs[WR_addr2][1][STAT_COUNTER_CLEAR_BITS_UB:0]  <= ZERO;
@@ -254,18 +189,20 @@ module meta_predictor #(
         GHP_trend_stat_counter_regs[WR_addr2][2][STAT_COUNTER_CLEAR_BITS_UB:0] <= ZERO;
         GHP_trend_stat_counter_regs[WR_addr2][1][STAT_COUNTER_CLEAR_BITS_UB:0] <= ZERO;
         GHP_trend_stat_counter_regs[WR_addr2][0][STAT_COUNTER_CLEAR_BITS_UB:0] <= ZERO;
-
+      end
+      else 
+      begin
         if(WR_SP_en2)  SP_trend_stat_counter_regs[WR_addr2][WR_SP_index2][STAT_COUNTER_WIDTH_UB:0]   <= WR_SP_stat_count2;
         if(WR_LHP_en2) LHP_trend_stat_counter_regs[WR_addr2][WR_LHP_index2][STAT_COUNTER_WIDTH_UB:0] <= WR_LHP_stat_count2;
         if(WR_GHP_en2) GHP_trend_stat_counter_regs[WR_addr2][WR_GHP_index2][STAT_COUNTER_WIDTH_UB:0] <= WR_GHP_stat_count2;
       end
 
-        if(WR_SP_en1)  SP_trend_stat_counter_regs[WR_addr1][WR_SP_index1][2 + STAT_COUNTER_WIDTH:STAT_COUNTER_WIDTH]   <= WR_SP_trend_count1;
-        if(WR_LHP_en1) LHP_trend_stat_counter_regs[WR_addr1][WR_LHP_index1][2 + STAT_COUNTER_WIDTH:STAT_COUNTER_WIDTH] <= WR_LHP_trend_count1;
-        if(WR_GHP_en1) GHP_trend_stat_counter_regs[WR_addr1][WR_GHP_index1][2 + STAT_COUNTER_WIDTH:STAT_COUNTER_WIDTH] <= WR_GHP_trend_count1;
-        if(WR_SP_en2)  SP_trend_stat_counter_regs[WR_addr2][WR_SP_index2][2 + STAT_COUNTER_WIDTH:STAT_COUNTER_WIDTH]   <= WR_SP_trend_count2;
-        if(WR_LHP_en2) LHP_trend_stat_counter_regs[WR_addr2][WR_LHP_index2][2 + STAT_COUNTER_WIDTH:STAT_COUNTER_WIDTH] <= WR_LHP_trend_count2;
-        if(WR_GHP_en2) GHP_trend_stat_counter_regs[WR_addr2][WR_GHP_index2][2 + STAT_COUNTER_WIDTH:STAT_COUNTER_WIDTH] <= WR_GHP_trend_count2;
+      if(WR_SP_en1)  SP_trend_stat_counter_regs[WR_addr1][WR_SP_index1][2 + STAT_COUNTER_WIDTH:STAT_COUNTER_WIDTH]   <= WR_SP_trend_count1;
+      if(WR_LHP_en1) LHP_trend_stat_counter_regs[WR_addr1][WR_LHP_index1][2 + STAT_COUNTER_WIDTH:STAT_COUNTER_WIDTH] <= WR_LHP_trend_count1;
+      if(WR_GHP_en1) GHP_trend_stat_counter_regs[WR_addr1][WR_GHP_index1][2 + STAT_COUNTER_WIDTH:STAT_COUNTER_WIDTH] <= WR_GHP_trend_count1;
+      if(WR_SP_en2)  SP_trend_stat_counter_regs[WR_addr2][WR_SP_index2][2 + STAT_COUNTER_WIDTH:STAT_COUNTER_WIDTH]   <= WR_SP_trend_count2;
+      if(WR_LHP_en2) LHP_trend_stat_counter_regs[WR_addr2][WR_LHP_index2][2 + STAT_COUNTER_WIDTH:STAT_COUNTER_WIDTH] <= WR_LHP_trend_count2;
+      if(WR_GHP_en2) GHP_trend_stat_counter_regs[WR_addr2][WR_GHP_index2][2 + STAT_COUNTER_WIDTH:STAT_COUNTER_WIDTH] <= WR_GHP_trend_count2;
     end
   end
 
@@ -364,7 +301,6 @@ module meta_predictor #(
 
 /////////////////////////////////////////////////////////////////////////////////
 
-
   wire [3:0]SP_trend_decode, LHP_trend_decode, GHP_trend_decode;
   trend_counter_decoder SP_trend_decode_inst(
     .count(SP_trend_count),
@@ -397,6 +333,49 @@ module meta_predictor #(
     .prediction_result(prediction_result)
   );
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////  
+
+  wire [3 + STAT_COUNTER_WIDTH_UB:0]SP_trend_stat_count, LHP_trend_stat_count, GHP_trend_stat_count;
+  assign SP_trend_stat_count  = SP_trend_stat_counter_regs[addr][SP_prediction_result];
+  assign LHP_trend_stat_count = LHP_trend_stat_counter_regs[addr][LHP_count];
+  assign GHP_trend_stat_count = GHP_trend_stat_counter_regs[addr][GHP_count];
+
+  assign SP_stat_count  = SP_trend_stat_count [STAT_COUNTER_WIDTH_UB:0];
+  assign LHP_stat_count = LHP_trend_stat_count[STAT_COUNTER_WIDTH_UB:0];
+  assign GHP_stat_count = GHP_trend_stat_count[STAT_COUNTER_WIDTH_UB:0];
+
+  assign SP_trend_count  = SP_trend_stat_count [2 + STAT_COUNTER_WIDTH:STAT_COUNTER_WIDTH];
+  assign LHP_trend_count = LHP_trend_stat_count[2 + STAT_COUNTER_WIDTH:STAT_COUNTER_WIDTH];
+  assign GHP_trend_count = GHP_trend_stat_count[2 + STAT_COUNTER_WIDTH:STAT_COUNTER_WIDTH];
+
+
+  wire [3 + STAT_COUNTER_WIDTH_UB:0]SP_trend_stat_count_id, LHP_trend_stat_count_id, GHP_trend_stat_count_id;
+  assign SP_trend_stat_count_id  = SP_trend_stat_counter_regs[addr][SP_prediction_result_id];
+  assign LHP_trend_stat_count_id = LHP_trend_stat_counter_regs[addr][LHP_count_id];
+  assign GHP_trend_stat_count_id = GHP_trend_stat_counter_regs[addr][GHP_count_id];
+
+  assign SP_stat_count_id  = SP_trend_stat_count_id [STAT_COUNTER_WIDTH_UB:0];
+  assign LHP_stat_count_id = LHP_trend_stat_count_id[STAT_COUNTER_WIDTH_UB:0];
+  assign GHP_stat_count_id = GHP_trend_stat_count_id[STAT_COUNTER_WIDTH_UB:0];
+
+  assign SP_trend_count_id  = SP_trend_stat_count_id [2 + STAT_COUNTER_WIDTH:STAT_COUNTER_WIDTH];
+  assign LHP_trend_count_id = LHP_trend_stat_count_id[2 + STAT_COUNTER_WIDTH:STAT_COUNTER_WIDTH];
+  assign GHP_trend_count_id = GHP_trend_stat_count_id[2 + STAT_COUNTER_WIDTH:STAT_COUNTER_WIDTH];
+
+
+  wire [3 + STAT_COUNTER_WIDTH_UB:0]SP_trend_stat_count_ex, LHP_trend_stat_count_ex, GHP_trend_stat_count_ex;
+  assign SP_trend_stat_count_ex  = SP_trend_stat_counter_regs[addr][SP_prediction_result_ex];
+  assign LHP_trend_stat_count_ex = LHP_trend_stat_counter_regs[addr][LHP_count_ex];
+  assign GHP_trend_stat_count_ex = GHP_trend_stat_counter_regs[addr][GHP_count_ex];
+ 
+  assign SP_stat_count_ex  = SP_trend_stat_count_ex [STAT_COUNTER_WIDTH_UB:0];
+  assign LHP_stat_count_ex = LHP_trend_stat_count_ex[STAT_COUNTER_WIDTH_UB:0];
+  assign GHP_stat_count_ex = GHP_trend_stat_count_ex[STAT_COUNTER_WIDTH_UB:0];
+
+  assign SP_trend_count_ex  = SP_trend_stat_count_ex [2 + STAT_COUNTER_WIDTH:STAT_COUNTER_WIDTH];
+  assign LHP_trend_count_ex = LHP_trend_stat_count_ex[2 + STAT_COUNTER_WIDTH:STAT_COUNTER_WIDTH];
+  assign GHP_trend_count_ex = GHP_trend_stat_count_ex[2 + STAT_COUNTER_WIDTH:STAT_COUNTER_WIDTH];
+
 //////////////////////////////////////////////////////////////////////////////////
 
   localparam ADDR_WIDTH = 3;
@@ -412,7 +391,7 @@ module meta_predictor #(
   parallel_mux #(
     .WIDTH(ADDR_WIDTH),
     .MUX_QUANTITY(6)
-  ) addr_inst(
+  ) addr_mux6_inst(
     .data({BEQ_ADDR, BNE_ADDR, BLT_ADDR, BGE_ADDR, BLTU_ADDR, BGEU_ADDR}),
     .signal({beq, bne, blt, bge, bltu, bgeu}),
     .dout(addr)
@@ -420,7 +399,7 @@ module meta_predictor #(
   parallel_mux #(
     .WIDTH(3),
     .MUX_QUANTITY(6)
-  ) addr_id_inst(
+  ) addr_id_mux6_inst(
     .data({BEQ_ADDR, BNE_ADDR, BLT_ADDR, BGE_ADDR, BLTU_ADDR, BGEU_ADDR}),
     .signal({beq_id, bne_id, blt_id, bge_id, bltu_id, bgeu_id}),
     .dout(addr_id)
@@ -428,7 +407,7 @@ module meta_predictor #(
   parallel_mux #(
     .WIDTH(3),
     .MUX_QUANTITY(6)
-  ) addr_ex_inst(
+  ) addr_ex_mux6_inst(
     .data({BEQ_ADDR, BNE_ADDR, BLT_ADDR, BGE_ADDR, BLTU_ADDR, BGEU_ADDR}),
     .signal({beq_ex, bne_ex, blt_ex, bge_ex, bltu_ex, bgeu_ex}),
     .dout(addr_ex)
@@ -438,7 +417,7 @@ module meta_predictor #(
   parallel_mux #(
     .WIDTH(JUMP_STATUS_COUNTER_WIDTH),
     .MUX_QUANTITY(6)
-  ) count_inst(
+  ) count_mux6_inst(
     .data({LHP_beq_count, LHP_bne_count, LHP_blt_count, LHP_bge_count, LHP_bltu_count, LHP_bgeu_count}),
     .signal({beq, bne, blt, bge, bltu, bgeu}),
     .dout(LHP_count)
@@ -446,7 +425,7 @@ module meta_predictor #(
   parallel_mux #(
     .WIDTH(JUMP_STATUS_COUNTER_WIDTH),
     .MUX_QUANTITY(6)
-  ) count_id_inst(
+  ) count_id_mux6_inst(
     .data({LHP_beq_count_id, LHP_bne_count_id, LHP_blt_count_id, LHP_bge_count_id, LHP_bltu_count_id, LHP_bgeu_count_id}),
     .signal({beq_id, bne_id, blt_id, bge_id, bltu_id, bgeu_id}),
     .dout(LHP_count_id)
@@ -454,7 +433,7 @@ module meta_predictor #(
   parallel_mux #(
     .WIDTH(JUMP_STATUS_COUNTER_WIDTH),
     .MUX_QUANTITY(6)
-  ) count_ex_inst(
+  ) count_ex_mux6_inst(
     .data({LHP_beq_count_ex, LHP_bne_count_ex, LHP_blt_count_ex, LHP_bge_count_ex, LHP_bltu_count_ex, LHP_bgeu_count_ex}),
     .signal({beq_ex, bne_ex, blt_ex, bge_ex, bltu_ex, bgeu_ex}),
     .dout(LHP_count_ex)

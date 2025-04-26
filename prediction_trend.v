@@ -47,12 +47,14 @@ module trend_counter_operator(
   ) adder_inst(
     .A(count),
     .B(B),
+    .PO(),
+    .NO(),
     .result(new_count)
   );
 endmodule 
 
 
-module stat_count_operator #(
+module stat_counter_operator #(
   parameter STAT_COUNTER_WIDTH = 5
 )(
   input  [STAT_COUNTER_WIDTH - 1:0]A, 
@@ -60,26 +62,17 @@ module stat_count_operator #(
   output OF,
   output [STAT_COUNTER_WIDTH - 1:0]result
 );
-  
+  localparam SUB = STAT_COUNTER_WIDTH - 3;
 
-  localparam SUB = STAT_COUNTER_WIDTH - 2;
-  localparam STAT_COUNTER_WIDTH_UB = STAT_COUNTER_WIDTH - 1;
-
-  wire NO;
-  wire [STAT_COUNTER_WIDTH:0]result_inner;
-
-  overflow_adder #(
-    .WIDTH(STAT_COUNTER_WIDTH + 1)
+  no_overflow_unsig_adder #(
+    .WIDTH(STAT_COUNTER_WIDTH),
+    .ALLOW_PO(1),
+    .ALLOW_NO(0)
   ) adder_inst(
-    .A({`zero, A}),
+    .A(A),
     .B({{SUB{B[2]}}, B}),
-
     .PO(OF),
-    .NO(NO),
-    .result(result_inner)
+    .NO(),
+    .result(result)
   );
-
-
-  localparam [STAT_COUNTER_WIDTH_UB:0]ZERO = {STAT_COUNTER_WIDTH{1'b0}};
-  assign result = NO ? ZERO : result_inner[STAT_COUNTER_WIDTH_UB:0];
 endmodule 

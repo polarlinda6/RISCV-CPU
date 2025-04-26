@@ -1,5 +1,6 @@
 module history_predictor #(
   parameter JUMP_STATUS_COUNTER_WIDTH = 2,
+  parameter [JUMP_STATUS_COUNTER_WIDTH - 1:0]JUMP_STATUS_COUNTER_INIT_VALUE = 0,
   parameter INDEX_HR_WIDTH = 5,
   parameter INDEX_PC_WIDTH = 3
 )(
@@ -31,8 +32,7 @@ module history_predictor #(
   localparam JUMP_STATUS_COUNTER_WIDTH_UB = JUMP_STATUS_COUNTER_WIDTH - 1;  
 
   localparam [JUMP_STATUS_COUNTER_WIDTH_UB:0]N_ONE  = {JUMP_STATUS_COUNTER_WIDTH{1'b1}};  
-  localparam [JUMP_STATUS_COUNTER_WIDTH_UB:0]ZERO   = {JUMP_STATUS_COUNTER_WIDTH{1'b0}};  
-  localparam [JUMP_STATUS_COUNTER_WIDTH_UB:0]P_ONE  = {ZERO[JUMP_STATUS_COUNTER_WIDTH_UB: 1], 1'b1};
+  localparam [JUMP_STATUS_COUNTER_WIDTH_UB:0]P_ONE  = {{JUMP_STATUS_COUNTER_WIDTH_UB{1'b0}}, 1'b1};
 
 
   reg [JUMP_STATUS_COUNTER_WIDTH_UB:0]count_reg_id, count_reg_ex;
@@ -46,24 +46,24 @@ module history_predictor #(
   always @(posedge clk)
   begin
     if (!rst_n)
-      begin
-        count_reg_id <= ZERO;
-        count_reg_ex <= ZERO;
-        history_reg <= {HR_DEPTH{1'b0}};
-      end
+    begin
+      count_reg_id <= JUMP_STATUS_COUNTER_INIT_VALUE;
+      count_reg_ex <= JUMP_STATUS_COUNTER_INIT_VALUE;
+      history_reg  <= {HR_DEPTH{1'b0}};
+    end
     else
-      begin
-        if(!PL_stall) 
-        begin   
-          count_reg_id <= HP_count;
-          count_reg_ex <= count_reg_id;
-        end
+    begin
+      if(!PL_stall) 
+      begin   
+        count_reg_id <= HP_count;
+        count_reg_ex <= count_reg_id;
+      end
 
-        if (rollback_en_ex)
-          history_reg <= history_reg >> (rollback_en_id ? 2 : 1);        
-        else if (corrected_en)
-          history_reg <= (history_reg << 1) | corrected_result;  
-      end 
+      if (rollback_en_ex)
+        history_reg <= history_reg >> (rollback_en_id ? 2 : 1);        
+      else if (corrected_en)
+        history_reg <= (history_reg << 1) | corrected_result;  
+    end 
   end
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -76,7 +76,8 @@ module history_predictor #(
 
   prediction_table #(
     .INDEX_WIDTH(INDEX_WIDTH), 
-    .JUMP_STATUS_COUNTER_WIDTH(JUMP_STATUS_COUNTER_WIDTH)
+    .JUMP_STATUS_COUNTER_WIDTH(JUMP_STATUS_COUNTER_WIDTH),
+    .JUMP_STATUS_COUNTER_INIT_VALUE(JUMP_STATUS_COUNTER_INIT_VALUE)
   ) prediction_table_inst(
     .clk(clk),
     .rst_n(rst_n),
@@ -129,6 +130,8 @@ module history_predictor #(
   ) adder_inst(
     .A(A),
     .B(B),
+    .PO(),
+    .NO(),
     .result(WR_data2)
   );
 endmodule

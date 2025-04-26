@@ -29,7 +29,7 @@ module datapath(
 	output W_en,
 	output [2:0]RW_type,
 	
-	output [7:0]rom_addr,
+	output [31:0]rom_addr,
 	output [31:0]ram_addr,
 
 

@@ -2,7 +2,7 @@ module riscv(
 	input  clk,
 	input  rst_n,	
 	
-    output [7:0]rom_addr,
+    output [31:0]rom_addr,
 	input  [31:0]instr,
 	
 	output W_en,
