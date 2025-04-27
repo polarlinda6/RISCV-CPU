@@ -35,31 +35,26 @@ module parallel_mux #(
 	output [WIDTH - 1:0]dout
 );
 
-	localparam WIDTH_UB = WIDTH - 1;
 	localparam ZERO = {WIDTH{1'b0}};
 
-
-	wire [MUX_QUANTITY - 1:0]result[WIDTH_UB:0];
+	wire [WIDTH * MUX_QUANTITY - 1:0]result;
 
 	generate
-		genvar i, j;
+		genvar i;
 		for (i = 0; i < MUX_QUANTITY; i = i + 1) 
 		begin
 			localparam lb = WIDTH * i;
 			localparam ub = lb + WIDTH - 1;
 
-			wire [WIDTH_UB:0]result_inner;
-			assign result_inner = signal[i] ? data[ub: lb] : ZERO;
-
-			for(j = 0; j < WIDTH; j = j + 1)
-			begin
-				assign result[j][i] = result_inner[j];
-			end
-		end
-
-		for (i = 0; i < WIDTH; i = i + 1)
-		begin 
-			assign dout[i] = |result[i];
+			assign result[ub:lb] = signal[i] ? data[ub:lb] : ZERO;
 		end
 	endgenerate
+
+	large_fan_in_or #(
+		.WIDTH(WIDTH),
+		.OR_QUANTITY(MUX_QUANTITY)
+	) or_inst(
+		.din(result),
+		.dout(dout)
+	);
 endmodule

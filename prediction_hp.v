@@ -118,7 +118,7 @@ module history_predictor #(
   wire [JUMP_STATUS_COUNTER_WIDTH_UB:0]count_offset;
   assign count_offset = corrected_result ? N_ONE : P_ONE;
 
-  wire [JUMP_STATUS_COUNTER_WIDTH_UB:0]counter_offset_ex;
+  wire [JUMP_STATUS_COUNTER_WIDTH_UB:0]count_offset_ex;
   assign count_offset_ex = prediction_result_branch_failed ? P_ONE : N_ONE;
   
   wire [JUMP_STATUS_COUNTER_WIDTH_UB:0]A, B;

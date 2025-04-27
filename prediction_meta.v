@@ -137,7 +137,7 @@ module meta_predictor #(
   wire WR_SP_en1, WR_SP_en2, WR_LHP_en1, WR_LHP_en2, WR_GHP_en1, WR_GHP_en2;
  
   wire [2:0]WR_addr1, WR_addr2;
-  wire SP_index1, SP_index2;
+  wire WR_SP_index1, WR_SP_index2;
   wire [JUMP_STATUS_COUNTER_WIDTH_UB:0]WR_LHP_index1, WR_LHP_index2;
   wire [JUMP_STATUS_COUNTER_WIDTH_UB:0]WR_GHP_index1, WR_GHP_index2;
 

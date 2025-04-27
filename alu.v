@@ -138,7 +138,6 @@ module Shifter(
 		 5'b11101:SRL_M[31:0]={29'd0,ALU_DA[31:29]}; 
 		 5'b11110:SRL_M[31:0]={30'd0,ALU_DA[31:30]};  
          5'b11111:SRL_M[31:0]={31'd0,ALU_DA[31]}; 
-         default: SRL_M[31:0]=ALU_DA[31:0]; 
       endcase
     end
     
@@ -177,7 +176,6 @@ module Shifter(
 		 5'b11101:SLL_M[31:0]={ALU_DA[2:0] ,29'd0};
 		 5'b11110:SLL_M[31:0]={ALU_DA[1:0] ,30'd0};
 		 5'b11111:SLL_M[31:0]={ALU_DA[0],31'd0}; 
-         default: SLL_M[31:0]=ALU_DA[31:0]; 
       endcase
     end
     
@@ -216,7 +214,6 @@ module Shifter(
 		 5'b11101:SRA_M[31:0]={{29{ALU_DA[31]}},ALU_DA[31:29]};
 		 5'b11110:SRA_M[31:0]={{30{ALU_DA[31]}},ALU_DA[31:30]};
 		 5'b11111:SRA_M[31:0]={{31{ALU_DA[31]}},ALU_DA[31]}; 
-         default: SRA_M[31:0]=ALU_DA[31:0]; 
       endcase
     end
     

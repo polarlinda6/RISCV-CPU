@@ -50,6 +50,7 @@ module no_overflow_unsig_adder #(
   wire [UB:0]result_inner;
   assign result_inner = A + B; 
 
+  wire ltu;
   parallel_unsig_comparator_lt #(
     .WIDTH(WIDTH)
   ) comparator_inst(
