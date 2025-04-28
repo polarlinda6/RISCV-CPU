@@ -33,42 +33,39 @@ module memory(
 
 	reg  [31:0]Wr_data_B;
 	wire [31:0]Wr_data_H;
+    always@(*)
+    begin
+        case(ram_addr[1:0])
+            2'b00:Wr_data_B={Rd_data[31:8],din[7:0]};
+            2'b01:Wr_data_B={Rd_data[31:16],din[7:0],Rd_data[7:0]};
+            2'b10:Wr_data_B={Rd_data[31:24],din[7:0],Rd_data[15:0]};
+            2'b11:Wr_data_B={din[7:0],Rd_data[23:0]};
+        endcase
+    end      
+    assign Wr_data_H=(ram_addr[1]) ? {din[15:0],Rd_data[15:0]} : {Rd_data[31:16],din[15:0]};
+    assign Wr_data=(RW_type[1:0]==2'b00) ? Wr_data_B :((RW_type[1:0]==2'b01) ? Wr_data_H : din);
+        
 
-
-   always@(*)
-   begin
-       case(ram_addr[1:0])
-           2'b00:Wr_data_B={Rd_data[31:8],din[7:0]};
-           2'b01:Wr_data_B={Rd_data[31:16],din[7:0],Rd_data[7:0]};
-           2'b10:Wr_data_B={Rd_data[31:24],din[7:0],Rd_data[15:0]};
-           2'b11:Wr_data_B={din[7:0],Rd_data[23:0]};
-       endcase
-   end      
-   assign Wr_data_H=(ram_addr[1]) ? {din[15:0],Rd_data[15:0]} : {Rd_data[31:16],din[15:0]};
-   assign Wr_data=(RW_type[1:0]==2'b00) ? Wr_data_B :((RW_type[1:0]==2'b01) ? Wr_data_H : din);
-    
-
-
-   reg [7:0]Rd_data_B;
-   wire [15:0]Rd_data_H;
-   wire [31:0]Rd_data_B_ext;
-   wire [31:0]Rd_data_H_ext;
-    
-   always@(*)
-   begin
-       case(ram_addr[1:0])
-           2'b00:Rd_data_B=Rd_data[7:0];
-           2'b01:Rd_data_B=Rd_data[15:8];
-           2'b10:Rd_data_B=Rd_data[23:16];
-           2'b11:Rd_data_B=Rd_data[31:24];
-       endcase
-   end   
-   assign Rd_data_B_ext=(RW_type[2]) ? {24'd0,Rd_data_B} : {{24{Rd_data_B[7]}},Rd_data_B};
-    
-   assign Rd_data_H=(ram_addr[1]) ? Rd_data[31:16] : Rd_data[15:0];
-   assign Rd_data_H_ext=(RW_type[2]) ? {16'd0,Rd_data_H} : {{16{Rd_data_H[15]}},Rd_data_H};
-    
-   assign dout=(RW_type[1:0]==2'b00) ? Rd_data_B_ext : ((RW_type[1:0]==2'b01) ? Rd_data_H_ext : Rd_data);
+    reg [7:0]Rd_data_B;
+    wire [15:0]Rd_data_H;
+    wire [31:0]Rd_data_B_ext;
+    wire [31:0]Rd_data_H_ext;
+        
+    always@(*)
+    begin
+        case(ram_addr[1:0])
+            2'b00:Rd_data_B=Rd_data[7:0];
+            2'b01:Rd_data_B=Rd_data[15:8];
+            2'b10:Rd_data_B=Rd_data[23:16];
+            2'b11:Rd_data_B=Rd_data[31:24];
+        endcase
+    end   
+    assign Rd_data_B_ext=(RW_type[2]) ? {24'd0,Rd_data_B} : {{24{Rd_data_B[7]}},Rd_data_B};
+        
+    assign Rd_data_H=(ram_addr[1]) ? Rd_data[31:16] : Rd_data[15:0];
+    assign Rd_data_H_ext=(RW_type[2]) ? {16'd0,Rd_data_H} : {{16{Rd_data_H[15]}},Rd_data_H};
+        
+    assign dout=(RW_type[1:0]==2'b00) ? Rd_data_B_ext : ((RW_type[1:0]==2'b01) ? Rd_data_H_ext : Rd_data);
 endmodule
 
 
@@ -77,7 +74,7 @@ module RAM(
     input  rst_n,
 
     input  [31:0]rom_addr,
-    output instr,
+    output [31:0]instr,
 
     input  W_en,
     input  [31:0]ram_addr,
@@ -154,9 +151,6 @@ module RAM(
         $readmemb("C:/Users/polar/Documents/CPU/CPU.srcs/sources_1/imports/src/rom_binary_file.txt", RAM1);
     end
 
-    wire [31:0]in;
-    assign in = RAM1[rom_addr[25:2]];
-
     wire [63:0]rom_select, ram_select;
     chip_select rom_select_inst(
         .addr(rom_addr),
@@ -171,7 +165,7 @@ module RAM(
         .WIDTH(32),
         .MUX_QUANTITY(64)
     ) rom_mux64_inst(
-        .data({RAM1[rom_addr[25:2]], RAM2[rom_addr[25:2]], RAM3[rom_addr[25:2]], RAM4[rom_addr[25:2]], RAM5[rom_addr[25:2]], RAM6[rom_addr[25:2]], RAM7[rom_addr[25:2]], RAM8[rom_addr[25:2]], RAM9[rom_addr[25:2]], RAM10[rom_addr[25:2]], RAM11[rom_addr[25:2]], RAM12[rom_addr[25:2]], RAM13[rom_addr[25:2]], RAM14[rom_addr[25:2]], RAM15[rom_addr[25:2]], RAM16[rom_addr[25:2]], RAM17[rom_addr[25:2]], RAM18[rom_addr[25:2]], RAM19[rom_addr[25:2]], RAM20[rom_addr[25:2]], RAM21[rom_addr[25:2]], RAM22[rom_addr[25:2]], RAM23[rom_addr[25:2]], RAM24[rom_addr[25:2]], RAM25[rom_addr[25:2]], RAM26[rom_addr[25:2]], RAM27[rom_addr[25:2]], RAM28[rom_addr[25:2]], RAM29[rom_addr[25:2]], RAM30[rom_addr[25:2]], RAM31[rom_addr[25:2]], RAM32[rom_addr[25:2]], RAM33[rom_addr[25:2]], RAM34[rom_addr[25:2]], RAM35[rom_addr[25:2]], RAM36[rom_addr[25:2]], RAM37[rom_addr[25:2]], RAM38[rom_addr[25:2]], RAM39[rom_addr[25:2]], RAM40[rom_addr[25:2]], RAM41[rom_addr[25:2]], RAM42[rom_addr[25:2]], RAM43[rom_addr[25:2]], RAM44[rom_addr[25:2]], RAM45[rom_addr[25:2]], RAM46[rom_addr[25:2]], RAM47[rom_addr[25:2]], RAM48[rom_addr[25:2]], RAM49[rom_addr[25:2]], RAM50[rom_addr[25:2]], RAM51[rom_addr[25:2]], RAM52[rom_addr[25:2]], RAM53[rom_addr[25:2]], RAM54[rom_addr[25:2]], RAM55[rom_addr[25:2]], RAM56[rom_addr[25:2]], RAM57[rom_addr[25:2]], RAM58[rom_addr[25:2]], RAM59[rom_addr[25:2]], RAM60[rom_addr[25:2]], RAM61[rom_addr[25:2]], RAM62[rom_addr[25:2]], RAM63[rom_addr[25:2]], RAM64[rom_addr[25:2]]}),
+        .data({RAM64[rom_addr[25:2]], RAM63[rom_addr[25:2]], RAM62[rom_addr[25:2]], RAM61[rom_addr[25:2]], RAM60[rom_addr[25:2]], RAM59[rom_addr[25:2]], RAM58[rom_addr[25:2]], RAM57[rom_addr[25:2]], RAM56[rom_addr[25:2]], RAM55[rom_addr[25:2]], RAM54[rom_addr[25:2]], RAM53[rom_addr[25:2]], RAM52[rom_addr[25:2]], RAM51[rom_addr[25:2]], RAM50[rom_addr[25:2]], RAM49[rom_addr[25:2]], RAM48[rom_addr[25:2]], RAM47[rom_addr[25:2]], RAM46[rom_addr[25:2]], RAM45[rom_addr[25:2]], RAM44[rom_addr[25:2]], RAM43[rom_addr[25:2]], RAM42[rom_addr[25:2]], RAM41[rom_addr[25:2]], RAM40[rom_addr[25:2]], RAM39[rom_addr[25:2]], RAM38[rom_addr[25:2]], RAM37[rom_addr[25:2]], RAM36[rom_addr[25:2]], RAM35[rom_addr[25:2]], RAM34[rom_addr[25:2]], RAM33[rom_addr[25:2]], RAM32[rom_addr[25:2]], RAM31[rom_addr[25:2]], RAM30[rom_addr[25:2]], RAM29[rom_addr[25:2]], RAM28[rom_addr[25:2]], RAM27[rom_addr[25:2]], RAM26[rom_addr[25:2]], RAM25[rom_addr[25:2]], RAM24[rom_addr[25:2]], RAM23[rom_addr[25:2]], RAM22[rom_addr[25:2]], RAM21[rom_addr[25:2]], RAM20[rom_addr[25:2]], RAM19[rom_addr[25:2]], RAM18[rom_addr[25:2]], RAM17[rom_addr[25:2]], RAM16[rom_addr[25:2]], RAM15[rom_addr[25:2]], RAM14[rom_addr[25:2]], RAM13[rom_addr[25:2]], RAM12[rom_addr[25:2]], RAM11[rom_addr[25:2]], RAM10[rom_addr[25:2]], RAM9[rom_addr[25:2]], RAM8[rom_addr[25:2]], RAM7[rom_addr[25:2]], RAM6[rom_addr[25:2]], RAM5[rom_addr[25:2]], RAM4[rom_addr[25:2]], RAM3[rom_addr[25:2]], RAM2[rom_addr[25:2]], RAM1[rom_addr[25:2]]}),
         .signal(rom_select),
         .dout(instr)
     );
@@ -180,7 +174,7 @@ module RAM(
         .WIDTH(32),
         .MUX_QUANTITY(64)
     ) ram_mux64_inst(
-        .data({RAM1[ram_addr[25:2]], RAM2[ram_addr[25:2]], RAM3[ram_addr[25:2]], RAM4[ram_addr[25:2]], RAM5[ram_addr[25:2]], RAM6[ram_addr[25:2]], RAM7[ram_addr[25:2]], RAM8[ram_addr[25:2]], RAM9[ram_addr[25:2]], RAM10[ram_addr[25:2]], RAM11[ram_addr[25:2]], RAM12[ram_addr[25:2]], RAM13[ram_addr[25:2]], RAM14[ram_addr[25:2]], RAM15[ram_addr[25:2]], RAM16[ram_addr[25:2]], RAM17[ram_addr[25:2]], RAM18[ram_addr[25:2]], RAM19[ram_addr[25:2]], RAM20[ram_addr[25:2]], RAM21[ram_addr[25:2]], RAM22[ram_addr[25:2]], RAM23[ram_addr[25:2]], RAM24[ram_addr[25:2]], RAM25[ram_addr[25:2]], RAM26[ram_addr[25:2]], RAM27[ram_addr[25:2]], RAM28[ram_addr[25:2]], RAM29[ram_addr[25:2]], RAM30[ram_addr[25:2]], RAM31[ram_addr[25:2]], RAM32[ram_addr[25:2]], RAM33[ram_addr[25:2]], RAM34[ram_addr[25:2]], RAM35[ram_addr[25:2]], RAM36[ram_addr[25:2]], RAM37[ram_addr[25:2]], RAM38[ram_addr[25:2]], RAM39[ram_addr[25:2]], RAM40[ram_addr[25:2]], RAM41[ram_addr[25:2]], RAM42[ram_addr[25:2]], RAM43[ram_addr[25:2]], RAM44[ram_addr[25:2]], RAM45[ram_addr[25:2]], RAM46[ram_addr[25:2]], RAM47[ram_addr[25:2]], RAM48[ram_addr[25:2]], RAM49[ram_addr[25:2]], RAM50[ram_addr[25:2]], RAM51[ram_addr[25:2]], RAM52[ram_addr[25:2]], RAM53[ram_addr[25:2]], RAM54[ram_addr[25:2]], RAM55[ram_addr[25:2]], RAM56[ram_addr[25:2]], RAM57[ram_addr[25:2]], RAM58[ram_addr[25:2]], RAM59[ram_addr[25:2]], RAM60[ram_addr[25:2]], RAM61[ram_addr[25:2]], RAM62[ram_addr[25:2]], RAM63[ram_addr[25:2]], RAM64[ram_addr[25:2]]}),
+        .data({RAM64[ram_addr[25:2]], RAM63[ram_addr[25:2]], RAM62[ram_addr[25:2]], RAM61[ram_addr[25:2]], RAM60[ram_addr[25:2]], RAM59[ram_addr[25:2]], RAM58[ram_addr[25:2]], RAM57[ram_addr[25:2]], RAM56[ram_addr[25:2]], RAM55[ram_addr[25:2]], RAM54[ram_addr[25:2]], RAM53[ram_addr[25:2]], RAM52[ram_addr[25:2]], RAM51[ram_addr[25:2]], RAM50[ram_addr[25:2]], RAM49[ram_addr[25:2]], RAM48[ram_addr[25:2]], RAM47[ram_addr[25:2]], RAM46[ram_addr[25:2]], RAM45[ram_addr[25:2]], RAM44[ram_addr[25:2]], RAM43[ram_addr[25:2]], RAM42[ram_addr[25:2]], RAM41[ram_addr[25:2]], RAM40[ram_addr[25:2]], RAM39[ram_addr[25:2]], RAM38[ram_addr[25:2]], RAM37[ram_addr[25:2]], RAM36[ram_addr[25:2]], RAM35[ram_addr[25:2]], RAM34[ram_addr[25:2]], RAM33[ram_addr[25:2]], RAM32[ram_addr[25:2]], RAM31[ram_addr[25:2]], RAM30[ram_addr[25:2]], RAM29[ram_addr[25:2]], RAM28[ram_addr[25:2]], RAM27[ram_addr[25:2]], RAM26[ram_addr[25:2]], RAM25[ram_addr[25:2]], RAM24[ram_addr[25:2]], RAM23[ram_addr[25:2]], RAM22[ram_addr[25:2]], RAM21[ram_addr[25:2]], RAM20[ram_addr[25:2]], RAM19[ram_addr[25:2]], RAM18[ram_addr[25:2]], RAM17[ram_addr[25:2]], RAM16[ram_addr[25:2]], RAM15[ram_addr[25:2]], RAM14[ram_addr[25:2]], RAM13[ram_addr[25:2]], RAM12[ram_addr[25:2]], RAM11[ram_addr[25:2]], RAM10[ram_addr[25:2]], RAM9[ram_addr[25:2]], RAM8[ram_addr[25:2]], RAM7[ram_addr[25:2]], RAM6[ram_addr[25:2]], RAM5[ram_addr[25:2]], RAM4[ram_addr[25:2]], RAM3[ram_addr[25:2]], RAM2[ram_addr[25:2]], RAM1[ram_addr[25:2]]}),
         .signal(ram_select),
         .dout(dout)
     );

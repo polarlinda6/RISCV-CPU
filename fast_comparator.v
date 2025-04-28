@@ -100,7 +100,6 @@ module parallel_unsig_comparator_lt #(
     end
   endgenerate
 
-
   assign compare_result = result[3] || 
                          (!result[3] && result[2]) || 
                          (!result[3] && !result[2] && result[1]) || 
@@ -116,28 +115,39 @@ module parallel_unsig_comparator_eq #(
   output compare_result
 );
 
-  localparam WIDTH_UB = WIDTH - 1;
+  wire ne_result;
+  parallel_unsig_comparator_ne #(
+    .WIDTH(WIDTH)
+  ) comparator_ne_inst(
+    .data1(data1),
+    .data2(data2),
+    .compare_result(ne_result)
+  );
+  assign compare_result = !ne_result;
+endmodule
 
-  localparam BASE_COMPARATOR_WIDTH = 4;
-  localparam BASE_COMPARATOR_WIDTH_UB = BASE_COMPARATOR_WIDTH - 1;   
-  
-  localparam PARALLEL_DEGREE = (WIDTH / BASE_COMPARATOR_WIDTH) + (WIDTH % BASE_COMPARATOR_WIDTH ? 1 : 0); 
-  localparam PARALLEL_DEGREE_UB = PARALLEL_DEGREE - 1;
 
-  wire [PARALLEL_DEGREE_UB:0]result; 
+module parallel_unsig_comparator_ne #(
+  parameter WIDTH = 32
+)(
+  input  [WIDTH - 1:0]data1,
+  input  [WIDTH - 1:0]data2,
+  output compare_result
+);
 
+  wire [WIDTH - 1:0]result;
   generate
     genvar i;
-    for(i = 0; i < PARALLEL_DEGREE; i = i + 1) 
-    begin
-      localparam lb = i * BASE_COMPARATOR_WIDTH;
-      
-      localparam value = lb + BASE_COMPARATOR_WIDTH_UB;
-      localparam ub = value > WIDTH_UB ? WIDTH_UB : value;
-
-      assign result[i] = data1[ub:lb] < data2[ub:lb];
+    for(i = 0; i < WIDTH; i = i + 1) begin
+      assign result[i] = data1[i] != data2[i];
     end
   endgenerate
 
-  assign compare_result = &result;
+  large_fan_in_or #(
+    .WIDTH(1),
+    .OR_QUANTITY(WIDTH)
+  ) inst(
+    .din(result),
+    .dout(compare_result)
+  );
 endmodule

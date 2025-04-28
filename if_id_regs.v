@@ -10,8 +10,8 @@ module if_id_regs(
 	input [31:0]pc_add_4_if_id_i,
 	output reg [31:0]pc_add_4_if_id_o,
 
-	input [31:0]jalr_pc_prediction_or_pc_if_id_i,
-	output reg [31:0]jalr_pc_prediction_or_pc_if_id_o,
+	input [31:0]jalr_jump_pc_or_pc_if_id_i,
+	output reg [31:0]jalr_jump_pc_or_pc_if_id_o,
 
 	input B_type_prediction_result_if_id_i, 
 	output reg B_type_prediction_result_if_id_o,
@@ -30,7 +30,7 @@ module if_id_regs(
 		    begin
 						pc_add_imme_if_id_o<=`zeroword;
 						pc_add_4_if_id_o<=`zeroword;
-						jalr_pc_prediction_or_pc_if_id_o<=`zeroword;
+						jalr_jump_pc_or_pc_if_id_o<=`zeroword;
 						B_type_prediction_result_if_id_o<=`zero;
 						instr_if_id_o<=`nop;
 				end
@@ -38,7 +38,7 @@ module if_id_regs(
 				begin
 						pc_add_imme_if_id_o<=pc_add_imme_if_id_i;
 						pc_add_4_if_id_o<=pc_add_4_if_id_i;
-						jalr_pc_prediction_or_pc_if_id_o<=jalr_pc_prediction_or_pc_if_id_i;
+						jalr_jump_pc_or_pc_if_id_o<=jalr_jump_pc_or_pc_if_id_i;
 						B_type_prediction_result_if_id_o<=B_type_prediction_result_if_id_i;
 						instr_if_id_o<=instr_if_id_i;
 				end

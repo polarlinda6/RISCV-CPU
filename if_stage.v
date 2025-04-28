@@ -10,7 +10,7 @@ module if_stage(
 
 	output [31:0]pc_add_imme,
     output [31:0]pc_add_4,    
-    output [31:0]jalr_pc_prediction_or_pc, 
+    output [31:0]jalr_jump_pc_or_pc, 
     output B_type_prediction_result,
 
 
@@ -282,12 +282,13 @@ module if_stage(
     );
 
 
-    //jalr_pc_prediction_or_pc
-    mux jalr_pc_prediction_or_pc_inst(
+    //jalr_jump_pc_or_pc
+    mux3 jalr_jump_pc_or_pc_inst(
         .data1(jalr_pc_prediction),
-        .data2(pc),
-        .signal(jalr),
-        .dout(jalr_pc_prediction_or_pc)
+        .data2(pc_jump),
+        .data3(pc),
+        .signal({jalr_prediction_en, jalr}),
+        .dout(jalr_jump_pc_or_pc)
     );
 
 

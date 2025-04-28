@@ -6,12 +6,12 @@ module id_ex_regs(
 	
 	input [31:0]pc_add_imme_id_ex_i,
     input [31:0]pc_add_4_id_ex_i,
-    input [31:0]jalr_pc_prediction_or_pc_id_ex_i,
+    input [31:0]jalr_jump_pc_or_pc_id_ex_i,
     input B_type_prediction_result_id_ex_i, 
 
 	output reg [31:0]pc_add_imme_id_ex_o,
     output reg [31:0]pc_add_4_id_ex_o,
-    output reg [31:0]jalr_pc_prediction_or_pc_id_ex_o,
+    output reg [31:0]jalr_jump_pc_or_pc_id_ex_o,
     output reg B_type_prediction_result_id_ex_o,
     	
 	input [31:0]imme_id_ex_i,
@@ -76,7 +76,7 @@ module id_ex_regs(
                     //non-standard nop: add x0, x0, x0
                     pc_add_imme_id_ex_o<=`zeroword;
                     pc_add_4_id_ex_o<=`zeroword;
-                    jalr_pc_prediction_or_pc_id_ex_o<=`zeroword;    
+                    jalr_jump_pc_or_pc_id_ex_o<=`zeroword;    
                     B_type_prediction_result_id_ex_o<=`zero;
 
                     imme_id_ex_o<=`zeroword;
@@ -107,7 +107,7 @@ module id_ex_regs(
                 begin
                     pc_add_imme_id_ex_o<=pc_add_imme_id_ex_i;
                     pc_add_4_id_ex_o<=pc_add_4_id_ex_i;
-                    jalr_pc_prediction_or_pc_id_ex_o<=jalr_pc_prediction_or_pc_id_ex_i;  
+                    jalr_jump_pc_or_pc_id_ex_o<=jalr_jump_pc_or_pc_id_ex_i;  
                     B_type_prediction_result_id_ex_o<=B_type_prediction_result_id_ex_i;
 
                     imme_id_ex_o<=imme_id_ex_i;
