@@ -44,19 +44,13 @@ module parallel_comparator #(
   assign eq_sig = data1[WIDTH_UB] == data2[WIDTH_UB];
 
   wire lt_bit, eq_bit;
-  parallel_unsig_comparator_eq #(
-    .WIDTH(WIDTH_UB)
-  ) eq_inst(
-    .data1(data1[WIDTH_UB - 1:0]),
-    .data2(data2[WIDTH_UB - 1:0]),
-    .compare_result(eq_bit)
-  );
-  parallel_unsig_comparator_lt #(
+  parallel_unsig_comparator_eq_lt #(
     .WIDTH(WIDTH_UB)
   ) lt_inst(
     .data1(data1[WIDTH_UB - 1:0]),
     .data2(data2[WIDTH_UB - 1:0]),
-    .compare_result(lt_bit)
+    .eq_result(eq_bit),
+    .lt_result(lt_bit)
   );
 
   assign beq_result  = eq_sig && eq_bit;
@@ -65,12 +59,13 @@ module parallel_comparator #(
 endmodule
 
 
-module parallel_unsig_comparator_lt #(
+module parallel_unsig_comparator_eq_lt #(
   parameter WIDTH = 32
 )(
   input  [WIDTH - 1:0]data1,
   input  [WIDTH - 1:0]data2,
-  output compare_result
+  output eq_result,
+  output lt_result
 );
 
   localparam PARALLEL_DEGREE = 4;
@@ -85,9 +80,9 @@ module parallel_unsig_comparator_lt #(
   localparam SUB = CORRECTED_WIDTH - WIDTH;
   wire [CORRECTED_WIDTH_UB:0]corrected_data1, corrected_data2;
   assign corrected_data1 = {{SUB{1'b0}}, data1};
-  assign corrected_data2 = {{SUB{1'B0}}, data2};
+  assign corrected_data2 = {{SUB{1'b0}}, data2};
 
-  wire [PARALLEL_DEGREE_UB:0]result; 
+  wire [PARALLEL_DEGREE_UB:0]lts, eqs;
 
   generate
     genvar i;
@@ -96,14 +91,47 @@ module parallel_unsig_comparator_lt #(
       localparam lb = i * BASE_COMPARATOR_WIDTH;
       localparam ub = lb + BASE_COMPARATOR_WIDTH_UB;
 
-      assign result[i] = corrected_data1[ub:lb] < corrected_data2[ub:lb];
+      assign lts[i] = corrected_data1[ub:lb] < corrected_data2[ub:lb];
+      assign eqs[i] = corrected_data1[ub:lb] == corrected_data2[ub:lb];
     end
   endgenerate
 
-  assign compare_result = result[3] || 
-                         (!result[3] && result[2]) || 
-                         (!result[3] && !result[2] && result[1]) || 
-                         (!result[3] && !result[2] && !result[1] && result[0]);
+
+  // assign lt_result = lts[3] || 
+  //                    (!lts[3] && eqs[3] && lts[2]) || 
+  //                    (!lts[3] && eqs[3] && !lts[2] && eqs[2] && lts[1]) || 
+  //                    (!lts[3] && eqs[3] && !lts[2] && eqs[2] && !lts[1] && eqs[1] && lts[0]);
+
+  wire lt_2, lt_3;
+  large_fan_in_and #(
+    .WIDTH(1),
+    .AND_QUANTITY(5)
+  ) lt_2_inst(
+    .din({!lts[3], eqs[3], !lts[2], eqs[2], lts[1]}),
+    .dout(lt_2)
+  );
+  large_fan_in_and #(
+    .WIDTH(1),
+    .AND_QUANTITY(7)
+  ) lt_3_inst(
+    .din({!lts[3], eqs[3], !lts[2], eqs[2], !lts[1], eqs[1], lts[0]}),
+    .dout(lt_3)
+  );
+  large_fan_in_or #(
+    .WIDTH(1),
+    .AND_QUANTITY(PARALLEL_DEGREE)
+  ) lt_inst(
+    .din({lts[3], (!lts[3] && eqs[3] && lts[2]), lt_2, lt_3}),
+    .dout(lt_result)
+  );
+
+  large_fan_in_and #(
+    .WIDTH(1),
+    .AND_QUANTITY(PARALLEL_DEGREE)
+  ) eq_inst(
+    .din(eqs),
+    .dout(eq_result)
+  );
 endmodule
 
 

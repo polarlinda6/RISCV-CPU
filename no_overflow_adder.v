@@ -51,20 +51,22 @@ module no_overflow_unsig_adder #(
   assign result_inner = A + B; 
 
   wire ltu;
-  parallel_unsig_comparator_lt #(
+  parallel_unsig_comparator_eq_lt #(
     .WIDTH(WIDTH)
   ) comparator_inst(
     .data1(result_inner),
     .data2(A),
-    .compare_result(ltu)
+    .eq_result(),
+    .lt_result(ltu)
   );
 
   assign PO = !B[UB] && ltu;
   assign NO = B[UB] && !ltu;
 
-
+  generate
   if(ALLOW_PO && ALLOW_NO) assign result = result_inner;
   if(ALLOW_PO && !ALLOW_NO) assign result = NO ? ZERO : result_inner;
   if(!ALLOW_PO && ALLOW_NO) assign result = PO ? P_MAX : result_inner;
   if(!ALLOW_PO && !ALLOW_NO) assign result = PO ? P_MAX : (NO ? ZERO : result_inner);
+  endgenerate
 endmodule
