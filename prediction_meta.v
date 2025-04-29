@@ -8,11 +8,11 @@ module meta_predictor #(
   input  rst_n,
   input  PL_stall,
   
-  output prediction_result,  
+  input  corrected_result,
   input  prediction_result_id,
   input  prediction_result_ex,
   
-  input  prediction_en,
+  input  corrected_en,
   input  rollback_en_id,
   input  rollback_en_ex,
 
@@ -65,7 +65,10 @@ module meta_predictor #(
   input  [JUMP_STATUS_COUNTER_WIDTH - 1:0]LHP_blt_count_ex,
   input  [JUMP_STATUS_COUNTER_WIDTH - 1:0]LHP_bge_count_ex,
   input  [JUMP_STATUS_COUNTER_WIDTH - 1:0]LHP_bltu_count_ex,
-  input  [JUMP_STATUS_COUNTER_WIDTH - 1:0]LHP_bgeu_count_ex
+  input  [JUMP_STATUS_COUNTER_WIDTH - 1:0]LHP_bgeu_count_ex,
+
+
+  output prediction_result
 );
 
   localparam STAT_COUNTER_WIDTH_UB = STAT_COUNTER_WIDTH - 1;  
@@ -134,7 +137,10 @@ module meta_predictor #(
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
   wire clear_en1, clear_en2;
-  wire WR_SP_en1, WR_SP_en2, WR_LHP_en1, WR_LHP_en2, WR_GHP_en1, WR_GHP_en2;
+  wire WR_SP_stat_en1, WR_LHP_stat_en1, WR_GHP_stat_en1;
+  wire WR_SP_stat_en2, WR_LHP_stat_en2, WR_GHP_stat_en2;
+  wire WR_SP_trend_en1, WR_LHP_trend_en1, WR_GHP_trend_en1;
+  wire wr_SP_trend_en2, WR_LHP_trend_en2, WR_GHP_trend_en2;
  
   wire [2:0]WR_addr1, WR_addr2;
   wire WR_SP_index1, WR_SP_index2;
@@ -172,9 +178,9 @@ module meta_predictor #(
       end
       else
       begin
-        if(WR_SP_en1)  SP_trend_stat_counter_regs[WR_addr1][WR_SP_index1][STAT_COUNTER_WIDTH_UB:0]   <= WR_SP_stat_count1;
-        if(WR_LHP_en1) LHP_trend_stat_counter_regs[WR_addr1][WR_LHP_index1][STAT_COUNTER_WIDTH_UB:0] <= WR_LHP_stat_count1;
-        if(WR_GHP_en1) GHP_trend_stat_counter_regs[WR_addr1][WR_GHP_index1][STAT_COUNTER_WIDTH_UB:0] <= WR_GHP_stat_count1;
+        if(WR_SP_stat_en1)  SP_trend_stat_counter_regs[WR_addr1][WR_SP_index1][STAT_COUNTER_CLEAR_BITS_UB:0]   <= WR_SP_stat_count1[STAT_COUNTER_CLEAR_BITS_UB:0];
+        if(WR_LHP_stat_en1) LHP_trend_stat_counter_regs[WR_addr1][WR_LHP_index1][STAT_COUNTER_CLEAR_BITS_UB:0] <= WR_LHP_stat_count1[STAT_COUNTER_CLEAR_BITS_UB:0];
+        if(WR_GHP_stat_en1) GHP_trend_stat_counter_regs[WR_addr1][WR_GHP_index1][STAT_COUNTER_CLEAR_BITS_UB:0] <= WR_GHP_stat_count1[STAT_COUNTER_CLEAR_BITS_UB:0];
       end
 
       if(clear_en2)
@@ -192,17 +198,24 @@ module meta_predictor #(
       end
       else 
       begin
-        if(WR_SP_en2)  SP_trend_stat_counter_regs[WR_addr2][WR_SP_index2][STAT_COUNTER_WIDTH_UB:0]   <= WR_SP_stat_count2;
-        if(WR_LHP_en2) LHP_trend_stat_counter_regs[WR_addr2][WR_LHP_index2][STAT_COUNTER_WIDTH_UB:0] <= WR_LHP_stat_count2;
-        if(WR_GHP_en2) GHP_trend_stat_counter_regs[WR_addr2][WR_GHP_index2][STAT_COUNTER_WIDTH_UB:0] <= WR_GHP_stat_count2;
+        if(WR_SP_stat_en2)  SP_trend_stat_counter_regs[WR_addr2][WR_SP_index2][STAT_COUNTER_CLEAR_BITS_UB:0]   <= WR_SP_stat_count2[STAT_COUNTER_CLEAR_BITS_UB:0];
+        if(WR_LHP_stat_en2) LHP_trend_stat_counter_regs[WR_addr2][WR_LHP_index2][STAT_COUNTER_CLEAR_BITS_UB:0] <= WR_LHP_stat_count2[STAT_COUNTER_CLEAR_BITS_UB:0];
+        if(WR_GHP_stat_en2) GHP_trend_stat_counter_regs[WR_addr2][WR_GHP_index2][STAT_COUNTER_CLEAR_BITS_UB:0] <= WR_GHP_stat_count2[STAT_COUNTER_CLEAR_BITS_UB:0];
       end
 
-      if(WR_SP_en1)  SP_trend_stat_counter_regs[WR_addr1][WR_SP_index1][2 + STAT_COUNTER_WIDTH:STAT_COUNTER_WIDTH]   <= WR_SP_trend_count1;
-      if(WR_LHP_en1) LHP_trend_stat_counter_regs[WR_addr1][WR_LHP_index1][2 + STAT_COUNTER_WIDTH:STAT_COUNTER_WIDTH] <= WR_LHP_trend_count1;
-      if(WR_GHP_en1) GHP_trend_stat_counter_regs[WR_addr1][WR_GHP_index1][2 + STAT_COUNTER_WIDTH:STAT_COUNTER_WIDTH] <= WR_GHP_trend_count1;
-      if(WR_SP_en2)  SP_trend_stat_counter_regs[WR_addr2][WR_SP_index2][2 + STAT_COUNTER_WIDTH:STAT_COUNTER_WIDTH]   <= WR_SP_trend_count2;
-      if(WR_LHP_en2) LHP_trend_stat_counter_regs[WR_addr2][WR_LHP_index2][2 + STAT_COUNTER_WIDTH:STAT_COUNTER_WIDTH] <= WR_LHP_trend_count2;
-      if(WR_GHP_en2) GHP_trend_stat_counter_regs[WR_addr2][WR_GHP_index2][2 + STAT_COUNTER_WIDTH:STAT_COUNTER_WIDTH] <= WR_GHP_trend_count2;
+      if(WR_SP_stat_en1)  SP_trend_stat_counter_regs[WR_addr1][WR_SP_index1][STAT_COUNTER_WIDTH_UB:STAT_COUNTER_CLEAR_BITS]   <= WR_SP_stat_count1[STAT_COUNTER_WIDTH_UB:STAT_COUNTER_CLEAR_BITS];
+      if(WR_LHP_stat_en1) LHP_trend_stat_counter_regs[WR_addr1][WR_LHP_index1][STAT_COUNTER_WIDTH_UB:STAT_COUNTER_CLEAR_BITS] <= WR_LHP_stat_count1[STAT_COUNTER_WIDTH_UB:STAT_COUNTER_CLEAR_BITS];
+      if(WR_GHP_stat_en1) GHP_trend_stat_counter_regs[WR_addr1][WR_GHP_index1][STAT_COUNTER_WIDTH_UB:STAT_COUNTER_CLEAR_BITS] <= WR_GHP_stat_count1[STAT_COUNTER_WIDTH_UB:STAT_COUNTER_CLEAR_BITS];
+      if(WR_SP_stat_en2)  SP_trend_stat_counter_regs[WR_addr2][WR_SP_index2][STAT_COUNTER_WIDTH_UB:STAT_COUNTER_CLEAR_BITS]   <= WR_SP_stat_count2[STAT_COUNTER_WIDTH_UB:STAT_COUNTER_CLEAR_BITS];
+      if(WR_LHP_stat_en2) LHP_trend_stat_counter_regs[WR_addr2][WR_LHP_index2][STAT_COUNTER_WIDTH_UB:STAT_COUNTER_CLEAR_BITS] <= WR_LHP_stat_count2[STAT_COUNTER_WIDTH_UB:STAT_COUNTER_CLEAR_BITS];
+      if(WR_GHP_stat_en2) GHP_trend_stat_counter_regs[WR_addr2][WR_GHP_index2][STAT_COUNTER_WIDTH_UB:STAT_COUNTER_CLEAR_BITS] <= WR_GHP_stat_count2[STAT_COUNTER_WIDTH_UB:STAT_COUNTER_CLEAR_BITS];
+
+      if(WR_SP_trend_en1)  SP_trend_stat_counter_regs[WR_addr1][WR_SP_index1][2 + STAT_COUNTER_WIDTH:STAT_COUNTER_WIDTH]   <= WR_SP_trend_count1;
+      if(WR_LHP_trend_en1) LHP_trend_stat_counter_regs[WR_addr1][WR_LHP_index1][2 + STAT_COUNTER_WIDTH:STAT_COUNTER_WIDTH] <= WR_LHP_trend_count1;
+      if(WR_GHP_trend_en1) GHP_trend_stat_counter_regs[WR_addr1][WR_GHP_index1][2 + STAT_COUNTER_WIDTH:STAT_COUNTER_WIDTH] <= WR_GHP_trend_count1;
+      if(WR_SP_trend_en2)  SP_trend_stat_counter_regs[WR_addr2][WR_SP_index2][2 + STAT_COUNTER_WIDTH:STAT_COUNTER_WIDTH]   <= WR_SP_trend_count2;
+      if(WR_LHP_trend_en2) LHP_trend_stat_counter_regs[WR_addr2][WR_LHP_index2][2 + STAT_COUNTER_WIDTH:STAT_COUNTER_WIDTH] <= WR_LHP_trend_count2;
+      if(WR_GHP_trend_en2) GHP_trend_stat_counter_regs[WR_addr2][WR_GHP_index2][2 + STAT_COUNTER_WIDTH:STAT_COUNTER_WIDTH] <= WR_GHP_trend_count2;
     end
   end
 
@@ -214,11 +227,11 @@ module meta_predictor #(
     .rst_n(rst_n),
     .PL_stall(PL_stall),
 
-    .prediction_result(prediction_result),    
+    .corrected_result(corrected_result),    
     .prediction_result_id(prediction_result_id),
     .prediction_result_ex(prediction_result_ex),
 
-    .prediction_en(prediction_en),
+    .corrected_en(corrected_en),
     .rollback_en_id(rollback_en_id),
     .rollback_en_ex(rollback_en_ex),
 
@@ -267,13 +280,22 @@ module meta_predictor #(
     .clear_en1(clear_en1),
     .clear_en2(clear_en2),
 
-    .WR_SP_en1(WR_SP_en1),
-    .WR_SP_en2(WR_SP_en2),    
-    .WR_LHP_en1(WR_LHP_en1),
-    .WR_LHP_en2(WR_LHP_en2),   
-    .WR_GHP_en1(WR_GHP_en1),
-    .WR_GHP_en2(WR_GHP_en2),
-  
+    .WR_SP_stat_en1(WR_SP_stat_en1),
+    .WR_LHP_stat_en1(WR_LHP_stat_en1),
+    .WR_GHP_stat_en1(WR_GHP_stat_en1),
+
+    .WR_SP_stat_en2(WR_SP_stat_en2),
+    .WR_LHP_stat_en2(WR_LHP_stat_en2),
+    .WR_GHP_stat_en2(WR_GHP_stat_en2),
+
+    .WR_SP_trend_en1(WR_SP_trend_en1),
+    .WR_LHP_trend_en1(WR_LHP_trend_en1),
+    .WR_GHP_trend_en1(WR_GHP_trend_en1),
+
+    .WR_SP_trend_en2(WR_SP_trend_en2),
+    .WR_LHP_trend_en2(WR_LHP_trend_en2),
+    .WR_GHP_trend_en2(WR_GHP_trend_en2),
+
     .WR_addr1(WR_addr1),
     .WR_addr2(WR_addr2),
 

@@ -4,7 +4,7 @@ module pc_reg(
 	input clk,
 	input rst_n,
 
-	input WR_en,	
+	input PL_stall,	
 	input [31:0]pc_new,
 	output reg [31:0]pc_out
   );
@@ -14,7 +14,7 @@ module pc_reg(
 	begin
 		if(!rst_n)
 			pc_out <= `zeroword;
-		else if(WR_en)
+		else if(!PL_stall)
 			pc_out <= pc_new;
 	end	
 endmodule

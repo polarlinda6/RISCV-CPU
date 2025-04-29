@@ -5,47 +5,36 @@ module ras #(
 )(
 	input  clk,
 	input  rst_n,
-	input  PL_flush,	
-	input  prediction_en,
-	
-	input  jal, 
-	input  jalr,
-	input  Rd_is_ra,
-	input  [31:0]pc_add_4,
-	
-	input  jal_id, 
-	input  jalr_id,
-	input  Rd_is_ra_id,
-	input  Rs1_is_ra_id,
 
+	input  pop, 
+	input  push,
+	input  rollback_pop,
+	input  rollback_push,
+
+	input  [31:0]pc_add_4,
 	output [31:0]jalr_pc_prediction
 );
 
 	localparam STACK_ADDR_WIDTH_UB = STACK_ADDR_WIDTH - 1;
 	localparam [STACK_ADDR_WIDTH_UB:0]N_ONE = {STACK_ADDR_WIDTH{1'b1}};	
-	localparam [STACK_ADDR_WIDTH_UB:0]ZERO  = {STACK_ADDR_WIDTH{1'b0}};
-	localparam [STACK_ADDR_WIDTH_UB:0]P_ONE = {ZERO[STACK_ADDR_WIDTH_UB:1], 1'b1};
-
-
-	wire push, rollback_pop, rollback_push;
-	assign push          = (!PL_flush) && Rd_is_ra && (jal || jalr);
-	assign rollback_pop  = PL_flush && Rd_is_ra_id && (jal_id || jalr_id);
-	assign rollback_push = PL_flush && Rs1_is_ra_id && jalr_id;
+	localparam [STACK_ADDR_WIDTH_UB:0]P_ONE = {{STACK_ADDR_WIDTH_UB{1'b0}}, 1'b1};
 
 	wire [3:0]offset;
-	assign offset = push || rollback_push ? P_ONE :
-	                (rollback_pop || (jalr && prediction_en)) ? N_ONE : ZERO;
+	assign offset = push || rollback_push ? P_ONE : N_ONE;
 
 	circular_stack #(
 		.STACK_ADDR_WIDTH(STACK_ADDR_WIDTH)
 	) ras_stack_inst(
 		.clk(clk),
 		.rst_n(rst_n),
-		.push(push),
+
+		.WR_data_en(push),
 		.din(pc_add_4),
-		.dout(jalr_pc_prediction),
-		 
-		.offset(offset)
+		
+		.WR_offset_en((push == pop) || (rollback_push == rollback_pop)),
+		.offset(offset),
+				
+		.dout(jalr_pc_prediction)
 	);	
 endmodule
 
@@ -56,11 +45,13 @@ module circular_stack #(
 	input clk,
 	input rst_n,
 
-	input  push,
+	input  WR_data_en,
 	input  [31:0]din,
-	output [31:0]dout,
 
-	input  [3:0] offset 
+	input  WR_offset_en,
+	input  [3:0]offset,
+
+	output [31:0]dout
 );
 
 	localparam STACK_ADDR_WIDTH_UB = STACK_ADDR_WIDTH - 1;
@@ -70,24 +61,22 @@ module circular_stack #(
 	reg [31:0]regs[STACK_DEPTH - 1:0]; 
 
 	assign dout = regs[stack_top_pointer];
+
 /////////////////////////////////////////////////////////////////////////////  
 
 	wire [STACK_ADDR_WIDTH_UB:0]stack_top_pointer_next;
-	assign stack_top_pointer_next = stack_top_pointer + offset;
-	
+	assign stack_top_pointer_next = WR_offset_en ? stack_top_pointer + offset : stack_top_pointer;
 
-	integer i;
 	always @(posedge clk) 
 	begin
 		if (!rst_n)
 			begin
 				stack_top_pointer <= {STACK_ADDR_WIDTH{1'b0}};
-        for (i = 0; i < STACK_DEPTH; i = i + 1) regs[i] <= `zeroword;
 			end			
 		else 
 			begin					
 				stack_top_pointer <= stack_top_pointer_next;	
-				if (push) regs[stack_top_pointer_next] <= din;
+				if (WR_data_en) regs[stack_top_pointer_next] <= din;
 			end	
 	end	
 endmodule 

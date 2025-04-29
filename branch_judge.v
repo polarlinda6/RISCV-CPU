@@ -10,10 +10,10 @@ module branch_judge(
 	
 	input zero,
 	input slt_result,
-	input [31:0]jalr_jump_pc_actual,
+	input [31:0]jalr_pc_jump_actual,
 
 	input B_type_prediction_result,
-	input [31:0]jalr_jump_pc,
+	input [31:0]jalr_pc_jump,
 	
 	output PL_flush
   );
@@ -22,8 +22,8 @@ module branch_judge(
 	parallel_unsig_comparator_ne #(
 		.WIDTH(32)
 	) jalr_pc_comparator_inst(
-		.data1(jalr_jump_pc_actual),
-		.data2(jalr_jump_pc),
+		.data1(jalr_pc_jump_actual),
+		.data2(jalr_pc_jump),
 		.compare_result(ne_result)
 	);
 

@@ -113,25 +113,26 @@ module history_predictor #(
     .compare_result(index_conflict)
   );
 
-//////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////
 
-  wire [JUMP_STATUS_COUNTER_WIDTH_UB:0]count_offset;
-  assign count_offset = corrected_result ? N_ONE : P_ONE;
-
-  wire [JUMP_STATUS_COUNTER_WIDTH_UB:0]count_offset_ex;
-  assign count_offset_ex = prediction_result_branch_failed ? P_ONE : N_ONE;
-  
-  wire [JUMP_STATUS_COUNTER_WIDTH_UB:0]A, B;
-  assign A = rollback_en_ex ? HP_count_ex     : HP_count;
-  assign B = rollback_en_ex ? count_offset_ex : count_offset;
-
+  wire [JUMP_STATUS_COUNTER_WIDTH_UB:0]WR_data_corrected, WR_data_rollback_ex;
   no_overflow_adder #(
     .WIDTH(JUMP_STATUS_COUNTER_WIDTH)
-  ) adder_inst(
-    .A(A),
-    .B(B),
+  ) corrected_adder_inst(
+    .A(HP_count),
+    .B(corrected_result ? N_ONE : P_ONE),
     .PO(),
     .NO(),
-    .result(WR_data2)
+    .result(WR_data_corrected)
   );
+  no_overflow_adder #(
+    .WIDTH(JUMP_STATUS_COUNTER_WIDTH)
+  ) rollback_ex_adder_inst(
+    .A(HP_count_ex),
+    .B(prediction_result_branch_failed ? P_ONE : N_ONE),
+    .PO(),
+    .NO(),
+    .result(WR_data_rollback_ex)
+  );
+  assign WR_data2 = rollback_en_ex ? WR_data_rollback_ex : WR_data_corrected;
 endmodule

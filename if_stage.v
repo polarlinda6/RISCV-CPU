@@ -10,7 +10,7 @@ module if_stage(
 
 	output [31:0]pc_add_imme,
     output [31:0]pc_add_4,    
-    output [31:0]jalr_jump_pc_or_pc, 
+    output [31:0]jalr_pc_jump_or_pc, 
     output B_type_prediction_result,
 
 
@@ -67,14 +67,14 @@ module if_stage(
     );
     
     wire [31:0]pc;
+    wire [31:0]jalr_pc_prediction;	
+
     wire PL_stall_inner;
 
 	assign rom_addr = pc;
     assign instr_if_o = PL_stall_inner ? `nop : instr_if_i;
 
-////////////////////////////////////////////////////////////////////////
-    
-    //mini decode
+
     wire jal;
     wire jalr;
     wire B_type;
@@ -84,96 +84,31 @@ module if_stage(
     wire bge;
     wire bltu;
     wire bgeu;
-    wire [2:0] func3;
-    wire [4:0] Rd; 
+    wire [2:0]func3;
     wire [31:0]imme;
 
-
-    mini_decode mini_decode_inst(
-        .instr(instr_if_i),	
-
-        .jal(jal),
-        .jalr(jalr),
-        .B_type(B_type),
-        .beq(beq),
-        .bne(bne),
-        .blt(blt),
-        .bge(bge),
-        .bltu(bltu),
-        .bgeu(bgeu),
-        
-        .Rs1(regs_Rs1_if_o),
-        .Rs2(regs_Rs2_if_o),
-
-        .Rd(Rd),    
-        .func3(func3),
-        .imme(imme)
-    );
-
-
-    //mini control
+    wire ras_pop;
+    wire ras_push;
+    wire ras_rollback_pop;
+    wire ras_rollback_push;
     wire jalr_prediction_en;
     wire B_type_prediction_en;
 
-
-    wire [1:0]Rs1_forward_signal;
-    wire [1:0]Rs2_forward_signal;
-
-    mini_control mini_control_inst(
-        .jalr(jalr),
-        .B_type(B_type),
-        .Rs1(regs_Rs1_if_o),
-        .Rs2(regs_Rs2_if_o),
-
-        .Rd_id(Rd_id_o),                
-        .Rd_ex(Rd_id_ex_o),
-        .Rd_mem(Rd_ex_mem_o),
-        .Rd_wb(Rd_mem_wb_o),
-
-        .RegWrite_id(RegWrite_id_o),
-        .RegWrite_ex(RegWrite_id_ex_o),
-        .RegWrite_mem(RegWrite_ex_mem_o),
-        .RegWrite_wb(RegWrite_mem_wb_o),
-
-        .MemRead_ex(MemRead_id_ex_o),
-        .MemRead_mem(MemRead_ex_mem_o),
-
-        .PL_stall_inner(PL_stall_inner),
-        .jalr_prediction_en(jalr_prediction_en),
-        .B_type_prediction_en(B_type_prediction_en),
-        .Rs1_forward_signal(Rs1_forward_signal),
-        .Rs2_forward_signal(Rs2_forward_signal)
-    );
-
-
-    //forward
+    wire B_type_result;
     wire [31:0]forwardA_data, forwardB_data;
 
 
-    mux3 forwardA_data_inst(
-        .data1(result_ex_mem_o),
-        .data2(load_or_result_mem_wb_o),
-        .data3(regs_Rs1_data_if_i),
-        .signal(Rs1_forward_signal),
-        .dout(forwardA_data)
-    );
-    mux3 forwardB_data_inst(
-        .data1(result_ex_mem_o),
-        .data2(load_or_result_mem_wb_o),
-        .data3(regs_Rs2_data_if_i),
-        .signal(Rs2_forward_signal),
-        .dout(forwardB_data)
-    );
-
+////////////////////////////////////////////////////////////////
 
     //pc_add_imme + pc_add_4 + pc_jump
     wire [31:0]pc_jump;
 
     wire [31:0]A;
-    mux adderB_inst(
-        .data1(forwardA_data),
-        .data2(pc),
-        .signal(jalr),
+    mux3 adderA_mux3_inst(
+        .data1(jalr_pc_prediction),
+        .data2(forwardA_data),
+        .data3(pc),
+        .signal({jalr_prediction_en, jalr}),
         .dout(A)
     );
     cla_adder32 pc_add_imme_inst(
@@ -198,6 +133,34 @@ module if_stage(
     );
 
 
+   //jalr_pc_jump_or_pc
+    mux jalr_pc_jump_or_pc_inst(
+        .data1(pc_jump),
+        .data2(pc),
+        .signal(jalr),
+        .dout(jalr_pc_jump_or_pc)
+    );
+
+   //pc
+    wire [31:0]pc_new;
+    mux3 pc_data_mux3_inst(
+        .data1(pc_rollback),
+        .data2(pc_jump),
+        .data3(pc_add_4),
+        .signal({PL_flush, jal || jalr || (B_type && B_type_result)}),
+        .dout(pc_new)
+    );    
+    pc_reg pc_reg_inst (
+        .clk(clk), 
+        .rst_n(rst_n),
+
+        .PL_stall(PL_stall || PL_stall_inner),       
+        .pc_new(pc_new), 
+        .pc_out(pc)
+    );
+
+///////////////////////////////////////////////////////////////////////////////////////
+
    //fast comparator   
     wire compare_result;
    
@@ -208,46 +171,29 @@ module if_stage(
         .compare_result(compare_result)
     );
 
-
     //B_type_result
-    wire B_type_result;
-
     mux #(
         .WIDTH(1)
-    ) B_type_result_inst(
+    ) B_type_result_mux_inst(
         .data1(B_type_prediction_result),
         .data2(compare_result),
         .signal(B_type_prediction_en),
         .dout(B_type_result)
     );
 
+/////////////////////////////////////////////////////////////////////////////////////
 
     //branch predictor   
-    wire [31:0]jalr_pc_prediction;	
-    
     branch_predictor branch_predictor_inst(
         .clk(clk), 
         .rst_n(rst_n),
-        .PL_stall(PL_stall),
+        .PL_stall(PL_stall || PL_stall_inner),
         .PL_flush(PL_flush),
-        .jalr_prediction_en(jalr_prediction_en),
-        .B_type_prediction_en(B_type_prediction_en),
  
         .B_type_prediction_result(B_type_prediction_result),
         .jalr_pc_prediction(jalr_pc_prediction),
-        
-        
-        .jal(jal),
-        .jalr(jalr),             
-        .Rd(Rd),     
+      
         .pc_add_4(pc_add_4),
-
-        .jal_id(jal_id_o),
-        .jalr_id(jalr_id_o),       
-        .Rd_id(Rd_id_o),
-        .Rs1_id(Rs1_id_o),
-  
-
         .imme(imme),
 
         .B_type(B_type),
@@ -281,39 +227,93 @@ module if_stage(
         .B_type_prediction_result_branch_failed(B_type_prediction_result_branch_failed)
     );
 
+////////////////////////////////////////////////////////////////////////
+    
+    //mini decode
+    wire [4:0] Rd; 
 
-    //jalr_jump_pc_or_pc
-    mux3 jalr_jump_pc_or_pc_inst(
-        .data1(jalr_pc_prediction),
-        .data2(pc_jump),
-        .data3(pc),
-        .signal({jalr_prediction_en, jalr}),
-        .dout(jalr_jump_pc_or_pc)
+    mini_decode mini_decode_inst(
+        .instr(instr_if_i),	
+
+        .jal(jal),
+        .jalr(jalr),
+        .B_type(B_type),
+        .beq(beq),
+        .bne(bne),
+        .blt(blt),
+        .bge(bge),
+        .bltu(bltu),
+        .bgeu(bgeu),
+        
+        .Rs1(regs_Rs1_if_o),
+        .Rs2(regs_Rs2_if_o),
+
+        .Rd(Rd),    
+        .func3(func3),
+        .imme(imme)
     );
 
+    //mini control
+    wire [1:0]Rs1_forward_signal;
+    wire [1:0]Rs2_forward_signal;
 
-   //pc
-    wire [31:0]pc_data;    
-    wire [31:0]pc_new;
-    mux3 pc_data_inst(
-        .data1(jalr_pc_prediction),
-        .data2(pc_jump),
-        .data3(pc_add_4),
-        .signal({jalr_prediction_en, jal || jalr || (B_type && B_type_result)}),
-        .dout(pc_data)
-    );    
-    mux pc_mux_inst(
-        .data1(pc_rollback),
-        .data2(pc_data),
-        .signal(PL_flush),
-        .dout(pc_new)
+    mini_control mini_control_inst(
+        .Rs1(regs_Rs1_if_o),
+        .Rs2(regs_Rs2_if_o),
+
+        .Rd_id(Rd_id_o),                
+        .Rd_ex(Rd_id_ex_o),
+        .Rd_mem(Rd_ex_mem_o),
+        .Rd_wb(Rd_mem_wb_o),
+
+        .RegWrite_id(RegWrite_id_o),
+        .RegWrite_ex(RegWrite_id_ex_o),
+        .RegWrite_mem(RegWrite_ex_mem_o),
+        .RegWrite_wb(RegWrite_mem_wb_o),
+
+        .MemRead_ex(MemRead_id_ex_o),
+        .MemRead_mem(MemRead_ex_mem_o),
+
+        .Rs1_forward_signal(Rs1_forward_signal),
+        .Rs2_forward_signal(Rs2_forward_signal),
+       
+
+        .B_type(B_type),       
+        .B_type_prediction_en(B_type_prediction_en),
+
+
+        .jal(jal),
+        .jalr(jalr),             
+        .jal_id(jal_id_o),
+        .jalr_id(jalr_id_o),     
+        .PL_flush(PL_flush),
+        .PL_stall(PL_stall || PL_stall_inner),
+
+        .Rd(Rd),      
+        .Rs1_id(Rs1_id_o),
+
+        .ras_pop(ras_pop),
+        .ras_push(ras_push),
+        .ras_rollback_pop(ras_rollback_pop),
+        .ras_rollback_push(ras_rollback_push),
+
+        .jalr_prediction_en(jalr_prediction_en),        
+        .PL_stall_inner(PL_stall_inner)
     );
-    pc_reg pc_reg_inst (
-        .clk(clk), 
-        .rst_n(rst_n),
 
-        .WR_en(!(PL_stall || PL_stall_inner)),       
-        .pc_new(pc_new), 
-        .pc_out(pc)
+    //forward
+    mux3 forwardA_data_inst(
+        .data1(result_ex_mem_o),
+        .data2(load_or_result_mem_wb_o),
+        .data3(regs_Rs1_data_if_i),
+        .signal(Rs1_forward_signal),
+        .dout(forwardA_data)
+    );
+    mux3 forwardB_data_inst(
+        .data1(result_ex_mem_o),
+        .data2(load_or_result_mem_wb_o),
+        .data3(regs_Rs2_data_if_i),
+        .signal(Rs2_forward_signal),
+        .dout(forwardB_data)
     );
 endmodule

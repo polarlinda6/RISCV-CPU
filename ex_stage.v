@@ -14,7 +14,7 @@ module ex_stage(
 
 	input  [31:0]pc_add_imme_ex_i,
 	input  [31:0]pc_add_4_ex_i, 
-	input  [31:0]jalr_jump_pc_or_pc_ex_i,	  
+	input  [31:0]jalr_pc_jump_or_pc_ex_i,	  
     input  B_type_prediction_result_ex_i,
     
 	output [31:0]pc_rollback_ex_o,
@@ -62,7 +62,7 @@ module ex_stage(
 	
     wire [31:0]ALU_DA, ALU_DB;
     mux ALU_DA_mux (
-        .data1(jalr_jump_pc_or_pc_ex_i), 
+        .data1(jalr_pc_jump_or_pc_ex_i), 
         .data2(A), 
         .signal(ALU_DA_signal), 
         .dout(ALU_DA)
@@ -135,8 +135,8 @@ module ex_stage(
         );
 
 
-    wire [31:0] jalr_jump_pc_actual;
-    assign jalr_jump_pc_actual= ALU_result & 32'hffffffe;
+    wire [31:0] jalr_pc_jump_actual;
+    assign jalr_pc_jump_actual= ALU_result & 32'hffffffe;
 	branch_judge branch_judge_inst (
         .B_type(B_type),
         .beq(beq), 
@@ -149,15 +149,15 @@ module ex_stage(
 
         .zero(zero), 
         .slt_result(ALU_result[0]), 
-        .jalr_jump_pc_actual(jalr_jump_pc_actual),            
+        .jalr_pc_jump_actual(jalr_pc_jump_actual),            
         
         .B_type_prediction_result(B_type_prediction_result_ex_i),
-        .jalr_jump_pc(jalr_jump_pc_or_pc_ex_i),
+        .jalr_pc_jump(jalr_pc_jump_or_pc_ex_i),
 
         .PL_flush(PL_flush)
         );
     mux3 branch_failed_inst(
-        .data1(jalr_jump_pc_actual),
+        .data1(jalr_pc_jump_actual),
         .data2(pc_add_4_ex_i),
         .data3(pc_add_imme_ex_i),
         .signal({jalr, B_type_prediction_result_ex_i}),

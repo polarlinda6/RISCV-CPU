@@ -119,7 +119,7 @@ module parallel_unsig_comparator_eq_lt #(
   );
   large_fan_in_or #(
     .WIDTH(1),
-    .AND_QUANTITY(PARALLEL_DEGREE)
+    .OR_QUANTITY(PARALLEL_DEGREE)
   ) lt_inst(
     .din({lts[3], (!lts[3] && eqs[3] && lts[2]), lt_2, lt_3}),
     .dout(lt_result)
