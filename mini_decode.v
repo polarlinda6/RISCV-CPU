@@ -48,6 +48,12 @@ module mini_decode(
  	assign B_imme=    {{20{instr[31]}},instr[7],instr[30:25],instr[11:8],1'b0};
 
  	
- 	assign imme=jal ? jal_imme : 
-              jalr ? jalr_imme : B_imme;
+	parallel_mux #(
+		.WIDTH(32),
+		.MUX_QUANTITY(3)
+	) imme_mux3_inst(
+ 		.din({jal_imme, jalr_imme, B_imme}),
+		.signal({jal, jalr, B_type}),
+ 		.dout(imme)
+ 	);
 endmodule

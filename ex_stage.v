@@ -62,14 +62,14 @@ module ex_stage(
 	
     wire [31:0]ALU_DA, ALU_DB;
     mux ALU_DA_mux (
-        .data1(jalr_pc_jump_or_pc_ex_i), 
-        .data2(A), 
+        .din1(jalr_pc_jump_or_pc_ex_i), 
+        .din2(A), 
         .signal(ALU_DA_signal), 
         .dout(ALU_DA)
         );
     mux ALU_DB_mux (
-        .data1(imme_ex_i), 
-        .data2(B), 
+        .din1(imme_ex_i), 
+        .din2(B), 
         .signal(ALU_DB_signal), 
         .dout(ALU_DB)
         );
@@ -84,8 +84,8 @@ module ex_stage(
 
 
     mux result_mux_inst(
-        .data1(pc_add_4_ex_i),
-        .data2(ALU_result),
+        .din1(pc_add_4_ex_i),
+        .din2(ALU_result),
         .signal(jal | jalr),
         .dout(result_ex_o)
     );
@@ -120,16 +120,16 @@ module ex_stage(
         .PL_stall(PL_stall)
         );
     mux3 mux3_forwardA (
-        .data1(result_ex_mem_o), 
-        .data2(load_or_result_mem_wb_o), 
-        .data3(Rs1_data_ex_i), 
+        .din1(result_ex_mem_o), 
+        .din2(load_or_result_mem_wb_o), 
+        .din3(Rs1_data_ex_i), 
         .signal(forwardA), 
         .dout(A)
         );
     mux3 mux3_forwardB (
-        .data1(result_ex_mem_o), 
-        .data2(load_or_result_mem_wb_o), 
-        .data3(Rs2_data_ex_i), 
+        .din1(result_ex_mem_o), 
+        .din2(load_or_result_mem_wb_o), 
+        .din3(Rs2_data_ex_i), 
         .signal(forwardB), 
         .dout(B)
         );
@@ -156,10 +156,10 @@ module ex_stage(
 
         .PL_flush(PL_flush)
         );
-    mux3 branch_failed_inst(
-        .data1(jalr_pc_jump_actual),
-        .data2(pc_add_4_ex_i),
-        .data3(pc_add_imme_ex_i),
+    mux3 branch_failed_mux3_inst(
+        .din1(jalr_pc_jump_actual),
+        .din2(pc_add_4_ex_i),
+        .din3(pc_add_imme_ex_i),
         .signal({jalr, B_type_prediction_result_ex_i}),
         .dout(pc_rollback_ex_o)
     );

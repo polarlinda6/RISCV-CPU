@@ -46,8 +46,8 @@ module prediction_arbiter #(
   parallel_mux #(
     .WIDTH(STAT_COUNTER_WIDTH),
     .MUX_QUANTITY(3)
-  ) stat_only_inst(
-    .data({SP_stat_count, LHP_stat_count, GHP_stat_count}),
+  ) stat_only_mux3_inst(
+    .din({SP_stat_count, LHP_stat_count, GHP_stat_count}),
     .signal({SP_only, LHP_only, GHP_only}),
     .dout(stat_only)
   );
@@ -61,7 +61,7 @@ module prediction_arbiter #(
 
   parallel_comparator #(
     .WIDTH(STAT_COUNTER_WIDTH + 1)
-  ) stat_arbiter_inst (
+  ) stat_arbiter_comparator_inst (
     .data1(stat_sum),
     .data2({`zero, stat_only}),
     .beq_result(double_arbitrate_signal),
@@ -76,8 +76,8 @@ module prediction_arbiter #(
   parallel_mux #(
     .WIDTH(4),
     .MUX_QUANTITY(3)
-  ) trend_only_inst(
-    .data({SP_trend_decode, LHP_trend_decode, GHP_trend_decode}),
+  ) trend_only_mux3_inst(
+    .din({SP_trend_decode, LHP_trend_decode, GHP_trend_decode}),
     .signal({SP_only, LHP_only, GHP_only}),
     .dout(trend_only)
   ); 
@@ -97,8 +97,8 @@ module prediction_arbiter #(
   parallel_mux #(
     .WIDTH(1),
     .MUX_QUANTITY(3)
-  ) prediction_result_inst(
-    .data({SP_prediction_result, LHP_prediction_result, GHP_prediction_result}),
+  ) prediction_result_mux3_inst(
+    .din({SP_prediction_result, LHP_prediction_result, GHP_prediction_result}),
     .signal({no_conflict || SP_sel, LHP_sel, GHP_sel}),
     .dout(prediction_result)
   );

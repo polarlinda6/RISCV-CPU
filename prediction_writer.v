@@ -306,7 +306,7 @@ module prediction_writer #(
     .WIDTH(3),
     .MUX_QUANTITY(6)
   ) SP_B_mux6_inst(
-    .data({P_THREE, P_TWO, P_ONE, N_ONE, N_TWO, N_THREE}),
+    .din({P_THREE, P_TWO, P_ONE, N_ONE, N_TWO, N_THREE}),
     .signal(SP_B_signal_ex),
     .dout(SP_B_ex)
   );
@@ -314,7 +314,7 @@ module prediction_writer #(
     .WIDTH(3),
     .MUX_QUANTITY(6)
   ) LHP_B_mux6_inst(
-    .data({P_THREE, P_TWO, P_ONE, N_ONE, N_TWO, N_THREE}),
+    .din({P_THREE, P_TWO, P_ONE, N_ONE, N_TWO, N_THREE}),
     .signal(LHP_B_signal_ex),
     .dout(LHP_B_ex)
   );
@@ -322,7 +322,7 @@ module prediction_writer #(
     .WIDTH(3),
     .MUX_QUANTITY(6)
   ) GHP_B_mux6_inst(
-    .data({P_THREE, P_TWO, P_ONE, N_ONE, N_TWO, N_THREE}),
+    .din({P_THREE, P_TWO, P_ONE, N_ONE, N_TWO, N_THREE}),
     .signal(GHP_B_signal_ex),
     .dout(GHP_B_ex)
   );

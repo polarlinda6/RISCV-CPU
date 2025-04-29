@@ -53,7 +53,7 @@ module no_overflow_unsig_adder #(
   wire ltu;
   parallel_unsig_comparator_eq_lt #(
     .WIDTH(WIDTH)
-  ) comparator_inst(
+  ) ltu_comparator_inst(
     .data1(result_inner),
     .data2(A),
     .eq_result(),

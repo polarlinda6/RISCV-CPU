@@ -35,10 +35,10 @@ module trend_counter_operator(
   wire [2:0]B;
   mux3 #(
     .WIDTH(3)
-  ) B_inst(
-    .data1(true_down_false_up ? N_THREE : P_TWO),
-    .data2(true_down_false_up ? N_TWO   : P_ONE),
-    .data3(true_down_false_up ? N_TWO   : P_TWO),
+  ) B_mux3_inst(
+    .din1(true_down_false_up ? N_THREE : P_TWO),
+    .din2(true_down_false_up ? N_TWO   : P_ONE),
+    .din3(true_down_false_up ? N_TWO   : P_TWO),
     .signal({upward_trend_signal, downward_trend_signal}),
     .dout(B)
   );

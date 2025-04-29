@@ -105,9 +105,9 @@ module if_stage(
 
     wire [31:0]A;
     mux3 adderA_mux3_inst(
-        .data1(jalr_pc_prediction),
-        .data2(forwardA_data),
-        .data3(pc),
+        .din1(jalr_pc_prediction),
+        .din2(forwardA_data),
+        .din3(pc),
         .signal({jalr_prediction_en, jalr}),
         .dout(A)
     );
@@ -125,18 +125,18 @@ module if_stage(
         .result(pc_add_4),
         .cout()
     );   
-    mux jalr_set_inst(
-        .data1(pc_add_imme & 32'hfffffffe),
-        .data2(pc_add_imme),
+    mux jalr_set_mux_inst(
+        .din1(pc_add_imme & 32'hfffffffe),
+        .din2(pc_add_imme),
         .signal(jalr),
         .dout(pc_jump)
     );
 
 
    //jalr_pc_jump_or_pc
-    mux jalr_pc_jump_or_pc_inst(
-        .data1(pc_jump),
-        .data2(pc),
+    mux jalr_pc_jump_or_pc_mux_inst(
+        .din1(pc_jump),
+        .din2(pc),
         .signal(jalr),
         .dout(jalr_pc_jump_or_pc)
     );
@@ -144,9 +144,9 @@ module if_stage(
    //pc
     wire [31:0]pc_new;
     mux3 pc_data_mux3_inst(
-        .data1(pc_rollback),
-        .data2(pc_jump),
-        .data3(pc_add_4),
+        .din1(pc_rollback),
+        .din2(pc_jump),
+        .din3(pc_add_4),
         .signal({PL_flush, jal || jalr || (B_type && B_type_result)}),
         .dout(pc_new)
     );    
@@ -164,7 +164,9 @@ module if_stage(
    //fast comparator   
     wire compare_result;
    
-    fast_comparator comparator_inst(
+    fast_comparator #(
+        .WIDTH(32)
+    ) comparator_inst(
         .data1(forwardA_data),
         .data2(forwardB_data),
         .func3(func3),
@@ -175,8 +177,8 @@ module if_stage(
     mux #(
         .WIDTH(1)
     ) B_type_result_mux_inst(
-        .data1(B_type_prediction_result),
-        .data2(compare_result),
+        .din1(B_type_prediction_result),
+        .din2(compare_result),
         .signal(B_type_prediction_en),
         .dout(B_type_result)
     );
@@ -302,17 +304,21 @@ module if_stage(
     );
 
     //forward
-    mux3 forwardA_data_inst(
-        .data1(result_ex_mem_o),
-        .data2(load_or_result_mem_wb_o),
-        .data3(regs_Rs1_data_if_i),
+    mux3 #(
+        .WIDTH(32)
+    ) forwardA_data_mux3_inst(
+        .din1(result_ex_mem_o),
+        .din2(load_or_result_mem_wb_o),
+        .din3(regs_Rs1_data_if_i),
         .signal(Rs1_forward_signal),
         .dout(forwardA_data)
     );
-    mux3 forwardB_data_inst(
-        .data1(result_ex_mem_o),
-        .data2(load_or_result_mem_wb_o),
-        .data3(regs_Rs2_data_if_i),
+    mux3 #(
+        .WIDTH(32)
+    ) forwardB_data_mux3_inst(
+        .din1(result_ex_mem_o),
+        .din2(load_or_result_mem_wb_o),
+        .din3(regs_Rs2_data_if_i),
         .signal(Rs2_forward_signal),
         .dout(forwardB_data)
     );

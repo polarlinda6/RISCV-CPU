@@ -1,28 +1,28 @@
 module mux #(
 	parameter WIDTH = 32
 )(
-	input  [WIDTH - 1:0]data1,
-	input  [WIDTH - 1:0]data2,
+	input  [WIDTH - 1:0]din1,
+	input  [WIDTH - 1:0]din2,
 	input  signal,
 	output [WIDTH - 1:0]dout
-    );
+  );
 	
-	assign dout = signal ? data1 : data2;
+	assign dout = signal ? din1 : din2;
 endmodule
 
 
 module mux3 #(
 	parameter WIDTH = 32
 )(
-	input  [WIDTH - 1:0]data1,
-	input  [WIDTH - 1:0]data2,
-	input  [WIDTH - 1:0]data3,
+	input  [WIDTH - 1:0]din1,
+	input  [WIDTH - 1:0]din2,
+	input  [WIDTH - 1:0]din3,
 	input  [1:0]signal,
 	output [WIDTH - 1:0]dout
-    );
+  );
 	
-	assign dout = signal[1] ? data1 : 
-	              signal[0] ? data2 : data3;
+	assign dout = signal[1] ? din1 : 
+	              signal[0] ? din2 : din3;
 endmodule
 
 
@@ -30,7 +30,7 @@ module parallel_mux #(
 	parameter WIDTH = 32,
 	parameter MUX_QUANTITY = 4
 )(
-	input  [WIDTH * MUX_QUANTITY - 1:0]data,
+	input  [WIDTH * MUX_QUANTITY - 1:0]din,
 	input  [MUX_QUANTITY - 1:0]signal,
 	output [WIDTH - 1:0]dout
 );
@@ -46,7 +46,7 @@ module parallel_mux #(
 			localparam lb = WIDTH * i;
 			localparam ub = lb + WIDTH - 1;
 
-			assign result[ub:lb] = signal[i] ? data[ub:lb] : ZERO;
+			assign result[ub:lb] = signal[i] ? din[ub:lb] : ZERO;
 		end
 	endgenerate
 
