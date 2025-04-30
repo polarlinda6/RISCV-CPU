@@ -101,7 +101,7 @@ module datapath(
 	wire bge_id_ex_o;
 	wire bltu_id_ex_o;
 	wire bgeu_id_ex_o;
-    wire B_type_prediction_result_id_ex_o;
+    wire B_type_result_id_ex_o;
     wire [31:0]jalr_pc_jump_or_pc_id_ex_o;
     wire [31:0]pc_rollback_ex_o;
 
@@ -114,7 +114,7 @@ module datapath(
 	//wire bgeu_id_o;
     //wire jalr_id_o;
     wire [31:0]jalr_pc_jump_or_pc_if_id_o;
-    wire B_type_prediction_result_if_id_o;
+    wire B_type_result_if_id_o;
     //wire [4:0]Rd_id_o;
     //wire [4:0]Rs1_id_o;
 
@@ -123,7 +123,7 @@ module datapath(
     wire [31:0]pc_add_imme_if_o;
     wire [31:0]pc_add_4_if_o;
     wire [31:0]jalr_pc_jump_or_pc_if_o;
-    wire B_type_prediction_result_if_o;
+    wire B_type_result_if_o;
 	
     if_stage if_stage_inst (
         .clk(clk), 
@@ -137,7 +137,7 @@ module datapath(
         .pc_add_imme(pc_add_imme_if_o),
         .pc_add_4(pc_add_4_if_o),
         .jalr_pc_jump_or_pc(jalr_pc_jump_or_pc_if_o), 
-        .B_type_prediction_result(B_type_prediction_result_if_o),
+        .B_type_result(B_type_result_if_o),
 
         .pc_rollback(pc_rollback_ex_o),
         .Rs1_id_o(Rs1_id_o),
@@ -152,7 +152,7 @@ module datapath(
         .bltu_id_o(bltu),
         .bgeu_id_o(bgeu),           
         .pc_if_id_o(jalr_pc_jump_or_pc_if_id_o),   
-        .B_type_prediction_result_if_id_o(B_type_prediction_result_if_id_o), 
+        .B_type_result_if_id_o(B_type_result_if_id_o), 
     
         
         .B_type_branch_failed(B_type_id_ex_o),
@@ -163,7 +163,7 @@ module datapath(
         .bltu_branch_failed(bltu_id_ex_o),
         .bgeu_branch_failed(bgeu_id_ex_o),
         .pc_branch_filled(jalr_pc_jump_or_pc_if_id_o),
-        .B_type_prediction_result_branch_failed(B_type_prediction_result_id_ex_o),
+        .B_type_result_branch_failed(B_type_result_id_ex_o),
    
 
         .regs_Rs1_if_o(prediction_Rs1_if_o),
@@ -213,8 +213,8 @@ module datapath(
         .jalr_pc_jump_or_pc_if_id_i(jalr_pc_jump_or_pc_if_o),
         .jalr_pc_jump_or_pc_if_id_o(jalr_pc_jump_or_pc_if_id_o),
 
-        .B_type_prediction_result_if_id_i(B_type_prediction_result_if_o),
-        .B_type_prediction_result_if_id_o(B_type_prediction_result_if_id_o),
+        .B_type_result_if_id_i(B_type_result_if_o),
+        .B_type_result_if_id_o(B_type_result_if_id_o),
 
         .instr_if_id_i(instr_if_o), 
         .instr_if_id_o(instr_if_id_o),
@@ -289,12 +289,12 @@ module datapath(
         .pc_add_imme_id_ex_i(pc_add_imme_if_id_o),
         .pc_add_4_id_ex_i(pc_add_4_if_id_o),
         .jalr_pc_jump_or_pc_id_ex_i(jalr_pc_jump_or_pc_if_id_o),
-        .B_type_prediction_result_id_ex_i(B_type_prediction_result_if_id_o),
+        .B_type_result_id_ex_i(B_type_result_if_id_o),
 
         .pc_add_imme_id_ex_o(pc_add_imme_id_ex_o), 
         .pc_add_4_id_ex_o(pc_add_4_id_ex_o),
         .jalr_pc_jump_or_pc_id_ex_o(jalr_pc_jump_or_pc_id_ex_o),
-        .B_type_prediction_result_id_ex_o(B_type_prediction_result_id_ex_o),
+        .B_type_result_id_ex_o(B_type_result_id_ex_o),
 
         .imme_id_ex_i(imme_id_o), 
         .Rs1_data_id_ex_i(Rs1_data_id_o), 
@@ -377,7 +377,7 @@ module datapath(
         .pc_add_imme_ex_i(pc_add_imme_id_ex_o), 
         .pc_add_4_ex_i(pc_add_4_id_ex_o),
         .jalr_pc_jump_or_pc_ex_i(jalr_pc_jump_or_pc_id_ex_o),
-        .B_type_prediction_result_ex_i(B_type_prediction_result_id_ex_o),
+        .B_type_result_ex_i(B_type_result_id_ex_o),
 
 
         .pc_rollback_ex_o(pc_rollback_ex_o),

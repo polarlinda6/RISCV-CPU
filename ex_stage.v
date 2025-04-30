@@ -17,7 +17,7 @@ module ex_stage(
 	input  [31:0]pc_add_imme_ex_i,
 	input  [31:0]pc_add_4_ex_i, 
 	input  [31:0]jalr_pc_jump_or_pc_ex_i,	  
-    input  B_type_prediction_result_ex_i,
+    input  B_type_result_ex_i,
     
 	output [31:0]pc_rollback_ex_o,
 	
@@ -158,7 +158,7 @@ module ex_stage(
         .slt_result(ALU_result[0]), 
         .jalr_pc_jump_actual(jalr_pc_jump_actual),            
         
-        .B_type_prediction_result(B_type_prediction_result_ex_i),
+        .B_type_result(B_type_result_ex_i),
         .jalr_pc_jump(jalr_pc_jump_or_pc_ex_i),
 
         .PL_flush(PL_flush)
@@ -167,7 +167,7 @@ module ex_stage(
         .din1(jalr_pc_jump_actual),
         .din2(pc_add_4_ex_i),
         .din3(pc_add_imme_ex_i),
-        .signal({jalr, B_type_prediction_result_ex_i}),
+        .signal({jalr, B_type_result_ex_i}),
         .dout(pc_rollback_ex_o)
     );
 endmodule

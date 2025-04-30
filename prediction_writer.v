@@ -9,8 +9,8 @@ module prediction_writer #(
   input  PL_stall, 
 
   input  corrected_result,
-  input  prediction_result_id,
-  input  prediction_result_ex,
+  input  jump_result_id,
+  input  jump_result_ex,
 
   input  corrected_en,
   input  rollback_en_id,
@@ -382,11 +382,11 @@ module prediction_writer #(
   assign LHP_prediction_failed = corrected_result != LHP_count[JUMP_STATUS_COUNTER_WIDTH_UB];
   assign GHP_prediction_failed = corrected_result != GHP_count[JUMP_STATUS_COUNTER_WIDTH_UB];
 
-  assign SP_prediction_failed_id  = prediction_result_id != SP_prediction_result_id;
-  assign LHP_prediction_failed_id = prediction_result_id != LHP_count_id[JUMP_STATUS_COUNTER_WIDTH_UB];
-  assign GHP_prediction_failed_id = prediction_result_id != GHP_count_id[JUMP_STATUS_COUNTER_WIDTH_UB];
+  assign SP_prediction_failed_id  = jump_result_id != SP_prediction_result_id;
+  assign LHP_prediction_failed_id = jump_result_id != LHP_count_id[JUMP_STATUS_COUNTER_WIDTH_UB];
+  assign GHP_prediction_failed_id = jump_result_id != GHP_count_id[JUMP_STATUS_COUNTER_WIDTH_UB];
 
-  assign SP_prediction_failed_ex  = prediction_result_ex == SP_prediction_result_ex;
-  assign LHP_prediction_failed_ex = prediction_result_ex == LHP_count_ex[JUMP_STATUS_COUNTER_WIDTH_UB];
-  assign GHP_prediction_failed_ex = prediction_result_ex == GHP_count_ex[JUMP_STATUS_COUNTER_WIDTH_UB];
+  assign SP_prediction_failed_ex  = jump_result_ex == SP_prediction_result_ex;
+  assign LHP_prediction_failed_ex = jump_result_ex == LHP_count_ex[JUMP_STATUS_COUNTER_WIDTH_UB];
+  assign GHP_prediction_failed_ex = jump_result_ex == GHP_count_ex[JUMP_STATUS_COUNTER_WIDTH_UB];
 endmodule 

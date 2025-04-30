@@ -9,8 +9,8 @@ module meta_predictor #(
   input  PL_stall,
   
   input  corrected_result,
-  input  prediction_result_id,
-  input  prediction_result_ex,
+  input  jump_result_id,
+  input  jump_result_ex,
   
   input  corrected_en,
   input  rollback_en_id,
@@ -228,8 +228,8 @@ module meta_predictor #(
     .PL_stall(PL_stall),
 
     .corrected_result(corrected_result),    
-    .prediction_result_id(prediction_result_id),
-    .prediction_result_ex(prediction_result_ex),
+    .jump_result_id(jump_result_id),
+    .jump_result_ex(jump_result_ex),
 
     .corrected_en(corrected_en),
     .rollback_en_id(rollback_en_id),

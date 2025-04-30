@@ -11,7 +11,7 @@ module if_stage(
 	output [31:0]pc_add_imme,
     output [31:0]pc_add_4,    
     output [31:0]jalr_pc_jump_or_pc, 
-    output B_type_prediction_result,
+    output B_type_result,
 
 
     input  [31:0]pc_rollback,   
@@ -28,7 +28,7 @@ module if_stage(
     input  bltu_id_o,
     input  bgeu_id_o,
     input  [31:0]pc_if_id_o,
-    input  B_type_prediction_result_if_id_o,
+    input  B_type_result_if_id_o,
 
     input  B_type_branch_failed,
     input  beq_branch_failed,
@@ -38,7 +38,7 @@ module if_stage(
     input  bltu_branch_failed,
     input  bgeu_branch_failed,
     input  [31:0]pc_branch_filled,
-    input  B_type_prediction_result_branch_failed,
+    input  B_type_result_branch_failed,
 
 
     output [4:0]regs_Rs1_if_o,
@@ -94,7 +94,7 @@ module if_stage(
     wire jalr_prediction_en;
     wire B_type_prediction_en;
 
-    wire B_type_result;
+    wire B_type_prediction_result;
     wire [31:0]forwardA_data, forwardB_data;
 
 
@@ -161,9 +161,9 @@ module if_stage(
 
 ///////////////////////////////////////////////////////////////////////////////////////
 
-   //fast comparator   
+    //fast comparator   
     wire compare_result;
-   
+
     fast_comparator #(
         .WIDTH(32)
     ) comparator_inst(
@@ -221,7 +221,7 @@ module if_stage(
         .bltu_id(bltu_id_o),
         .bgeu_id(bgeu_id_o),
         .pc_id(pc_if_id_o),
-        .B_type_prediction_result_id(B_type_prediction_result_if_id_o),
+        .B_type_result_id(B_type_result_if_id_o),
 
         .B_type_branch_failed(B_type_branch_failed),
         .beq_branch_failed(beq_branch_failed),
@@ -231,7 +231,7 @@ module if_stage(
         .bltu_branch_failed(bltu_branch_failed),
         .bgeu_branch_failed(bgeu_branch_failed),
         .pc_branch_filled(pc_branch_filled),
-        .B_type_prediction_result_branch_failed(B_type_prediction_result_branch_failed)
+        .B_type_result_branch_failed(B_type_result_branch_failed)
     );
 
 ////////////////////////////////////////////////////////////////////////

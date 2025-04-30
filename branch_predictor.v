@@ -36,7 +36,7 @@ module branch_predictor(
 	input  bltu_id,
 	input  bgeu_id,
 	input  [31:0]pc_id,
-	input  B_type_prediction_result_id, 
+	input  B_type_result_id, 
 
 	input  B_type_branch_failed,
 	input  beq_branch_failed,
@@ -46,7 +46,7 @@ module branch_predictor(
 	input  bltu_branch_failed,
 	input  bgeu_branch_failed,
 	input  [31:0]pc_branch_filled,
-	input  B_type_prediction_result_branch_failed
+	input  B_type_result_branch_failed
 );
 
 	localparam RAS_STACK_ADDR_WIDTH = 4;
@@ -108,8 +108,8 @@ module branch_predictor(
 		.PL_stall(PL_stall),
 
 		.corrected_result(corrected_result),
-		.prediction_result_id(B_type_prediction_result_id),
-		.prediction_result_ex(B_type_prediction_result_branch_failed),
+		.jump_result_id(B_type_result_id),
+		.jump_result_ex(B_type_result_branch_failed),
 		
 		.corrected_en(corrected_en),
 		.rollback_en_id(rollback_en_id),
@@ -195,7 +195,7 @@ module branch_predictor(
 		.PL_stall(PL_stall),
 
 		.corrected_result(corrected_result),
-    .prediction_result_branch_failed(B_type_prediction_result_branch_failed),
+    .prediction_result_branch_failed(B_type_result_branch_failed),
 
 		.corrected_en(corrected_en),
 		.rollback_en_id(rollback_en_id),
@@ -223,7 +223,7 @@ module branch_predictor(
 		.PL_stall(PL_stall),
 
 		.corrected_result(corrected_result),
-		.prediction_result_branch_failed(B_type_prediction_result_branch_failed),
+		.prediction_result_branch_failed(B_type_result_branch_failed),
 
 		.corrected_en(beq && !PL_stall && !PL_stall_inner),
 		.rollback_en_id(beq_id && PL_flush),
@@ -251,7 +251,7 @@ module branch_predictor(
 		.PL_stall(PL_stall),
 
 		.corrected_result(corrected_result),
-		.prediction_result_branch_failed(B_type_prediction_result_branch_failed),
+		.prediction_result_branch_failed(B_type_result_branch_failed),
 
 		.corrected_en(bne && !PL_stall && !PL_stall_inner),
 		.rollback_en_id(bne_id && PL_flush),
@@ -279,7 +279,7 @@ module branch_predictor(
 		.PL_stall(PL_stall),
 
 		.corrected_result(corrected_result),
-		.prediction_result_branch_failed(B_type_prediction_result_branch_failed),
+		.prediction_result_branch_failed(B_type_result_branch_failed),
 
 		.corrected_en(blt && !PL_stall && !PL_stall_inner),
 		.rollback_en_id(blt_id && PL_flush),
@@ -307,7 +307,7 @@ module branch_predictor(
 		.PL_stall(PL_stall),
 
 		.corrected_result(corrected_result),
-		.prediction_result_branch_failed(B_type_prediction_result_branch_failed),
+		.prediction_result_branch_failed(B_type_result_branch_failed),
 
 		.corrected_en(bge && !PL_stall && !PL_stall_inner),
 		.rollback_en_id(bge_id && PL_flush),
@@ -335,7 +335,7 @@ module branch_predictor(
 		.PL_stall(PL_stall),
 
 		.corrected_result(corrected_result),
-		.prediction_result_branch_failed(B_type_prediction_result_branch_failed),
+		.prediction_result_branch_failed(B_type_result_branch_failed),
 
 		.corrected_en(bltu && !PL_stall && !PL_stall_inner),
 		.rollback_en_id(bltu_id && PL_flush),
@@ -363,7 +363,7 @@ module branch_predictor(
 		.PL_stall(PL_stall),
 
 		.corrected_result(corrected_result),
-		.prediction_result_branch_failed(B_type_prediction_result_branch_failed),
+		.prediction_result_branch_failed(B_type_result_branch_failed),
 
 		.corrected_en(bgeu && !PL_stall && !PL_stall_inner),
 		.rollback_en_id(bgeu_id && PL_flush),

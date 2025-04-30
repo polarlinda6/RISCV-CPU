@@ -7,12 +7,12 @@ module id_ex_regs(
 	input [31:0]pc_add_imme_id_ex_i,
     input [31:0]pc_add_4_id_ex_i,
     input [31:0]jalr_pc_jump_or_pc_id_ex_i,
-    input B_type_prediction_result_id_ex_i, 
+    input B_type_result_id_ex_i, 
 
 	output reg [31:0]pc_add_imme_id_ex_o,
     output reg [31:0]pc_add_4_id_ex_o,
     output reg [31:0]jalr_pc_jump_or_pc_id_ex_o,
-    output reg B_type_prediction_result_id_ex_o,
+    output reg B_type_result_id_ex_o,
     	
 	input [31:0]imme_id_ex_i,
 	input [31:0]Rs1_data_id_ex_i,
@@ -85,7 +85,7 @@ module id_ex_regs(
             pc_add_imme_id_ex_o<=`zeroword;
             pc_add_4_id_ex_o<=`zeroword;
             jalr_pc_jump_or_pc_id_ex_o<=`zeroword;    
-            B_type_prediction_result_id_ex_o<=`zero;
+            B_type_result_id_ex_o<=`zero;
 
             imme_id_ex_o<=`zeroword;
             Rs1_data_id_ex_o<=`zeroword;
@@ -116,7 +116,7 @@ module id_ex_regs(
             pc_add_imme_id_ex_o<=pc_add_imme_id_ex_i;
             pc_add_4_id_ex_o<=pc_add_4_id_ex_i;
             jalr_pc_jump_or_pc_id_ex_o<=jalr_pc_jump_or_pc_id_ex_i;  
-            B_type_prediction_result_id_ex_o<=B_type_prediction_result_id_ex_i;
+            B_type_result_id_ex_o<=B_type_result_id_ex_i;
 
             imme_id_ex_o<=imme_id_ex_i;
             Rs1_data_id_ex_o<=Rs1_data_id_ex_i;

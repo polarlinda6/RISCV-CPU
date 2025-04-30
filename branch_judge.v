@@ -12,7 +12,7 @@ module branch_judge(
 	input slt_result,
 	input [31:0]jalr_pc_jump_actual,
 
-	input B_type_prediction_result,
+	input B_type_result,
 	input [31:0]jalr_pc_jump,
 	
 	output PL_flush
@@ -29,7 +29,7 @@ module branch_judge(
 
 	assign PL_flush= (jalr && ne_result) 
 	                 || 
-                   (B_type && (B_type_prediction_result ^ ((beq  && zero)||
+                   (B_type && (B_type_result ^ ((beq  && zero)||
 																													 (bne  && (!zero))||
 																													 (blt  && slt_result)||
 																													 (bge  && (!slt_result))||
