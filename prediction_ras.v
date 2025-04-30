@@ -31,7 +31,7 @@ module ras #(
 		.WR_data_en(push),
 		.din(pc_add_4),
 		
-		.WR_offset_en((push == pop) || (rollback_push == rollback_pop)),
+		.WR_offset_en((push != pop) || (rollback_push != rollback_pop)),
 		.offset(offset),
 				
 		.dout(jalr_pc_prediction)
@@ -61,6 +61,15 @@ module circular_stack #(
 	reg [31:0]regs[STACK_DEPTH - 1:0]; 
 
 	assign dout = regs[stack_top_pointer];
+	
+	generate
+		genvar i;
+		for(i = 0; i < STACK_DEPTH; i = i + 1) begin
+			always @(posedge clk) begin
+				if (!rst_n) regs[i] <= `zeroword;
+			end
+		end
+	endgenerate
 
 /////////////////////////////////////////////////////////////////////////////  
 

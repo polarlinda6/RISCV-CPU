@@ -3,8 +3,8 @@ module datapath(
 	input  rst_n,
 	input  [31:0]instr,
 
-	input  ALU_DA_signal,
-	input  ALU_DB_signal,
+	input  ALU_DA_pc_signal,
+	input  ALU_DA_imme_signal,
 	input  [3:0]ALUctl,
     input  B_type,
 	input  beq,
@@ -36,7 +36,18 @@ module datapath(
     output [4:0]Rd, 
 	output [6:0]opcode,
 	output [2:0]func3,
-	output func7
+	output func7,
+
+
+    output stat_beq, 
+    output stat_bne,
+    output stat_blt,
+    output stat_bge,
+    output stat_bltu,
+    output stat_bgeu,
+    output stat_jal,
+    output stat_jalr,
+    output stat_PL_flush
     );
 
     //forward
@@ -75,7 +86,6 @@ module datapath(
     assign W_en=MemWrite_ex_mem_o;
     assign RW_type=RW_type_ex_mem_o;
     assign ram_addr=result_ex_mem_o;
-
 
 ////////////////////////////////////////////////////////////////////
 
@@ -214,7 +224,7 @@ module datapath(
         );
     
     
- 
+    wire ecall_id_o;
     wire [31:0]imme_id_o;
     wire [31:0]Rs1_data_id_o;
     wire [31:0]Rs2_data_id_o;
@@ -245,7 +255,9 @@ module datapath(
         .Rd_id_o(Rd),        
         .opcode_id_o(opcode), 
         .func3_id_o(func3), 
-        .func7_id_o(func7)
+        .func7_id_o(func7),
+
+        .ecall_id_o(ecall_id_o)
         );
     
 
@@ -261,13 +273,14 @@ module datapath(
     //wire [4:0]Rs1_id_ex_o;
 	wire [4:0]Rs2_id_ex_o;
 
-    wire ALU_DA_signal_id_ex_o;
-    wire ALU_DB_signal_id_ex_o;    
+    wire ALU_DA_pc_signal_id_ex_o;
+    wire ALU_DA_imme_signal_id_ex_o;    
 	wire [3:0]ALUctl_id_ex_o;
     wire jal_id_ex_o;
     wire jalr_id_ex_o;
     wire [4:0]Rs1_id_ex_o;
     wire MemWrite_id_ex_o;
+    wire ecall_id_ex_o;
 
     id_ex_regs id_ex_regs_inst (
         .clk(clk), 
@@ -298,8 +311,8 @@ module datapath(
         .Rs2_id_ex_o(Rs2_id_ex_o),
     
         //control signals
-        .ALU_DA_signal_id_ex_i(ALU_DA_signal), 
-        .ALU_DB_signal_id_ex_i(ALU_DB_signal), 
+        .ALU_DA_pc_signal_id_ex_i(ALU_DA_pc_signal), 
+        .ALU_DA_imme_signal_id_ex_i(ALU_DA_imme_signal), 
         .ALUctl_id_ex_i(ALUctl), 
         .B_type_id_ex_i(B_type),
         .beq_id_ex_i(beq), 
@@ -314,9 +327,10 @@ module datapath(
         .MemRead_id_ex_i(MemRead), 
         .MemWrite_id_ex_i(MemWrite), 
         .RW_type_id_ex_i(RW_type_id), 
+        .ecall_id_ex_i(ecall_id_o),
 
-        .ALU_DA_signal_id_ex_o(ALU_DA_signal_id_ex_o),         
-        .ALU_DB_signal_id_ex_o(ALU_DB_signal_id_ex_o), 
+        .ALU_DA_pc_signal_id_ex_o(ALU_DA_pc_signal_id_ex_o),         
+        .ALU_DA_imme_signal_id_ex_o(ALU_DA_imme_signal_id_ex_o), 
         .ALUctl_id_ex_o(ALUctl_id_ex_o), 
         .B_type_id_ex_o(B_type_id_ex_o),
         .beq_id_ex_o(beq_id_ex_o), 
@@ -331,7 +345,7 @@ module datapath(
         .MemRead_id_ex_o(MemRead_id_ex_o), 
         .MemWrite_id_ex_o(MemWrite_id_ex_o), 
         .RW_type_id_ex_o(RW_type_id_ex_o), 
-
+        .ecall_id_ex_o(ecall_id_ex_o),
         
         .PL_stall(PL_stall),
         .PL_flush(PL_flush)
@@ -345,8 +359,10 @@ module datapath(
     wire forward_load_ex_o;
 
     ex_stage ex_stage_inst (
-        .ALU_DA_signal(ALU_DA_signal_id_ex_o),
-        .ALU_DB_signal(ALU_DB_signal_id_ex_o), 
+        .ecall(ecall_id_ex_o),
+
+        .ALU_DA_pc_signal(ALU_DA_pc_signal_id_ex_o),
+        .ALU_DA_imme_signal(ALU_DA_imme_signal_id_ex_o), 
         .ALUctl(ALUctl_id_ex_o),
         .B_type(B_type_id_ex_o),
         .beq(beq_id_ex_o), 
@@ -461,4 +477,16 @@ module datapath(
         .RegWrite_mem_wb_o(RegWrite_mem_wb_o), 
         .Rd_mem_wb_o(Rd_mem_wb_o)
         );
+
+///////////////////////////////////////////////////////////////////////
+
+    assign stat_beq      = beq_id_ex_o; 
+    assign stat_bne      = bne_id_ex_o;
+    assign stat_blt      = blt_id_ex_o;
+    assign stat_bge      = bge_id_ex_o;
+    assign stat_bltu     = bltu_id_ex_o;
+    assign stat_bgeu     = bgeu_id_ex_o;
+    assign stat_jal      = jal_id_ex_o;
+    assign stat_jalr     = jalr_id_ex_o;
+    assign stat_PL_flush = PL_flush;
 endmodule

@@ -13,7 +13,9 @@ module memory(
 	input  [31:0]ram_addr,
 	input  [2:0]RW_type,
 	input  [31:0]din,
-	output [31:0]dout
+	output [31:0]dout,
+
+    output Rd_x_warning_ram
     );
 
  	wire [31:0]Wr_data;
@@ -25,10 +27,13 @@ module memory(
         .rom_addr(rom_addr),
         .instr(instr),
 
+        .R_en(R_en),
+        .W_en(W_en),
         .ram_addr(ram_addr),
         .din(Wr_data),
         .dout(Rd_data),
-        .W_en(W_en)
+
+        .Rd_x_warning_ram(Rd_x_warning_ram)
     );
 
 	reg  [31:0]Wr_data_B;
@@ -60,12 +65,12 @@ module memory(
             2'b11:Rd_data_B=Rd_data[31:24];
         endcase
     end   
-    assign Rd_data_B_ext=(RW_type[2]) ? {24'd0,Rd_data_B} : {{24{Rd_data_B[7]}},Rd_data_B};
+    assign Rd_data_B_ext = (RW_type[2]) ? {24'd0,Rd_data_B} : {{24{Rd_data_B[7]}},Rd_data_B};
         
-    assign Rd_data_H=(ram_addr[1]) ? Rd_data[31:16] : Rd_data[15:0];
-    assign Rd_data_H_ext=(RW_type[2]) ? {16'd0,Rd_data_H} : {{16{Rd_data_H[15]}},Rd_data_H};
+    assign Rd_data_H     = (ram_addr[1]) ? Rd_data[31:16] : Rd_data[15:0];
+    assign Rd_data_H_ext = (RW_type[2]) ? {16'd0,Rd_data_H} : {{16{Rd_data_H[15]}},Rd_data_H};
         
-    assign dout=(RW_type[1:0]==2'b00) ? Rd_data_B_ext : ((RW_type[1:0]==2'b01) ? Rd_data_H_ext : Rd_data);
+    assign dout = (RW_type[1:0]==2'b00) ? Rd_data_B_ext : ((RW_type[1:0]==2'b01) ? Rd_data_H_ext : Rd_data);
 endmodule
 
 
@@ -76,11 +81,21 @@ module RAM(
     input  [31:0]rom_addr,
     output [31:0]instr,
 
+    input  R_en,
     input  W_en,
     input  [31:0]ram_addr,
     input  [31:0]din,
-    output [31:0]dout
+    output [31:0]dout,
+
+    output Rd_x_warning_ram
 );
+    wire [31:0]Rd_data;
+    wire Rd_x_signal;
+    assign Rd_x_signal = ^Rd_data === 1'bx;    
+    assign Rd_x_warning_ram = R_en && Rd_x_signal; 
+    assign dout = Rd_x_signal ? `zeroword : Rd_data;
+
+
 
     reg [31:0]RAM1[24'hffffff:0];
     reg [31:0]RAM2[24'hffffff:0];
@@ -176,7 +191,7 @@ module RAM(
     ) ram_mux64_inst(
         .din({RAM64[ram_addr[25:2]], RAM63[ram_addr[25:2]], RAM62[ram_addr[25:2]], RAM61[ram_addr[25:2]], RAM60[ram_addr[25:2]], RAM59[ram_addr[25:2]], RAM58[ram_addr[25:2]], RAM57[ram_addr[25:2]], RAM56[ram_addr[25:2]], RAM55[ram_addr[25:2]], RAM54[ram_addr[25:2]], RAM53[ram_addr[25:2]], RAM52[ram_addr[25:2]], RAM51[ram_addr[25:2]], RAM50[ram_addr[25:2]], RAM49[ram_addr[25:2]], RAM48[ram_addr[25:2]], RAM47[ram_addr[25:2]], RAM46[ram_addr[25:2]], RAM45[ram_addr[25:2]], RAM44[ram_addr[25:2]], RAM43[ram_addr[25:2]], RAM42[ram_addr[25:2]], RAM41[ram_addr[25:2]], RAM40[ram_addr[25:2]], RAM39[ram_addr[25:2]], RAM38[ram_addr[25:2]], RAM37[ram_addr[25:2]], RAM36[ram_addr[25:2]], RAM35[ram_addr[25:2]], RAM34[ram_addr[25:2]], RAM33[ram_addr[25:2]], RAM32[ram_addr[25:2]], RAM31[ram_addr[25:2]], RAM30[ram_addr[25:2]], RAM29[ram_addr[25:2]], RAM28[ram_addr[25:2]], RAM27[ram_addr[25:2]], RAM26[ram_addr[25:2]], RAM25[ram_addr[25:2]], RAM24[ram_addr[25:2]], RAM23[ram_addr[25:2]], RAM22[ram_addr[25:2]], RAM21[ram_addr[25:2]], RAM20[ram_addr[25:2]], RAM19[ram_addr[25:2]], RAM18[ram_addr[25:2]], RAM17[ram_addr[25:2]], RAM16[ram_addr[25:2]], RAM15[ram_addr[25:2]], RAM14[ram_addr[25:2]], RAM13[ram_addr[25:2]], RAM12[ram_addr[25:2]], RAM11[ram_addr[25:2]], RAM10[ram_addr[25:2]], RAM9[ram_addr[25:2]], RAM8[ram_addr[25:2]], RAM7[ram_addr[25:2]], RAM6[ram_addr[25:2]], RAM5[ram_addr[25:2]], RAM4[ram_addr[25:2]], RAM3[ram_addr[25:2]], RAM2[ram_addr[25:2]], RAM1[ram_addr[25:2]]}),
         .signal(ram_select),
-        .dout(dout)
+        .dout(Rd_data)
     );
 
     always @(posedge clk)

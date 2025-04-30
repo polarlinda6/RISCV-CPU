@@ -9,9 +9,14 @@ module instr_decode(
 	output [4:0]Rs1,
 	output [4:0]Rs2,
 	output [4:0]Rd,
-	output [31:0]imme
+	output [31:0]imme,
+
+	output ecall
 	);
 	 
+	assign ecall = instr == `ecall;  
+
+
 	wire I_type;
 	wire U_type;
 	wire J_type;

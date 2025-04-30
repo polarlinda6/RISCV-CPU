@@ -21,7 +21,9 @@ module id_stage(
 
 	output [6:0]opcode_id_o,
 	output [2:0]func3_id_o,
-	output func7_id_o
+	output func7_id_o,
+
+    output ecall_id_o
     );
 	
 	instr_decode instr_decode_inst (
@@ -32,7 +34,8 @@ module id_stage(
         .Rs1(Rs1_id_o), 
         .Rs2(Rs2_id_o), 
         .Rd(Rd_id_o), 
-        .imme(imme_id_o)
+        .imme(imme_id_o),
+        .ecall(ecall_id_o)
         );
 	
     registers registers_inst (

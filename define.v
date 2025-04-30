@@ -1,7 +1,8 @@
 `define     zeroword		32'd0
 `define     zeroreg     5'd0
-`define     zero            1'b0
-`define     nop             32'h00000013  //addi x0, x0, 0
+`define     zero        1'b0
+`define     nop         32'h00000013  //addi x0, x0, 0
+`define     ecall       32'h00000073 
 
 `define	    lui				7'b0110111
 `define		auipc			7'b0010111

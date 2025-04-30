@@ -1,6 +1,8 @@
 module ex_stage(
-    input  ALU_DA_signal,
-    input  ALU_DB_signal,
+    input  ecall,
+
+    input  ALU_DA_pc_signal,
+    input  ALU_DA_imme_signal,
 	input  [3:0]ALUctl,
     input  B_type,
 	input  beq,
@@ -56,6 +58,11 @@ module ex_stage(
 	output PL_flush
     );
 
+    wire PL_stall_inner;
+    assign PL_stall = ecall || PL_stall_inner;
+
+//////////////////////////////////////////////////////////////////////////////////////////
+
 	wire zero;
     wire [31:0]ALU_result;
     wire [31:0]A;
@@ -64,13 +71,13 @@ module ex_stage(
     mux ALU_DA_mux (
         .din1(jalr_pc_jump_or_pc_ex_i), 
         .din2(A), 
-        .signal(ALU_DA_signal), 
+        .signal(ALU_DA_pc_signal), 
         .dout(ALU_DA)
         );
     mux ALU_DB_mux (
         .din1(imme_ex_i), 
         .din2(B), 
-        .signal(ALU_DB_signal), 
+        .signal(ALU_DA_imme_signal), 
         .dout(ALU_DB)
         );
 	alu alu_inst (
@@ -117,7 +124,7 @@ module ex_stage(
         .MemWrite_id_ex_o(MemWrite_id_ex_o), 
 
         .forward_load(forward_load),
-        .PL_stall(PL_stall)
+        .PL_stall(PL_stall_inner)
         );
     mux3 mux3_forwardA (
         .din1(result_ex_mem_o), 

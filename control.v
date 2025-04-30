@@ -9,8 +9,8 @@ module control(
 	output RegWrite, 
 	output MemRead,
 	output MemWrite,
-	output ALU_DB_signal,
-	output ALU_DA_signal,
+	output ALU_DA_imme_signal,
+	output ALU_DA_pc_signal,
 	
 	output B_type,
 	output beq,
@@ -23,8 +23,10 @@ module control(
 	output jalr,
 	
 	output [2:0]RW_type,
-	output [3:0]ALUctl
-    );
+	output [3:0]ALUctl,
+
+	output unknown_instr_warning_main_decode
+  );
 	
 	wire R_type;
 	wire I_type;
@@ -37,8 +39,8 @@ module control(
 				.RegWrite(RegWrite),
         .MemRead(MemRead),
         .MemWrite(MemWrite),
-        .ALU_DB_signal(ALU_DB_signal),
-        .ALU_DA_signal(ALU_DA_signal),
+        .ALU_DA_imme_signal(ALU_DA_imme_signal),
+        .ALU_DA_pc_signal(ALU_DA_pc_signal),
         
         .beq(beq),
         .bne(bne),
@@ -53,7 +55,9 @@ module control(
         
         .B_type(B_type),
         .R_type(R_type),
-        .I_type(I_type)
+        .I_type(I_type),
+
+				.unknown_instr_warning_main_decode(unknown_instr_warning_main_decode)
         );
 	
 	alu_control alu_control_inst(
@@ -77,8 +81,8 @@ module main_control(
 	output RegWrite,
 	output MemRead,
 	output MemWrite,
-	output ALU_DB_signal,
-	output ALU_DA_signal,
+	output ALU_DA_imme_signal,
+	output ALU_DA_pc_signal,
 	
 	output beq,
 	output bne,
@@ -93,11 +97,15 @@ module main_control(
 	
 	output B_type,
 	output R_type, 
-	output I_type
+	output I_type,
+
+	output unknown_instr_warning_main_decode
   );
 
 	wire lui, auipc;
 	wire load, store;
+
+	assign unknown_instr_warning_main_decode = !(lui || auipc || jal || jalr || B_type || load || store || I_type || R_type);
 	
 	assign B_type=(opcode==`B_type);
 	assign R_type=(opcode==`R_type);
@@ -124,11 +132,11 @@ module main_control(
 	//enable
 	assign MemRead= load;
 	assign MemWrite= store;
-	assign RegWrite= Rd && !(store || B_type);
+	assign RegWrite= Rd && (lui || auipc || jal || jalr || load || I_type || R_type);
 	
 	//MUX
-	assign ALU_DA_signal = auipc;
-	assign ALU_DB_signal = lui || auipc || jalr || load || store || I_type;  //select imme
+	assign ALU_DA_pc_signal   = auipc;
+	assign ALU_DA_imme_signal = lui || auipc || jalr || load || store || I_type;  //select imme
 endmodule
 
 

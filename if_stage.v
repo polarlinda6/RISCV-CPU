@@ -195,6 +195,11 @@ module if_stage(
         .B_type_prediction_result(B_type_prediction_result),
         .jalr_pc_prediction(jalr_pc_prediction),
       
+        .ras_pop(ras_pop),
+        .ras_push(ras_push),
+        .ras_rollback_pop(ras_rollback_pop),
+        .ras_rollback_push(ras_rollback_push),
+
         .pc_add_4(pc_add_4),
         .imme(imme),
 

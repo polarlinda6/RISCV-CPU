@@ -140,7 +140,7 @@ module meta_predictor #(
   wire WR_SP_stat_en1, WR_LHP_stat_en1, WR_GHP_stat_en1;
   wire WR_SP_stat_en2, WR_LHP_stat_en2, WR_GHP_stat_en2;
   wire WR_SP_trend_en1, WR_LHP_trend_en1, WR_GHP_trend_en1;
-  wire wr_SP_trend_en2, WR_LHP_trend_en2, WR_GHP_trend_en2;
+  wire WR_SP_trend_en2, WR_LHP_trend_en2, WR_GHP_trend_en2;
  
   wire [2:0]WR_addr1, WR_addr2;
   wire WR_SP_index1, WR_SP_index2;

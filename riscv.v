@@ -10,15 +10,28 @@ module riscv(
 	output [2:0]RW_type,
 	output [31:0]ram_addr,		
 	input  [31:0]load_data,
-	output [31:0]store_data
+	output [31:0]store_data,
+
+
+    output stat_beq, 
+    output stat_bne,
+    output stat_blt,
+    output stat_bge,
+    output stat_bltu,
+    output stat_bgeu,
+    output stat_jal,
+    output stat_jalr,
+    output stat_PL_flush,
+
+    output unknown_instr_warning_main_decode
     );
 	
     wire [4:0]Rd;
 	wire [6:0]opcode;
 	wire [2:0]func3;
 	wire func7;
-	wire ALU_DA_signal;	
-    wire ALU_DB_signal;
+	wire ALU_DA_pc_signal;	
+    wire ALU_DA_imme_signal;
     wire B_type;
 	wire beq;
 	wire bne;
@@ -44,8 +57,8 @@ module riscv(
         .RegWrite(RegWrite),
         .MemRead(MemRead), 
         .MemWrite(MemWrite), 
-        .ALU_DA_signal(ALU_DA_signal),        
-        .ALU_DB_signal(ALU_DB_signal), 
+        .ALU_DA_pc_signal(ALU_DA_pc_signal),        
+        .ALU_DA_imme_signal(ALU_DA_imme_signal), 
         .B_type(B_type),
         .beq(beq), 
         .bne(bne), 
@@ -56,7 +69,9 @@ module riscv(
         .jal(jal),
         .jalr(jalr),  
         .RW_type(RW_type_id), 
-        .ALUctl(ALUctl)
+        .ALUctl(ALUctl),
+
+        .unknown_instr_warning_main_decode(unknown_instr_warning_main_decode)
         );
 	
 	datapath datapath_inst (
@@ -64,8 +79,8 @@ module riscv(
         .rst_n(rst_n), 
         .instr(instr), 
 
-        .ALU_DA_signal(ALU_DA_signal),        
-        .ALU_DB_signal(ALU_DB_signal),
+        .ALU_DA_pc_signal(ALU_DA_pc_signal),        
+        .ALU_DA_imme_signal(ALU_DA_imme_signal),
         .ALUctl(ALUctl),  
         .B_type(B_type),
         .beq(beq), 
@@ -94,6 +109,17 @@ module riscv(
         .Rd(Rd),
         .opcode(opcode),
         .func3(func3),
-        .func7(func7)
+        .func7(func7),
+
+
+        .stat_beq(stat_beq),
+        .stat_bne(stat_bne),
+        .stat_blt(stat_blt),
+        .stat_bge(stat_bge),
+        .stat_bltu(stat_bltu),
+        .stat_bgeu(stat_bgeu),
+        .stat_jal(stat_jal),
+        .stat_jalr(stat_jalr),
+        .stat_PL_flush(stat_PL_flush)
         );
 endmodule
