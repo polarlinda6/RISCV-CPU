@@ -89,12 +89,12 @@ module RAM(
 
     output Rd_x_warning_ram
 );
+
     wire [31:0]Rd_data;
     wire Rd_x_signal;
     assign Rd_x_signal = ^Rd_data === 1'bx;    
     assign Rd_x_warning_ram = R_en && Rd_x_signal; 
     assign dout = Rd_x_signal ? `zeroword : Rd_data;
-
 
 
     reg [31:0]RAM1[24'hffffff:0];
