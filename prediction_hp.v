@@ -9,7 +9,6 @@ module history_predictor #(
   input  PL_stall,
 
   input  corrected_result,
-  input  prediction_result_branch_failed,
 
   input  corrected_en,
   input  rollback_en_id,
@@ -34,7 +33,7 @@ module history_predictor #(
   localparam [JUMP_STATUS_COUNTER_WIDTH_UB:0]N_ONE  = {JUMP_STATUS_COUNTER_WIDTH{1'b1}};  
   localparam [JUMP_STATUS_COUNTER_WIDTH_UB:0]P_ONE  = {{JUMP_STATUS_COUNTER_WIDTH_UB{1'b0}}, 1'b1};
 
-
+  wire prediction_result_branch_failed;
   reg [JUMP_STATUS_COUNTER_WIDTH_UB:0]count_reg_id, count_reg_ex;
   reg [HR_DEPTH_UB:0]history_reg;
 
@@ -42,6 +41,9 @@ module history_predictor #(
   assign HP_count_ex = count_reg_ex;  
   
 ////////////////////////////////////////////////////////////////////////////////
+
+  wire [HR_DEPTH_UB:0]history_ex = history_reg >> rollback_en_id;
+  assign prediction_result_branch_failed = history_ex[0];
 
   always @(posedge clk)
   begin
@@ -60,7 +62,7 @@ module history_predictor #(
       end
 
       if (rollback_en_ex)
-        history_reg <= history_reg >> (rollback_en_id ? 2 : 1);        
+        history_reg <= {history_ex[HR_DEPTH_UB:1], !prediction_result_branch_failed};        
       else if (corrected_en)
         history_reg <= (history_reg << 1) | corrected_result;  
     end 
@@ -101,7 +103,8 @@ module history_predictor #(
   localparam INDEX_PC_TOP_POSITION = INDEX_PC_WIDTH + 1;
   assign index    = {pc[INDEX_PC_TOP_POSITION: 2], history_reg[INDEX_HR_WIDTH - 1: 0]};
   assign index_id = {pc_id[INDEX_PC_TOP_POSITION: 2], history_reg[INDEX_HR_WIDTH: 1]};
-  assign index_ex = {pc_ex[INDEX_PC_TOP_POSITION: 2], history_reg[INDEX_HR_WIDTH + 1: 2]};
+  assign index_ex = {pc_ex[INDEX_PC_TOP_POSITION: 2], rollback_en_id ? history_reg[INDEX_HR_WIDTH + 1: 2] : history_reg[INDEX_HR_WIDTH: 1]};
+
 
   assign WR_index2 = rollback_en_ex ? index_ex : index;
 

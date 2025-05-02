@@ -162,7 +162,7 @@ module datapath(
         .bge_branch_failed(bge_id_ex_o),
         .bltu_branch_failed(bltu_id_ex_o),
         .bgeu_branch_failed(bgeu_id_ex_o),
-        .pc_branch_filled(jalr_pc_jump_or_pc_if_id_o),
+        .pc_branch_filled(jalr_pc_jump_or_pc_id_ex_o),
         .B_type_result_branch_failed(B_type_result_id_ex_o),
    
 

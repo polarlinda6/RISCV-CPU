@@ -232,10 +232,10 @@ module prediction_writer #(
 
   localparam [2:0]P_THREE = 3'b011;
   localparam [2:0]P_TWO   = 3'b010;
-  localparam [2:0]P_ONE   = 3'b001;
-  localparam [2:0]N_THREE = 3'b101;
-  localparam [2:0]N_TWO   = 3'b110;
+  localparam [2:0]P_ONE   = 3'b001; 
   localparam [2:0]N_ONE   = 3'b111;
+  localparam [2:0]N_TWO   = 3'b110;
+  localparam [2:0]N_THREE = 3'b101;
 
   stat_counter_operator #(
     .STAT_COUNTER_WIDTH(STAT_COUNTER_WIDTH)
@@ -281,26 +281,26 @@ module prediction_writer #(
 
   wire [2:0]SP_B_ex, LHP_B_ex, GHP_B_ex;
   wire [5:0]SP_B_signal_ex, LHP_B_signal_ex, GHP_B_signal_ex;
-  assign SP_B_signal_ex[P_THREE_INDEX] =  (rollback_en_id && SP_conflict) && !SP_prediction_failed_ex && !SP_prediction_failed_id; 
+  assign SP_B_signal_ex[P_THREE_INDEX] =  (rollback_en_id && SP_conflict) && !SP_prediction_failed_ex &&  SP_prediction_failed_id; 
   assign SP_B_signal_ex[P_TWO_INDEX]   = !(rollback_en_id && SP_conflict) && !SP_prediction_failed_ex;
-  assign SP_B_signal_ex[P_ONE_INDEX]   =  (rollback_en_id && SP_conflict) && !SP_prediction_failed_ex &&  SP_prediction_failed_id;
-  assign SP_B_signal_ex[N_ONE_INDEX]   =  (rollback_en_id && SP_conflict) &&  SP_prediction_failed_ex && !SP_prediction_failed_id;
+  assign SP_B_signal_ex[P_ONE_INDEX]   =  (rollback_en_id && SP_conflict) && !SP_prediction_failed_ex && !SP_prediction_failed_id;
+  assign SP_B_signal_ex[N_ONE_INDEX]   =  (rollback_en_id && SP_conflict) &&  SP_prediction_failed_ex &&  SP_prediction_failed_id;
   assign SP_B_signal_ex[N_TWO_INDEX]   = !(rollback_en_id && SP_conflict) &&  SP_prediction_failed_ex;
-  assign SP_B_signal_ex[N_THREE_INDEX] =  (rollback_en_id && SP_conflict) &&  SP_prediction_failed_ex &&  SP_prediction_failed_id;
+  assign SP_B_signal_ex[N_THREE_INDEX] =  (rollback_en_id && SP_conflict) &&  SP_prediction_failed_ex && !SP_prediction_failed_id;
 
-  assign LHP_B_signal_ex[P_THREE_INDEX] = !(rollback_en_id && LHP_conflict) && !LHP_prediction_failed_ex && !LHP_prediction_failed_id;
+  assign LHP_B_signal_ex[P_THREE_INDEX] = !(rollback_en_id && LHP_conflict) && !LHP_prediction_failed_ex &&  LHP_prediction_failed_id;
   assign LHP_B_signal_ex[P_TWO_INDEX]   =  (rollback_en_id && LHP_conflict) && !LHP_prediction_failed_ex;
-  assign LHP_B_signal_ex[P_ONE_INDEX]   = !(rollback_en_id && LHP_conflict) && !LHP_prediction_failed_ex &&  LHP_prediction_failed_id;
-  assign LHP_B_signal_ex[N_ONE_INDEX]   = !(rollback_en_id && LHP_conflict) &&  LHP_prediction_failed_ex && !LHP_prediction_failed_id;
+  assign LHP_B_signal_ex[P_ONE_INDEX]   = !(rollback_en_id && LHP_conflict) && !LHP_prediction_failed_ex && !LHP_prediction_failed_id;
+  assign LHP_B_signal_ex[N_ONE_INDEX]   = !(rollback_en_id && LHP_conflict) &&  LHP_prediction_failed_ex &&  LHP_prediction_failed_id;
   assign LHP_B_signal_ex[N_TWO_INDEX]   =  (rollback_en_id && LHP_conflict) &&  LHP_prediction_failed_ex;
-  assign LHP_B_signal_ex[N_THREE_INDEX] = !(rollback_en_id && LHP_conflict) &&  LHP_prediction_failed_ex &&  LHP_prediction_failed_id;
+  assign LHP_B_signal_ex[N_THREE_INDEX] = !(rollback_en_id && LHP_conflict) &&  LHP_prediction_failed_ex && !LHP_prediction_failed_id;
 
-  assign GHP_B_signal_ex[P_THREE_INDEX] = !(rollback_en_id && GHP_conflict) && !GHP_prediction_failed_ex && !GHP_prediction_failed_id;
+  assign GHP_B_signal_ex[P_THREE_INDEX] = !(rollback_en_id && GHP_conflict) && !GHP_prediction_failed_ex &&  GHP_prediction_failed_id;
   assign GHP_B_signal_ex[P_TWO_INDEX]   =  (rollback_en_id && GHP_conflict) && !GHP_prediction_failed_ex;
-  assign GHP_B_signal_ex[P_ONE_INDEX]   = !(rollback_en_id && GHP_conflict) && !GHP_prediction_failed_ex &&  GHP_prediction_failed_id;
-  assign GHP_B_signal_ex[N_ONE_INDEX]   = !(rollback_en_id && GHP_conflict) &&  GHP_prediction_failed_ex && !GHP_prediction_failed_id;
+  assign GHP_B_signal_ex[P_ONE_INDEX]   = !(rollback_en_id && GHP_conflict) && !GHP_prediction_failed_ex && !GHP_prediction_failed_id;
+  assign GHP_B_signal_ex[N_ONE_INDEX]   = !(rollback_en_id && GHP_conflict) &&  GHP_prediction_failed_ex &&  GHP_prediction_failed_id;
   assign GHP_B_signal_ex[N_TWO_INDEX]   =  (rollback_en_id && GHP_conflict) &&  GHP_prediction_failed_ex;
-  assign GHP_B_signal_ex[N_THREE_INDEX] = !(rollback_en_id && GHP_conflict) &&  GHP_prediction_failed_ex &&  GHP_prediction_failed_id;
+  assign GHP_B_signal_ex[N_THREE_INDEX] = !(rollback_en_id && GHP_conflict) &&  GHP_prediction_failed_ex && !GHP_prediction_failed_id;
   
   parallel_mux #(
     .WIDTH(3),

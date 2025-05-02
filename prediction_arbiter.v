@@ -21,10 +21,10 @@ module prediction_arbiter #(
   localparam STAT_COUNTER_WIDTH_UB = STAT_COUNTER_WIDTH - 1;
   localparam [STAT_COUNTER_WIDTH_UB:0]ZERO = {STAT_COUNTER_WIDTH{1'b0}};
   
-  wire [STAT_COUNTER_WIDTH_UB:0]corrected_SP_count, corrected_LHP_count, corrected_GHP_count;
-  assign corrected_SP_count  = SP_trend_decode[0] ? ZERO : SP_stat_count;
-  assign corrected_LHP_count = LHP_trend_decode[0] ? ZERO : LHP_stat_count;
-  assign corrected_GHP_count = GHP_trend_decode[0] ? ZERO : GHP_stat_count;
+  wire [STAT_COUNTER_WIDTH_UB:0]SP_corrected_stat_count, LHP_corrected_stat_count, GHP_corrected_stat_count;
+  assign SP_corrected_stat_count  = SP_trend_decode[0]  ? ZERO : SP_stat_count;
+  assign LHP_corrected_stat_count = LHP_trend_decode[0] ? ZERO : LHP_stat_count;
+  assign GHP_corrected_stat_count = GHP_trend_decode[0] ? ZERO : GHP_stat_count;
 
 
   wire SP_LHP_conflict, SP_GHP_conflict;
@@ -47,14 +47,14 @@ module prediction_arbiter #(
     .WIDTH(STAT_COUNTER_WIDTH),
     .MUX_QUANTITY(3)
   ) stat_only_mux3_inst(
-    .din({SP_stat_count, LHP_stat_count, GHP_stat_count}),
+    .din({SP_corrected_stat_count, LHP_corrected_stat_count, GHP_corrected_stat_count}),
     .signal({SP_only, LHP_only, GHP_only}),
     .dout(stat_only)
   );
 
   wire [STAT_COUNTER_WIDTH_UB:0]stat_A, stat_B;
-  assign stat_A = SP_LHP_conflict ? GHP_stat_count : SP_stat_count;
-  assign stat_B = SP_GHP_conflict ? LHP_stat_count : SP_stat_count;
+  assign stat_A = SP_LHP_conflict ? GHP_corrected_stat_count : SP_corrected_stat_count;
+  assign stat_B = SP_GHP_conflict ? LHP_corrected_stat_count : SP_corrected_stat_count;
 
   wire [STAT_COUNTER_WIDTH:0]stat_sum;
   assign stat_sum = stat_A + stat_B;
