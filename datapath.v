@@ -359,6 +359,8 @@ module datapath(
     wire forward_load_ex_o;
 
     ex_stage ex_stage_inst (
+        .clk(clk),
+        .rst_n(rst_n),
         .ecall(ecall_id_ex_o),
 
         .ALU_DA_pc_signal(ALU_DA_pc_signal_id_ex_o),

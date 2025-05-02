@@ -189,8 +189,9 @@ module if_stage(
     branch_predictor branch_predictor_inst(
         .clk(clk), 
         .rst_n(rst_n),
-        .PL_stall(PL_stall || PL_stall_inner),
         .PL_flush(PL_flush),
+        .PL_stall(PL_stall),
+        .PL_stall_inner(PL_stall_inner),
  
         .B_type_prediction_result(B_type_prediction_result),
         .jalr_pc_prediction(jalr_pc_prediction),

@@ -1,4 +1,8 @@
+`include "define.v"
+
 module ex_stage(
+    input  clk,
+    input  rst_n,
     input  ecall,
 
     input  ALU_DA_pc_signal,
@@ -58,8 +62,16 @@ module ex_stage(
 	output PL_flush
     );
 
+    reg ecall_reg;
+    always @(posedge clk) begin
+        if(!rst_n) 
+            ecall_reg <= `zero;
+        else if(!ecall_reg)
+            ecall_reg <= ecall;
+    end
+
     wire PL_stall_inner;
-    assign PL_stall = ecall || PL_stall_inner;
+    assign PL_stall = ecall_reg || ecall || PL_stall_inner;
 
 //////////////////////////////////////////////////////////////////////////////////////////
 

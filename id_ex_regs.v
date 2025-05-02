@@ -71,14 +71,6 @@ module id_ex_regs(
 
     always@(posedge clk)
     begin
-        if (!rst_n) 
-            ecall_id_ex_o<=`zero;
-        else if(!ecall_id_ex_o) 
-            ecall_id_ex_o<=ecall_id_ex_i;
-    end 
-
-    always@(posedge clk)
-    begin
         if(!rst_n || PL_flush || PL_stall)
         begin 
             //non-standard nop: add x0, x0, x0
@@ -110,6 +102,8 @@ module id_ex_regs(
             MemRead_id_ex_o<=`zero;
             MemWrite_id_ex_o<=`zero;
             RW_type_id_ex_o<=3'b000;
+            
+            ecall_id_ex_o<=`zero;
         end
         else 
         begin
@@ -141,6 +135,8 @@ module id_ex_regs(
             MemRead_id_ex_o<=MemRead_id_ex_i;
             MemWrite_id_ex_o<=MemWrite_id_ex_i;
             RW_type_id_ex_o<=RW_type_id_ex_i;
+
+            ecall_id_ex_o<=ecall_id_ex_i;
         end
     end
 endmodule
