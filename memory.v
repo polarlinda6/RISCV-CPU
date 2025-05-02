@@ -90,7 +90,24 @@ module RAM(
     output Rd_x_warning_ram
 );
 
-    wire [31:0]Rd_data;
+    //A read-after-write to the same address returns the old data.
+    //lui x1, 0xfffff;
+    //sw x1, x0, 0xfff;
+    //lw x2, x0, 0xfff;
+
+    //write throuth
+    reg [31:0]write_through_addr_reg;
+    reg [31:0]write_throuth_data_reg;
+    always @(posedge clk) begin
+        if (W_en) begin
+            write_through_addr_reg <= ram_addr;
+            write_throuth_data_reg <= din;
+        end
+    end
+
+    wire [31:0]Rd_data, ram_data;
+    assign Rd_data = ram_addr != write_through_addr_reg ? ram_data : write_throuth_data_reg;
+
     wire Rd_x_signal;
     assign Rd_x_signal = ^Rd_data === 1'bx;    
     assign Rd_x_warning_ram = R_en && Rd_x_signal; 
@@ -191,7 +208,7 @@ module RAM(
     ) ram_mux64_inst(
         .din({RAM64[ram_addr[25:2]], RAM63[ram_addr[25:2]], RAM62[ram_addr[25:2]], RAM61[ram_addr[25:2]], RAM60[ram_addr[25:2]], RAM59[ram_addr[25:2]], RAM58[ram_addr[25:2]], RAM57[ram_addr[25:2]], RAM56[ram_addr[25:2]], RAM55[ram_addr[25:2]], RAM54[ram_addr[25:2]], RAM53[ram_addr[25:2]], RAM52[ram_addr[25:2]], RAM51[ram_addr[25:2]], RAM50[ram_addr[25:2]], RAM49[ram_addr[25:2]], RAM48[ram_addr[25:2]], RAM47[ram_addr[25:2]], RAM46[ram_addr[25:2]], RAM45[ram_addr[25:2]], RAM44[ram_addr[25:2]], RAM43[ram_addr[25:2]], RAM42[ram_addr[25:2]], RAM41[ram_addr[25:2]], RAM40[ram_addr[25:2]], RAM39[ram_addr[25:2]], RAM38[ram_addr[25:2]], RAM37[ram_addr[25:2]], RAM36[ram_addr[25:2]], RAM35[ram_addr[25:2]], RAM34[ram_addr[25:2]], RAM33[ram_addr[25:2]], RAM32[ram_addr[25:2]], RAM31[ram_addr[25:2]], RAM30[ram_addr[25:2]], RAM29[ram_addr[25:2]], RAM28[ram_addr[25:2]], RAM27[ram_addr[25:2]], RAM26[ram_addr[25:2]], RAM25[ram_addr[25:2]], RAM24[ram_addr[25:2]], RAM23[ram_addr[25:2]], RAM22[ram_addr[25:2]], RAM21[ram_addr[25:2]], RAM20[ram_addr[25:2]], RAM19[ram_addr[25:2]], RAM18[ram_addr[25:2]], RAM17[ram_addr[25:2]], RAM16[ram_addr[25:2]], RAM15[ram_addr[25:2]], RAM14[ram_addr[25:2]], RAM13[ram_addr[25:2]], RAM12[ram_addr[25:2]], RAM11[ram_addr[25:2]], RAM10[ram_addr[25:2]], RAM9[ram_addr[25:2]], RAM8[ram_addr[25:2]], RAM7[ram_addr[25:2]], RAM6[ram_addr[25:2]], RAM5[ram_addr[25:2]], RAM4[ram_addr[25:2]], RAM3[ram_addr[25:2]], RAM2[ram_addr[25:2]], RAM1[ram_addr[25:2]]}),
         .signal(ram_select),
-        .dout(Rd_data)
+        .dout(ram_data)
     );
 
     always @(posedge clk)
