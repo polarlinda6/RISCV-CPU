@@ -39,6 +39,7 @@ module prediction_arbiter #(
 
 
 ///////////////////////////////////////////////////////////////////////////
+
   wire double_arbitrate_signal, once_arbitrate_result;
 
 
@@ -59,17 +60,17 @@ module prediction_arbiter #(
   wire [STAT_COUNTER_WIDTH:0]stat_sum;
   assign stat_sum = stat_A + stat_B;
 
-  parallel_comparator #(
+  parallel_unsig_comparator_eq_lt #(
     .WIDTH(STAT_COUNTER_WIDTH + 1)
   ) stat_arbiter_comparator_inst (
     .data1(stat_sum),
     .data2({`zero, stat_only}),
     .beq_result(double_arbitrate_signal),
-    .blt_result(),
-    .bltu_result(once_arbitrate_result)
+    .blt_result(once_arbitrate_result)
   );
 
 ////////////////////////////////////////////////////////////////////////////////////
+
   wire double_arbitrate_result;
 
   wire [3:0]trend_only;  

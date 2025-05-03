@@ -372,9 +372,9 @@ module meta_predictor #(
 
 
   wire [3 + STAT_COUNTER_WIDTH_UB:0]SP_trend_stat_count_id, LHP_trend_stat_count_id, GHP_trend_stat_count_id;
-  assign SP_trend_stat_count_id  = SP_trend_stat_counter_regs[addr][SP_prediction_result_id];
-  assign LHP_trend_stat_count_id = LHP_trend_stat_counter_regs[addr][LHP_count_id];
-  assign GHP_trend_stat_count_id = GHP_trend_stat_counter_regs[addr][GHP_count_id];
+  assign SP_trend_stat_count_id  = SP_trend_stat_counter_regs[addr_id][SP_prediction_result_id];
+  assign LHP_trend_stat_count_id = LHP_trend_stat_counter_regs[addr_id][LHP_count_id];
+  assign GHP_trend_stat_count_id = GHP_trend_stat_counter_regs[addr_id][GHP_count_id];
 
   assign SP_stat_count_id  = SP_trend_stat_count_id [STAT_COUNTER_WIDTH_UB:0];
   assign LHP_stat_count_id = LHP_trend_stat_count_id[STAT_COUNTER_WIDTH_UB:0];
@@ -386,9 +386,9 @@ module meta_predictor #(
 
 
   wire [3 + STAT_COUNTER_WIDTH_UB:0]SP_trend_stat_count_ex, LHP_trend_stat_count_ex, GHP_trend_stat_count_ex;
-  assign SP_trend_stat_count_ex  = SP_trend_stat_counter_regs[addr][SP_prediction_result_ex];
-  assign LHP_trend_stat_count_ex = LHP_trend_stat_counter_regs[addr][LHP_count_ex];
-  assign GHP_trend_stat_count_ex = GHP_trend_stat_counter_regs[addr][GHP_count_ex];
+  assign SP_trend_stat_count_ex  = SP_trend_stat_counter_regs[addr_ex][SP_prediction_result_ex];
+  assign LHP_trend_stat_count_ex = LHP_trend_stat_counter_regs[addr_ex][LHP_count_ex];
+  assign GHP_trend_stat_count_ex = GHP_trend_stat_counter_regs[addr_ex][GHP_count_ex];
  
   assign SP_stat_count_ex  = SP_trend_stat_count_ex [STAT_COUNTER_WIDTH_UB:0];
   assign LHP_stat_count_ex = LHP_trend_stat_count_ex[STAT_COUNTER_WIDTH_UB:0];
@@ -439,7 +439,7 @@ module meta_predictor #(
   parallel_mux #(
     .WIDTH(JUMP_STATUS_COUNTER_WIDTH),
     .MUX_QUANTITY(6)
-  ) count_mux6_inst(
+  ) LHP_count_mux6_inst(
     .din({LHP_beq_count, LHP_bne_count, LHP_blt_count, LHP_bge_count, LHP_bltu_count, LHP_bgeu_count}),
     .signal({beq, bne, blt, bge, bltu, bgeu}),
     .dout(LHP_count)
@@ -447,7 +447,7 @@ module meta_predictor #(
   parallel_mux #(
     .WIDTH(JUMP_STATUS_COUNTER_WIDTH),
     .MUX_QUANTITY(6)
-  ) count_id_mux6_inst(
+  ) LHP_count_id_mux6_inst(
     .din({LHP_beq_count_id, LHP_bne_count_id, LHP_blt_count_id, LHP_bge_count_id, LHP_bltu_count_id, LHP_bgeu_count_id}),
     .signal({beq_id, bne_id, blt_id, bge_id, bltu_id, bgeu_id}),
     .dout(LHP_count_id)
@@ -455,7 +455,7 @@ module meta_predictor #(
   parallel_mux #(
     .WIDTH(JUMP_STATUS_COUNTER_WIDTH),
     .MUX_QUANTITY(6)
-  ) count_ex_mux6_inst(
+  ) LHP_count_ex_mux6_inst(
     .din({LHP_beq_count_ex, LHP_bne_count_ex, LHP_blt_count_ex, LHP_bge_count_ex, LHP_bltu_count_ex, LHP_bgeu_count_ex}),
     .signal({beq_ex, bne_ex, blt_ex, bge_ex, bltu_ex, bgeu_ex}),
     .dout(LHP_count_ex)

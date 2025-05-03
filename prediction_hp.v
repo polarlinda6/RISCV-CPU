@@ -1,8 +1,8 @@
 module history_predictor #(
   parameter JUMP_STATUS_COUNTER_WIDTH = 2,
-  parameter [JUMP_STATUS_COUNTER_WIDTH - 1:0]JUMP_STATUS_COUNTER_INIT_VALUE = 0,
-  parameter INDEX_HR_WIDTH = 5,
-  parameter INDEX_PC_WIDTH = 3
+  parameter [JUMP_STATUS_COUNTER_WIDTH - 1:0]JUMP_STATUS_COUNTER_INIT_VALUE = 0,  
+  parameter INDEX_WIDTH = 12,
+  parameter HR_WIDTH = 6
 )(
   input  clk,
   input  rst_n,  
@@ -23,10 +23,9 @@ module history_predictor #(
   output [JUMP_STATUS_COUNTER_WIDTH - 1: 0]HP_count_ex
 );
 
-  localparam HR_DEPTH = INDEX_HR_WIDTH + 2;
+  localparam HR_DEPTH = HR_WIDTH + 2;
   localparam HR_DEPTH_UB = HR_DEPTH - 1;
 
-  localparam INDEX_WIDTH = INDEX_HR_WIDTH + INDEX_PC_WIDTH;
   localparam INDEX_WIDTH_UB = INDEX_WIDTH - 1;
   localparam JUMP_STATUS_COUNTER_WIDTH_UB = JUMP_STATUS_COUNTER_WIDTH - 1;  
 
@@ -98,22 +97,52 @@ module history_predictor #(
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-  wire [INDEX_WIDTH_UB:0]index_ex;
-
-  localparam INDEX_PC_TOP_POSITION = INDEX_PC_WIDTH + 1;
-  assign index    = {pc[INDEX_PC_TOP_POSITION: 2], history_reg[INDEX_HR_WIDTH - 1: 0]};
-  assign index_id = {pc_id[INDEX_PC_TOP_POSITION: 2], history_reg[INDEX_HR_WIDTH: 1]};
-  assign index_ex = {pc_ex[INDEX_PC_TOP_POSITION: 2], rollback_en_id ? history_reg[INDEX_HR_WIDTH + 1: 2] : history_reg[INDEX_HR_WIDTH: 1]};
-
-
-  assign WR_index2 = rollback_en_ex ? index_ex : index;
-
+  wire [INDEX_WIDTH_UB:0]index_rid_ex, index_nrid_ex;
+  assign WR_index2 = rollback_en_ex ? (rollback_en_id ? index_rid_ex : index_nrid_ex) : index;
+ 
   parallel_unsig_comparator_eq #(
     .WIDTH(INDEX_WIDTH)
-  ) eq_inst(
+  ) rid_conflict_inst(
     .data1(index_id),
-    .data2(index_ex),
+    .data2(index_rid_ex),
     .compare_result(index_conflict)
+  );
+  // localparam INDEX_PC_TOP_POSITION = INDEX_32 + 1;
+  // assign index    = {pc[INDEX_PC_TOP_POSITION: 2], history_reg[HR_WIDTH - 1: 0]};
+  // assign index_id = {pc_id[INDEX_PC_TOP_POSITION: 2], history_reg[HR_WIDTH: 1]};
+  // assign index_ex = {pc_ex[INDEX_PC_TOP_POSITION: 2], rollback_en_id ? history_reg[HR_WIDTH + 1: 2] : history_reg[HR_WIDTH: 1]};
+
+  index_hash #(
+    .HR_WIDTH(HR_WIDTH),
+    .INDEX_WIDTH(INDEX_WIDTH)
+  ) index_inst(
+    .pc(pc),
+    .hr(history_reg[HR_WIDTH - 1: 0]),
+    .index(index)
+  );
+  index_hash #(
+    .HR_WIDTH(HR_WIDTH),
+    .INDEX_WIDTH(INDEX_WIDTH)
+  ) index_id_inst(
+    .pc(pc_id),
+    .hr(history_reg[HR_WIDTH: 1]),
+    .index(index_id)
+  );
+  index_hash #(
+    .HR_WIDTH(HR_WIDTH),
+    .INDEX_WIDTH(INDEX_WIDTH)
+  ) index_ex_rollback_id_inst(
+    .pc(pc_ex),
+    .hr(history_reg[HR_WIDTH + 1: 2]),
+    .index(index_rid_ex)
+  );
+  index_hash #(
+    .HR_WIDTH(HR_WIDTH),
+    .INDEX_WIDTH(INDEX_WIDTH)
+  ) index_ex_no_rollback_id_inst(
+    .pc(pc_ex),
+    .hr(history_reg[HR_WIDTH: 1]),
+    .index(index_nrid_ex)
   );
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -138,4 +167,34 @@ module history_predictor #(
     .result(WR_data_rollback_ex)
   );
   assign WR_data2 = rollback_en_ex ? WR_data_rollback_ex : WR_data_corrected;
+endmodule
+
+
+module index_hash #(
+  parameter HR_WIDTH = 6,
+  parameter INDEX_WIDTH = 12
+)(
+  input  [31:0]pc, 
+  input  [HR_WIDTH - 1:0]hr,
+  output [INDEX_WIDTH - 1:0]index
+);
+  localparam PC_WIDTH = 32;
+
+    // // 第一级XOR：PC的低位与历史寄存器
+    // wire [HR_WIDTH-1:0] level1_result;
+    // assign level1_result = pc[HR_WIDTH-1:0] ^ hr;
+    
+    // // 第二级XOR：第一级结果与PC的中间位
+    // wire [HR_WIDTH-1:0] level2_result;
+    // assign level2_result = level1_result ^ pc[2*HR_WIDTH-1:HR_WIDTH];
+    
+    // // 第三级XOR：第二级结果与PC的高位
+    // wire [INDEX_WIDTH-1:0] level3_result;
+    // assign level3_result = {level2_result, pc[INDEX_WIDTH-HR_WIDTH-1:0]} ^ 
+    //                       pc[32-1:32-INDEX_WIDTH];
+    
+    // assign index = level3_result;
+    localparam INDEX_PC_TOP_POSITION = INDEX_WIDTH - HR_WIDTH + 1;
+    assign index = {pc[INDEX_PC_TOP_POSITION: 2], hr[HR_WIDTH - 1: 0]};
+    // assign index = {pc[INDEX_PC_TOP_POSITION + 1: 2], hr[HR_WIDTH - 2: 0]};
 endmodule

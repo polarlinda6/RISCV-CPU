@@ -7,35 +7,6 @@ module fast_comparator #(
   output compare_result
 );
 
-  wire eq, lt, ltu;
-
-  parallel_comparator #(
-    .WIDTH(WIDTH)
-  ) parallel_comparator_inst(
-    .data1(data1),
-    .data2(data2),
-    .beq_result(eq),
-    .blt_result(lt),
-    .bltu_result(ltu)
-  );
-
-  wire lt_result;
-  assign lt_result = func3[1] ? ltu : lt; 
-
-  assign compare_result = func3[2] ? (func3[0] ? !lt_result : lt_result) : (func3[0] ? !eq : eq);
-endmodule
-
-
-module parallel_comparator #(
-  parameter WIDTH = 32
-)(
-  input  [WIDTH - 1:0]data1,
-  input  [WIDTH - 1:0]data2,
-  output beq_result,
-  output blt_result,
-  output bltu_result
-);
-
   localparam WIDTH_UB = WIDTH - 1;
 
   wire gt_sig, lt_sig, eq_sig;
@@ -53,9 +24,15 @@ module parallel_comparator #(
     .lt_result(lt_bit)
   );
 
-  assign beq_result  = eq_sig && eq_bit;
-  assign blt_result  = gt_sig || (eq_sig && lt_bit);
-  assign bltu_result = lt_sig || (eq_sig && lt_bit);
+  wire eq, lt, ltu;
+  assign eq  = eq_sig && eq_bit;
+  assign lt  = gt_sig || (eq_sig && lt_bit);
+  assign ltu = lt_sig || (eq_sig && lt_bit);
+
+  wire lt_result;
+  assign lt_result = func3[1] ? ltu : lt; 
+
+  assign compare_result = func3[2] ? (func3[0] ? !lt_result : lt_result) : (func3[0] ? !eq : eq);
 endmodule
 
 
@@ -95,7 +72,6 @@ module parallel_unsig_comparator_eq_lt #(
       assign eqs[i] = corrected_data1[ub:lb] == corrected_data2[ub:lb];
     end
   endgenerate
-
 
   // assign lt_result = lts[3] || 
   //                    (!lts[3] && eqs[3] && lts[2]) || 
