@@ -65,8 +65,8 @@ module prediction_arbiter #(
   ) stat_arbiter_comparator_inst (
     .data1(stat_sum),
     .data2({`zero, stat_only}),
-    .beq_result(double_arbitrate_signal),
-    .blt_result(once_arbitrate_result)
+    .eq_result(double_arbitrate_signal),
+    .lt_result(once_arbitrate_result)
   );
 
 ////////////////////////////////////////////////////////////////////////////////////
