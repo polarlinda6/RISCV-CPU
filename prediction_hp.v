@@ -178,23 +178,6 @@ module index_hash #(
   input  [HR_WIDTH - 1:0]hr,
   output [INDEX_WIDTH - 1:0]index
 );
-  localparam PC_WIDTH = 32;
-
-    // // 第一级XOR：PC的低位与历史寄存器
-    // wire [HR_WIDTH-1:0] level1_result;
-    // assign level1_result = pc[HR_WIDTH-1:0] ^ hr;
-    
-    // // 第二级XOR：第一级结果与PC的中间位
-    // wire [HR_WIDTH-1:0] level2_result;
-    // assign level2_result = level1_result ^ pc[2*HR_WIDTH-1:HR_WIDTH];
-    
-    // // 第三级XOR：第二级结果与PC的高位
-    // wire [INDEX_WIDTH-1:0] level3_result;
-    // assign level3_result = {level2_result, pc[INDEX_WIDTH-HR_WIDTH-1:0]} ^ 
-    //                       pc[32-1:32-INDEX_WIDTH];
-    
-    // assign index = level3_result;
-    localparam INDEX_PC_TOP_POSITION = INDEX_WIDTH - HR_WIDTH + 1;
-    assign index = {pc[INDEX_PC_TOP_POSITION: 2], hr[HR_WIDTH - 1: 0]};
-    // assign index = {pc[INDEX_PC_TOP_POSITION + 1: 2], hr[HR_WIDTH - 2: 0]};
+  localparam INDEX_PC_TOP_POSITION = INDEX_WIDTH - HR_WIDTH + 1;
+  assign index = {pc[INDEX_PC_TOP_POSITION: 2], hr[HR_WIDTH - 1: 0]};
 endmodule

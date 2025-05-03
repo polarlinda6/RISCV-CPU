@@ -51,11 +51,11 @@ module branch_predictor(
 
 	localparam RAS_STACK_ADDR_WIDTH = 4;
 
-	localparam GHP_HR_WIDTH = 5;
-	localparam LHP_HR_WIDTH = 5;
-	localparam GHP_INDEX_WIDTH = 10;
-	localparam LHP_INDEX_WIDTH = 10;
-	localparam STAT_COUNTER_WIDTH = 5;
+	localparam GHP_HR_WIDTH = 6;
+	localparam LHP_HR_WIDTH = 6;
+	localparam GHP_INDEX_WIDTH = 11;
+	localparam LHP_INDEX_WIDTH = 11;
+	localparam STAT_COUNTER_WIDTH = 6;
 
 	localparam JUMP_STATUS_COUNTER_WIDTH = 2;
 	localparam JUMP_STATUS_COUNTER_WIDTH_UB = JUMP_STATUS_COUNTER_WIDTH - 1;

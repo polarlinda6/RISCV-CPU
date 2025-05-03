@@ -338,7 +338,8 @@ module meta_predictor #(
   );
 
   prediction_arbiter #(
-    .STAT_COUNTER_WIDTH(STAT_COUNTER_WIDTH)
+    .STAT_COUNTER_WIDTH(STAT_COUNTER_WIDTH),
+    .HIGH_CONFIDENCE_OR_VALUE((1 << (STAT_COUNTER_CLEAR_BITS - 1)) - 1)
   ) prediction_arbiter_inst (
     .SP_prediction_result(SP_prediction_result),
     .LHP_prediction_result(LHP_count[JUMP_STATUS_COUNTER_WIDTH_UB]),
