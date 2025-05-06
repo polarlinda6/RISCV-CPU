@@ -55,8 +55,8 @@ module branch_predictor(
 	localparam GHP_INDEX_WIDTH = 13;
 	localparam LHP_BEQ_HR_WIDTH = 9;
 	localparam LHP_BEQ_INDEX_WIDTH = 12;
-	localparam LHP_BLT_HR_WIDTH = 7;
-	localparam LHP_BLT_INDEX_WIDTH = 12;
+	localparam LHP_BLT_HR_WIDTH = 3;
+	localparam LHP_BLT_INDEX_WIDTH = 10;
 	localparam LHP_BLTU_HR_WIDTH = 9;
 	localparam LHP_BLTU_INDEX_WIDTH = 12;
 

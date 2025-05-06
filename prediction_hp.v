@@ -167,7 +167,7 @@ endmodule
 
 
 module index_hash #(
-  parameter HR_WIDTH = 9,
+  parameter HR_WIDTH = 10,
   parameter INDEX_WIDTH = 13
 )(
   input  [31:0]pc, 
