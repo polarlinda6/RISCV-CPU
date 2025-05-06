@@ -1,8 +1,11 @@
 module meta_predictor #(
   parameter JUMP_STATUS_COUNTER_WIDTH = 2,
-  parameter STAT_COUNTER_WIDTH = 5,
-  parameter STAT_COUNTER_CLEAR_BITS = STAT_COUNTER_WIDTH / 2 + (STAT_COUNTER_WIDTH % 2 ? 1 : 0),
-  parameter [STAT_COUNTER_WIDTH - 1:0]SP_STAT_COUNTER_INIT_VALUE = 1 << STAT_COUNTER_CLEAR_BITS
+  parameter STAT_COUNTER_WIDTH = 6,
+  parameter [STAT_COUNTER_WIDTH - 1:0]SP_STAT_COUNTER_INIT_VALUE = 0,
+  parameter [STAT_COUNTER_WIDTH - 1:0]GHP_STAT_COUNTER_INIT_VALUE = 0,
+  parameter [STAT_COUNTER_WIDTH - 1:0]LHP_STAT_COUNTER_INIT_VALUE = 0,
+  parameter STAT_COUNTER_CLEAR_BITS = 2,
+  parameter HIGH_CONFIDENCE_OR_VALUE = 1
 )(
   input  clk,
   input  rst_n,
@@ -95,7 +98,8 @@ module meta_predictor #(
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
   localparam SP_TREND_STAT_COUNTER_INIT_VALUE = {3'b000, SP_STAT_COUNTER_INIT_VALUE};
-  localparam LHP_GHP_TREND_STAT_COUNTER_INIT_VALUE = {3'b000, {STAT_COUNTER_WIDTH{1'b0}}};
+  localparam LHP_TREND_STAT_COUNTER_INIT_VALUE = {3'b000, LHP_STAT_COUNTER_INIT_VALUE};
+  localparam GHP_TREND_STAT_COUNTER_INIT_VALUE = {3'b000, GHP_STAT_COUNTER_INIT_VALUE};
 
    always @(posedge clk) 
   begin 
@@ -126,8 +130,8 @@ module meta_predictor #(
         begin
           if(!rst_n)
           begin
-            LHP_trend_stat_counter_regs[i][j] <= LHP_GHP_TREND_STAT_COUNTER_INIT_VALUE;
-            GHP_trend_stat_counter_regs[i][j] <= LHP_GHP_TREND_STAT_COUNTER_INIT_VALUE;
+            LHP_trend_stat_counter_regs[i][j] <= LHP_TREND_STAT_COUNTER_INIT_VALUE;
+            GHP_trend_stat_counter_regs[i][j] <= GHP_TREND_STAT_COUNTER_INIT_VALUE;
           end
         end
       end
@@ -339,7 +343,7 @@ module meta_predictor #(
 
   prediction_arbiter #(
     .STAT_COUNTER_WIDTH(STAT_COUNTER_WIDTH),
-    .HIGH_CONFIDENCE_OR_VALUE((1 << (STAT_COUNTER_CLEAR_BITS - 1)) - 1)
+    .HIGH_CONFIDENCE_OR_VALUE(HIGH_CONFIDENCE_OR_VALUE)
   ) prediction_arbiter_inst (
     .SP_prediction_result(SP_prediction_result),
     .LHP_prediction_result(LHP_count[JUMP_STATUS_COUNTER_WIDTH_UB]),

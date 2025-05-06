@@ -107,10 +107,6 @@ module history_predictor #(
     .data2(index_rid_ex),
     .compare_result(index_conflict)
   );
-  // localparam INDEX_PC_TOP_POSITION = INDEX_32 + 1;
-  // assign index    = {pc[INDEX_PC_TOP_POSITION: 2], history_reg[HR_WIDTH - 1: 0]};
-  // assign index_id = {pc_id[INDEX_PC_TOP_POSITION: 2], history_reg[HR_WIDTH: 1]};
-  // assign index_ex = {pc_ex[INDEX_PC_TOP_POSITION: 2], rollback_en_id ? history_reg[HR_WIDTH + 1: 2] : history_reg[HR_WIDTH: 1]};
 
   index_hash #(
     .HR_WIDTH(HR_WIDTH),
@@ -171,13 +167,14 @@ endmodule
 
 
 module index_hash #(
-  parameter HR_WIDTH = 6,
+  parameter HR_WIDTH = 8,
   parameter INDEX_WIDTH = 12
 )(
   input  [31:0]pc, 
   input  [HR_WIDTH - 1:0]hr,
   output [INDEX_WIDTH - 1:0]index
 );
+
   localparam INDEX_PC_TOP_POSITION = INDEX_WIDTH - HR_WIDTH + 1;
   assign index = {pc[INDEX_PC_TOP_POSITION: 2], hr[HR_WIDTH - 1: 0]};
 endmodule

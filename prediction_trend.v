@@ -1,6 +1,6 @@
 `include "define.v"
-//|| (count == 3'b010)
-`define high_confidence (count == 3'b011) || (count == 3'b010)
+
+`define high_confidence (count == 3'b011) || (count == 3'b010) || (count == 3'b001)
 `define upward_trend    (count == 3'b000) || (count == 3'b010)
 `define downward_trend  (count == 3'b001) || (count == 3'b111) || (count == 3'b101)
 `define no_confidence   (count == 3'b100) || (count == 3'b101) || (count == 3'b110)

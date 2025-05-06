@@ -51,8 +51,8 @@ module if_stage(
 	
     input  [4:0]Rd_id_o,
     input  [4:0]Rd_id_ex_o,
- 	input  [4:0]Rd_mem_wb_o,
 	input  [4:0]Rd_ex_mem_o,
+ 	input  [4:0]Rd_mem_wb_o,
 
 	input  RegWrite_id_o,
 	input  RegWrite_id_ex_o,
