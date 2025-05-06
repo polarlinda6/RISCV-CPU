@@ -167,14 +167,40 @@ endmodule
 
 
 module index_hash #(
-  parameter HR_WIDTH = 8,
-  parameter INDEX_WIDTH = 12
+  parameter HR_WIDTH = 9,
+  parameter INDEX_WIDTH = 13
 )(
   input  [31:0]pc, 
   input  [HR_WIDTH - 1:0]hr,
   output [INDEX_WIDTH - 1:0]index
 );
+  localparam HR_WIDTH_UB = HR_WIDTH - 1;
+  localparam INDEX_WIDTH_UB = INDEX_WIDTH - 1;
 
-  localparam INDEX_PC_TOP_POSITION = INDEX_WIDTH - HR_WIDTH + 1;
-  assign index = {pc[INDEX_PC_TOP_POSITION: 2], hr[HR_WIDTH - 1: 0]};
+  generate
+  if(HR_WIDTH >= INDEX_WIDTH) begin
+    wire [HR_WIDTH_UB:0]once_result;
+    assign once_result = hr ^ pc[HR_WIDTH + 1:2];
+
+    if(HR_WIDTH == INDEX_WIDTH)
+      assign index = once_result;
+    else begin
+      wire [HR_WIDTH_UB:0]double_result;
+      assign index = double_result[INDEX_WIDTH_UB:0];      
+      
+      localparam SUB = HR_WIDTH - INDEX_WIDTH;
+      localparam NUM = INDEX_WIDTH / SUB + (INDEX_WIDTH % SUB ? 1 : 0);
+
+      genvar i;
+      for(i = 0; i < NUM; i = i + 1) begin
+        localparam lb = i * SUB;
+        localparam ub = lb + SUB - 1;
+        assign double_result[ub:lb] = once_result[ub:lb] ^ once_result[HR_WIDTH_UB:HR_WIDTH_UB - SUB + 1];
+      end
+    end
+  end else begin
+    localparam INDEX_PC_TOP_POSITION = INDEX_WIDTH - HR_WIDTH + 1;
+    assign index = {pc[INDEX_PC_TOP_POSITION: 2], hr[HR_WIDTH_UB: 0]};
+  end
+  endgenerate
 endmodule
