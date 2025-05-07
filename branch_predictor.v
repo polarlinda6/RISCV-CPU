@@ -54,26 +54,30 @@ module branch_predictor(
 	localparam STAT_COUNTER_CLEAR_BITS = 2;
 	localparam UPWARD_TREND_OR_VALUE = {(STAT_COUNTER_WIDTH - 2){1'b1}};
 
-	localparam GHP_HR_WIDTH = 10;
-	localparam GHP_INDEX_WIDTH = 13;
-	localparam LHP_BEQ_HR_WIDTH = 9;
-	localparam LHP_BEQ_INDEX_WIDTH = 12;
-	localparam LHP_BLT_HR_WIDTH = 3;
-	localparam LHP_BLT_INDEX_WIDTH = 10;
-	localparam LHP_BLTU_HR_WIDTH = 9;
-	localparam LHP_BLTU_INDEX_WIDTH = 12;
-
-	localparam LHP_BNE_HR_WIDTH = LHP_BEQ_HR_WIDTH;
-	localparam LHP_BNE_INDEX_WIDTH = LHP_BEQ_INDEX_WIDTH;
-	localparam LHP_BGE_HR_WIDTH = LHP_BLT_HR_WIDTH;
-	localparam LHP_BGE_INDEX_WIDTH = LHP_BLT_INDEX_WIDTH;
-	localparam LHP_BGEU_HR_WIDTH = LHP_BLTU_HR_WIDTH;
-	localparam LHP_BGEU_INDEX_WIDTH = LHP_BLTU_INDEX_WIDTH;
-
 	localparam STAT_COUNTER_WIDTH = 6;
 	localparam [STAT_COUNTER_WIDTH - 1:0]SP_STAT_COUNTER_INIT_VALUE  = 0;
 	localparam [STAT_COUNTER_WIDTH - 1:0]LHP_STAT_COUNTER_INIT_VALUE = 0;
 	localparam [STAT_COUNTER_WIDTH - 1:0]GHP_STAT_COUNTER_INIT_VALUE = 0;
+	
+
+	localparam GHP_HR_WIDTH    = 10; 
+	localparam GHP_INDEX_WIDTH = 13;
+
+	localparam LHP_BEQ_HR_WIDTH    = 9;  
+	localparam LHP_BEQ_INDEX_WIDTH = 12; 
+	localparam LHP_BNE_HR_WIDTH    = 7; 
+	localparam LHP_BNE_INDEX_WIDTH = 6;  
+	
+	localparam LHP_BLT_HR_WIDTH    = 3; 
+	localparam LHP_BLT_INDEX_WIDTH = 6; 
+	localparam LHP_BGE_HR_WIDTH    = 3;   
+	localparam LHP_BGE_INDEX_WIDTH = 8; 
+
+	localparam LHP_BLTU_HR_WIDTH    = 10;   
+	localparam LHP_BLTU_INDEX_WIDTH = 12; 
+	localparam LHP_BGEU_HR_WIDTH    = 7;   
+	localparam LHP_BGEU_INDEX_WIDTH = 10;  
+
 
 	localparam JUMP_STATUS_COUNTER_WIDTH = 2;
 	localparam JUMP_STATUS_COUNTER_WIDTH_UB = JUMP_STATUS_COUNTER_WIDTH - 1;
