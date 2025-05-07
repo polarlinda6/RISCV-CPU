@@ -92,7 +92,7 @@ module ex_stage(
         .signal(ALU_DA_imme_signal), 
         .dout(ALU_DB)
         );
-	alu alu_inst (
+	ALU ALU_inst (
         .ALU_DA(ALU_DA), 
         .ALU_DB(ALU_DB), 
         .ALU_CTL(ALUctl), 

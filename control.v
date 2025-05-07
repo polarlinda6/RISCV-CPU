@@ -60,7 +60,7 @@ module control(
 				.unknown_instr_warning_main_decode(unknown_instr_warning_main_decode)
         );
 	
-	alu_control alu_control_inst(
+	ALU_control ALU_control_inst(
         .B_type(B_type),
         .R_type(R_type),
         .I_type(I_type),
@@ -140,7 +140,7 @@ module main_control(
 endmodule
 
 
-module alu_control(
+module ALU_control(
     input  B_type,
 	input  R_type,
 	input  I_type,

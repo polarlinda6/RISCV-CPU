@@ -1,4 +1,4 @@
-module alu(
+module ALU(
     input  [31:0]ALU_DA,
     input  [31:0]ALU_DB,
     input  [3:0]ALU_CTL,
