@@ -5,7 +5,7 @@ module meta_predictor #(
   parameter [STAT_COUNTER_WIDTH - 1:0]GHP_STAT_COUNTER_INIT_VALUE = 0,
   parameter [STAT_COUNTER_WIDTH - 1:0]LHP_STAT_COUNTER_INIT_VALUE = 0,
   parameter STAT_COUNTER_CLEAR_BITS = 2,
-  parameter HIGH_CONFIDENCE_OR_VALUE = 1
+  parameter UPWARD_TREND_OR_VALUE = 1
 )(
   input  clk,
   input  rst_n,
@@ -343,7 +343,7 @@ module meta_predictor #(
 
   prediction_arbiter #(
     .STAT_COUNTER_WIDTH(STAT_COUNTER_WIDTH),
-    .HIGH_CONFIDENCE_OR_VALUE(HIGH_CONFIDENCE_OR_VALUE)
+    .UPWARD_TREND_OR_VALUE(UPWARD_TREND_OR_VALUE)
   ) prediction_arbiter_inst (
     .SP_prediction_result(SP_prediction_result),
     .LHP_prediction_result(LHP_count[JUMP_STATUS_COUNTER_WIDTH_UB]),

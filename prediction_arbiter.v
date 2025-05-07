@@ -2,7 +2,7 @@
 
 module prediction_arbiter #(
   parameter STAT_COUNTER_WIDTH = 5,
-  parameter [STAT_COUNTER_WIDTH - 1:0]HIGH_CONFIDENCE_OR_VALUE = 3
+  parameter [STAT_COUNTER_WIDTH - 1:0]UPWARD_TREND_OR_VALUE = 3
 )(
   input SP_prediction_result,
   input LHP_prediction_result,
@@ -23,9 +23,9 @@ module prediction_arbiter #(
   localparam [STAT_COUNTER_WIDTH_UB:0]ZERO = {STAT_COUNTER_WIDTH{1'b0}};
 
   wire [STAT_COUNTER_WIDTH_UB:0]SP_corrected_stat_count, LHP_corrected_stat_count, GHP_corrected_stat_count;
-  assign SP_corrected_stat_count  = SP_trend_decode[0]  ? ZERO : SP_trend_decode[3] ?  HIGH_CONFIDENCE_OR_VALUE | SP_stat_count : SP_stat_count;
-  assign LHP_corrected_stat_count = LHP_trend_decode[0] ? ZERO : LHP_trend_decode[3] ? HIGH_CONFIDENCE_OR_VALUE | LHP_stat_count : LHP_stat_count;
-  assign GHP_corrected_stat_count = GHP_trend_decode[0] ? ZERO : GHP_trend_decode[3] ? HIGH_CONFIDENCE_OR_VALUE | GHP_stat_count : GHP_stat_count;
+  assign SP_corrected_stat_count  = SP_trend_decode[0]  ? ZERO : SP_trend_decode[2]  ? UPWARD_TREND_OR_VALUE | SP_stat_count : SP_stat_count;
+  assign LHP_corrected_stat_count = LHP_trend_decode[0] ? ZERO : LHP_trend_decode[2] ? UPWARD_TREND_OR_VALUE | LHP_stat_count : LHP_stat_count;
+  assign GHP_corrected_stat_count = GHP_trend_decode[0] ? ZERO : GHP_trend_decode[2] ? UPWARD_TREND_OR_VALUE | GHP_stat_count : GHP_stat_count;
 
 
   wire SP_LHP_conflict, SP_GHP_conflict;
