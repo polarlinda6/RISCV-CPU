@@ -52,27 +52,3 @@ module trend_counter_operator(
     .result(new_count)
   );
 endmodule 
-
-
-module stat_counter_operator #(
-  parameter STAT_COUNTER_WIDTH = 5
-)(
-  input  [STAT_COUNTER_WIDTH - 1:0]A, 
-  input  [2:0]B,
-  output OF,
-  output [STAT_COUNTER_WIDTH - 1:0]result
-);
-  localparam SUB = STAT_COUNTER_WIDTH - 3;
-
-  no_overflow_unsig_adder #(
-    .WIDTH(STAT_COUNTER_WIDTH),
-    .ALLOW_PO(1),
-    .ALLOW_NO(0)
-  ) adder_inst(
-    .A(A),
-    .B({{SUB{B[2]}}, B}),
-    .PO(OF),
-    .NO(),
-    .result(result)
-  );
-endmodule 
