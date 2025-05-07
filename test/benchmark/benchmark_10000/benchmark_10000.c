@@ -1,5 +1,3 @@
-//https://godbolt.org/z/MrbTY7jhb
-
 /*--- pi.c       PROGRAM RANPI
  *
  *   Program to compute PI by probability.
@@ -10,7 +8,30 @@
  *  Translated to C from FORTRAN 20 Nov 1993
  */
 
- void myadd(float* sum, float* addend) {
+/*
+ * ----------------------------------------------------------------------------
+ * MODIFICATIONS for RISC-V CPU Project (Benchmark Version)
+ * Based on: pi.c (original version in this project)
+ * By: Linda6
+ * Date: 2025-05-07
+ *
+ * Purpose: Create a clean benchmark version from pi.c for performance evaluation
+ *          of the RISC-V CPU. This version removes debug outputs and standardizes
+ *          the iteration count to 10000.
+ *
+ * Benchmark results/details: https://godbolt.org/z/98azEs6vK
+ *
+ * Summary of changes from pi.c:
+ * - Removed all printf statements for cleaner benchmarking.
+ * - Removed #include <stdio.h> as it's no longer needed after removing printf.
+ * - Ensured iteration count 'itot' is set to 10000.
+ * - Removed argc and argv from main() function signature as they are not used.
+ * ----------------------------------------------------------------------------
+ */
+
+// #include <stdio.h> // Removed as printf is no longer used
+
+void myadd(float* sum, float* addend) {
   /*
   c   Simple adding subroutine thrown in to allow subroutine
   c   calls/returns to be factored in as part of the benchmark.
@@ -18,9 +39,12 @@
   *sum = *sum + *addend;
 }
 
-int main() {
+// int main(int argc, char* argv[]) { // Original signature from pi.c
+int main() { // Modified signature: argc and argv removed as they are not used
   float ztot, yran, ymult, ymod, x, y, z, pi, prod;
   long int low, ixran, itot, j, iprod;
+
+  // printf("Running RanPI...\n"); // Removed
 
   ztot = 0.0;
   low = 1;
@@ -28,7 +52,7 @@ int main() {
   yran = 5813.0;
   ymult = 1307.0;
   ymod = 5471.0;
-  itot = 100;
+  itot = 10000; // Standardized iteration count for this benchmark version
 
   for (j = 1; j <= itot; j++) {
       /*
@@ -39,6 +63,7 @@ int main() {
       c   integer overflow and to allow full precision even with a 23-bit
       c   mantissa.
       */
+      // printf("\tIteration: %d\n", j); // Removed
       iprod = 27611 * ixran;
       ixran = iprod - 74383 * (long int)(iprod / 74383);
       x = (float)ixran / 74383.0;
@@ -53,6 +78,9 @@ int main() {
   }
 
   pi = 4.0 * (float)low / (float)itot;
+
+  // Print result
+  // printf("Result: %f\n", pi); // Removed
 
   // Move result to some pre-determined register
   asm("mv x27, %[v]"
