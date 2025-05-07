@@ -1,6 +1,6 @@
 `include "define.v"
 
-module ras #(
+module RAS #(
 	parameter STACK_ADDR_WIDTH = 4
 )(
 	input  clk,

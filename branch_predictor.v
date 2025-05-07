@@ -400,7 +400,7 @@ module branch_predictor(
 
 /////////////////////////////////////////////////////////////////////////////////
 
-	ras #(
+	RAS #(
 		.STACK_ADDR_WIDTH(RAS_STACK_ADDR_WIDTH)
 	) ras_inst(
 		.clk(clk),

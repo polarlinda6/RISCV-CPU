@@ -1,6 +1,6 @@
 `include "define.v"
 
-module prediction_table #(
+module PHT #(
   parameter INDEX_WIDTH = 8,
   parameter JUMP_STATUS_COUNTER_WIDTH = 2,
   parameter [JUMP_STATUS_COUNTER_WIDTH - 1: 0]JUMP_STATUS_COUNTER_INIT_VALUE = 0
