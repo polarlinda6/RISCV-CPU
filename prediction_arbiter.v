@@ -84,7 +84,7 @@ module prediction_arbiter #(
     .dout(trend_only)
   ); 
 
-  assign double_arbitrate_result = 0;//trend_only[3] 
+  assign double_arbitrate_result = trend_only[3];
 
 /////////////////////////////////////////////////////////////////////////////////////
 
