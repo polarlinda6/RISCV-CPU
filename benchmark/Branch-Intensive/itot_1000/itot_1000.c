@@ -23,7 +23,7 @@ Original Author: Shay Gal-on
  * Modified by: Linda6
  * Date: 2023-05-08
  *
- * Benchmark results/details: https://godbolt.org/z/aeTKTx6E5
+ * Benchmark results/details: https://godbolt.org/z/dnxEThYMx
  *
  * Description:
  * This file is a modified version of the original core_state.c from the EEMBC
@@ -33,7 +33,7 @@ Original Author: Shay Gal-on
  * making it ideal for testing CPU branch prediction performance.
  *
  * Key Modifications:
- * - Ensured iteration count 'itot' is set to 100.
+ * - Ensured iteration count 'itot' is set to 1000.
  * - Removed dependency on coremark.h, directly defining necessary types and constants
  * - Removed core_bench_state() and core_init_state() functions, simplifying benchmark logic
  * - Added new main() function to directly drive the state machine with predefined test strings
@@ -44,7 +44,7 @@ Original Author: Shay Gal-on
  * ----------------------------------------------------------------------------
  */
 
-
+ 
 // Define necessary types (originally from coremark.h)
 typedef unsigned char ee_u8;
 typedef unsigned ee_u32;
@@ -401,7 +401,7 @@ ee_u8* generate_test_string(ee_u32 itot) {
 }
  
 int main() {
-    ee_u32 itot = 100; 
+    ee_u32 itot = 1000; 
     ee_u32 transition_counts[NUM_CORE_STATES] = {};
     ee_u32 final_state_counts[NUM_CORE_STATES] = {};
     
