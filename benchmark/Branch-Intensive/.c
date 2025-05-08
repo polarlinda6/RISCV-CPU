@@ -19,11 +19,11 @@ Original Author: Shay Gal-on
 /* 
   * ---------------------------------------------------------------------------- 
   * MODIFICATIONS for RISC-V CPU Project (Benchmark Version)
-  * Based on: core_state.c (original version in this project)
+  * Based on: https://github.com/eembc/coremark/blob/main/core_state.c
   * By: Linda6
   * Date: 2025-05-08
   *
-  * Benchmark results/details: https://godbolt.org/z/1qh6dxceP
+  * Benchmark results/details: https://godbolt.org/z/hMGaessde
   * 
   * Purpose: This file is a modified version of the original core_state.c from 
   *          the EEMBC CoreMark benchmark suite. It has been adapted to serve as 
@@ -65,7 +65,7 @@ Original Author: Shay Gal-on
 // Define necessary types (originally from coremark.h)
 typedef unsigned char ee_u8;
 typedef signed short ee_s16; // Not used in this simplified version, but kept for consistency
-typedef unsigned int ee_u32;
+typedef unsigned ee_u32;
 
 // CoreMark specific enums and constants (originally from coremark.h)
 #define NUM_CORE_STATES 8
@@ -225,33 +225,16 @@ core_state_transition(ee_u8 **instr, ee_u32 *transition_count)
     *instr = str;
     return state;
 }
-
-// Example main function to drive the state machine
+ 
+ 
 int main() {
-    // Test strings - you can modify these or provide input differently
-    ee_u8 test_input_string[] = "5012,.1234500,-110.700,+0.64400,5.500e+3,-.123e-2,-87e+832,+0.6e-12,T0.3e-1F,-T.T++Tq,1T3.4e4z,34.0e-T^";
-    ee_u8 *p_input = test_input_string;
-    ee_u32 transition_counts[NUM_CORE_STATES];
-    ee_u32 final_state_counts[NUM_CORE_STATES];
-    int i;
-
-    for (i = 0; i < NUM_CORE_STATES; i++) {
-        transition_counts[i] = 0;
-        final_state_counts[i] = 0;
-    }
-
-    while (*p_input != '\0') {
-        ee_u8 *token_start = p_input;
+    ee_u8* test_string = (ee_u8*)"5012,.1234500,-110.700,+0.64400,5.500e+3,-.123e-2,-87e+832,+0.6e-12,T0.3e-1F,-T.T++Tq,1T3.4e4z,34.0e-T^";
+    ee_u32 transition_counts[NUM_CORE_STATES] = {};
+    ee_u32 final_state_counts[NUM_CORE_STATES] = {};
+    
+    for (ee_u8* p_input = test_string; *p_input != '\0';) {
         enum CORE_STATE final_state = core_state_transition(&p_input, transition_counts);
-        final_state_counts[final_state]++;
-        
-        // Print the token that was just processed
-        // Find the end of the processed token (either comma or null terminator from p_input before core_state_transition incremented it)
-        ee_u8 *token_end = p_input;
-        if (*(token_end-1) == ',') { // If it ended with a comma, don't print the comma as part of the token
-            token_end--;
-        }
-        if (*p_input == '\0') break; // End of string
+        ++final_state_counts[final_state];
     }
 
     // Results to registers
