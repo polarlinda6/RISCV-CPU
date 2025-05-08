@@ -11,7 +11,7 @@
 /*
  * ----------------------------------------------------------------------------
  * MODIFICATIONS for RISC-V CPU Project (Benchmark Version)
- * Based on: pi.c (original version in this project)
+ * Based on: https://github.com/mortbopet/Ripes/blob/master/test/riscv-tests/ranpi.c
  * By: Linda6
  * Date: 2025-05-07
  *

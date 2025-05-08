@@ -11,20 +11,20 @@
 /*
  * ----------------------------------------------------------------------------
  * MODIFICATIONS for RISC-V CPU Project (Benchmark Version)
- * Based on: pi.c (original version in this project)
+ * Based on: https://github.com/mortbopet/Ripes/blob/master/test/riscv-tests/ranpi.c
  * By: Linda6
  * Date: 2025-05-07
  *
+ * Benchmark results/details: https://godbolt.org/z/18jaKfxTY
+ *
  * Purpose: Create a clean benchmark version from pi.c for performance evaluation
  *          of the RISC-V CPU. This version removes debug outputs and standardizes
- *          the iteration count to 1000.
- *
- * Benchmark results/details: https://godbolt.org/z/nx135Gqhd
+ *          the iteration count to 100.
  *
  * Summary of changes from pi.c:
  * - Removed all printf statements for cleaner benchmarking.
  * - Removed #include <stdio.h> as it's no longer needed after removing printf.
- * - Ensured iteration count 'itot' is set to 1000.
+ * - Ensured iteration count 'itot' is set to 100.
  * - Removed argc and argv from main() function signature as they are not used.
  * ----------------------------------------------------------------------------
  */
@@ -52,7 +52,7 @@ int main() { // Modified signature: argc and argv removed as they are not used
   yran = 5813.0;
   ymult = 1307.0;
   ymod = 5471.0;
-  itot = 1000; // Standardized iteration count for this benchmark version
+  itot = 100; // Standardized iteration count for this benchmark version
 
   for (j = 1; j <= itot; j++) {
       /*
