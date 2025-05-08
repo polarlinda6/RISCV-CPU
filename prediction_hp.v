@@ -79,7 +79,7 @@ module history_predictor #(
     .INDEX_WIDTH(INDEX_WIDTH), 
     .JUMP_STATUS_COUNTER_WIDTH(JUMP_STATUS_COUNTER_WIDTH),
     .JUMP_STATUS_COUNTER_INIT_VALUE(JUMP_STATUS_COUNTER_INIT_VALUE)
-  ) prediction_table_inst(
+  ) PHT_inst(
     .clk(clk),
     .rst_n(rst_n),
 

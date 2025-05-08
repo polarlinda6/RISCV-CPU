@@ -63,13 +63,13 @@ module if_stage(
 	input  MemRead_ex_mem_o,
 
 	input  PL_stall,
-    input  PL_flush
+    input  PL_flush,
+
+    output PL_stall_inner
     );
     
     wire [31:0]pc;
     wire [31:0]jalr_pc_prediction;	
-
-    wire PL_stall_inner;
 
 	assign rom_addr = pc;
     assign instr_if_o = PL_stall_inner ? `nop : instr_if_i;

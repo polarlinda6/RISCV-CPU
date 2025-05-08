@@ -47,7 +47,11 @@ module datapath(
     output stat_bgeu,
     output stat_jal,
     output stat_jalr,
-    output stat_PL_flush
+    output stat_PL_flush,
+
+    output stat_PL_stall,
+    output stat_PL_stall_inner,
+    output stat_ecall
     );
 
     //forward
@@ -190,7 +194,9 @@ module datapath(
 
 
         .PL_stall(PL_stall),
-        .PL_flush(PL_flush)
+        .PL_flush(PL_flush),
+
+        .PL_stall_inner(stat_PL_stall_inner)
         );
     
     
@@ -491,4 +497,8 @@ module datapath(
     assign stat_jal      = jal_id_ex_o;
     assign stat_jalr     = jalr_id_ex_o;
     assign stat_PL_flush = PL_flush;
+
+    assign stat_PL_stall = PL_stall;
+    //assign stat_PL_stall_inner = PL_stall_inner;
+    assign stat_ecall = ecall_id_ex_o;
 endmodule
