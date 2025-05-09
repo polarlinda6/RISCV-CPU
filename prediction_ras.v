@@ -19,7 +19,7 @@ module RAS #(
 	localparam [STACK_ADDR_WIDTH_UB:0]N_ONE = {STACK_ADDR_WIDTH{1'b1}};	
 	localparam [STACK_ADDR_WIDTH_UB:0]P_ONE = {{STACK_ADDR_WIDTH_UB{1'b0}}, 1'b1};
 
-	wire [3:0]offset;
+	wire [STACK_ADDR_WIDTH_UB:0]offset;
 	assign offset = push || rollback_push ? P_ONE : N_ONE;
 
 	circular_stack #(
@@ -49,7 +49,7 @@ module circular_stack #(
 	input  [31:0]din,
 
 	input  WR_offset_en,
-	input  [3:0]offset,
+	input  [STACK_ADDR_WIDTH - 1:0]offset,
 
 	output [31:0]dout
 );
