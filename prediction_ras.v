@@ -25,6 +25,7 @@ module RAS #(
 	wire [STACK_ADDR_WIDTH_UB:0]offset;
 	wire en, rollback_en_id, rollback_en_ex;
 
+	reg [31:0]jalr_pc_prediction_reg;
 
 	circular_stack #(
 		.WIDTH(32),
@@ -33,8 +34,8 @@ module RAS #(
 		.clk(clk),
 		.rst_n(rst_n),
 
-		.WR_data_en(push),
-		.din(pc_add_4),
+		.WR_data_en(push || (rollback_pop_id && rollback_push_ex)),
+		.din(push ? pc_add_4 : jalr_pc_prediction_reg),
 
 		.WR_offset_en(en || rollback_en_id || rollback_en_ex),
 		.offset(offset),
@@ -58,12 +59,12 @@ module RAS #(
 	// 	.dout(jalr_pc_prediction)
 	// );	
 
-	// always @(posedge clk) begin
-	// 	if(!rst_n) 
-	// 		jalr_pc_prediction_reg <= `zeroword;
-	// 	else if(pop)
-	// 		jalr_pc_prediction_reg <= jalr_pc_prediction;
-	// end
+	always @(posedge clk) begin
+		if(!rst_n) 
+			jalr_pc_prediction_reg <= `zeroword;
+		else if(pop)
+			jalr_pc_prediction_reg <= jalr_pc_prediction;
+	end
 
 ////////////////////////////////////////////////////////////////////////////////
 
