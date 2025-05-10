@@ -12,8 +12,9 @@ module branch_predictor(
 
 	input  ras_pop, 
 	input  ras_push,
-	input  ras_rollback_pop, 
-	input  ras_rollback_push,
+	input  ras_rollback_pop_id, 
+	input  ras_rollback_push_id,
+	input  ras_rollback_push_ex,
 
 	input  [31:0]pc_add_4,
 	input  [31:0]imme,
@@ -408,45 +409,11 @@ module branch_predictor(
 
 		.pop(ras_pop),
 		.push(ras_push),
-		.rollback_pop(ras_rollback_pop),	
-		.rollback_push(ras_rollback_push),
+		.rollback_pop_id(ras_rollback_pop_id),	
+		.rollback_push_id(ras_rollback_push_id),
+		.rollback_push_ex(ras_rollback_push_ex),
 		
 		.pc_add_4(pc_add_4),
 		.jalr_pc_prediction(jalr_pc_prediction)
 	);
-endmodule
-
-
-module static_predictor(
-	input clk,
-	input rst_n,
-	input PL_stall,
-
-	input imme_sig,
-	output SP_prediction_result, 
-	output SP_prediction_result_id,
-	output SP_prediction_result_ex
-);
-	reg prediciont_result_reg_id, prediciont_result_reg_ex;
-
-	always @(posedge clk)
-	begin
-		if (!rst_n)
-			begin
-				prediciont_result_reg_id <= `zero;
-				prediciont_result_reg_ex <= `zero;
-			end
-		else
-			begin
-				if(!PL_stall)
-				begin
-					prediciont_result_reg_id <= SP_prediction_result;
-					prediciont_result_reg_ex <= prediciont_result_reg_id;
-				end
-			end
-	end	
-
-	assign SP_prediction_result_id = prediciont_result_reg_id;
-	assign SP_prediction_result_ex = prediciont_result_reg_ex;
-	assign SP_prediction_result = imme_sig;
 endmodule

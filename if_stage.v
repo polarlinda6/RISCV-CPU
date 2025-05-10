@@ -18,6 +18,7 @@ module if_stage(
     input  [4:0]Rs1_id_o,
     input  jal_id_o,
     input  jalr_id_o, 
+    input  jalr_branch_failed,
     
     
     input  B_type_id_o,
@@ -89,8 +90,9 @@ module if_stage(
 
     wire ras_pop;
     wire ras_push;
-    wire ras_rollback_pop;
-    wire ras_rollback_push;
+    wire ras_rollback_pop_id;
+    wire ras_rollback_push_id;
+    wire ras_rollback_push_ex;
     wire jalr_prediction_en;
     wire B_type_prediction_en;
 
@@ -198,8 +200,9 @@ module if_stage(
       
         .ras_pop(ras_pop),
         .ras_push(ras_push),
-        .ras_rollback_pop(ras_rollback_pop),
-        .ras_rollback_push(ras_rollback_push),
+        .ras_rollback_pop_id(ras_rollback_pop_id),
+        .ras_rollback_push_id(ras_rollback_push_id),
+        .ras_rollback_push_ex(ras_rollback_push_ex),
 
         .pc_add_4(pc_add_4),
         .imme(imme),
@@ -293,7 +296,8 @@ module if_stage(
         .jal(jal),
         .jalr(jalr),             
         .jal_id(jal_id_o),
-        .jalr_id(jalr_id_o),     
+        .jalr_id(jalr_id_o),
+        .jalr_ex(jalr_branch_failed),     
         .PL_flush(PL_flush),
         .PL_stall(PL_stall || PL_stall_inner),
 
@@ -302,8 +306,9 @@ module if_stage(
 
         .ras_pop(ras_pop),
         .ras_push(ras_push),
-        .ras_rollback_pop(ras_rollback_pop),
-        .ras_rollback_push(ras_rollback_push),
+        .ras_rollback_pop_id(ras_rollback_pop_id),
+        .ras_rollback_push_id(ras_rollback_push_id),
+        .ras_rollback_push_ex(ras_rollback_push_ex),
 
         .jalr_prediction_en(jalr_prediction_en),        
         .PL_stall_inner(PL_stall_inner)

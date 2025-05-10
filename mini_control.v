@@ -29,16 +29,20 @@ module mini_control(
 	input  jalr,
 	input  jal_id,
 	input  jalr_id,
+	input  jalr_ex,
 	input  PL_flush,
 	input  PL_stall,
 
 	input  [4:0]Rd,
 	input  [4:0]Rs1_id,
+	// input  [4:0]Rid_addr_track_i,
+	// output [4:0]Rid_addr_track_o,
 
 	output ras_pop, 
 	output ras_push,
-	output ras_rollback_pop,
-	output ras_rollback_push,
+	output ras_rollback_pop_id,
+	output ras_rollback_push_id,
+	output ras_rollback_push_ex,
 
 	output jalr_prediction_en,	
 	output PL_stall_inner
@@ -65,33 +69,45 @@ module mini_control(
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-	wire Rd_is_ra, Rd_is_ra_id, Rs1_is_ra, Rs1_is_ra_id; 
+	wire Rd_is_ra, Rd_is_ra_id; 
 	assign Rd_is_ra     = Rd == `ra;
-	assign Rs1_is_ra    = Rs1 == `ra;
 	assign Rd_is_ra_id  = Rd_id == `ra;
+
+	wire Rs1_is_ra, Rs1_is_ra_id;
+	assign Rs1_is_ra    = Rs1 == `ra;
 	assign Rs1_is_ra_id = Rs1_id == `ra;
 
-	assign PL_stall_inner     = jalr && (!Rs1_is_ra) && (Rs1_hazard_ex_noload || Rs1_hazard_mem_load);
-	assign jalr_prediction_en = jalr && Rs1_is_ra && (Rs1_hazard_id || Rs1_hazard_ex || Rs1_hazard_mem_load);
+	// assign PL_stall_inner     = jalr && (!Rs1_is_ra) && (Rs1_hazard_ex_noload || Rs1_hazard_mem_load);
+	// assign jalr_prediction_en = jalr && Rs1_is_ra && (Rs1_hazard_id || Rs1_hazard_ex || Rs1_hazard_mem_load);
 
-
-	assign ras_pop  = (!PL_flush && !PL_stall && Rs1_is_ra && jalr);
-	assign ras_push = (!PL_flush && !PL_stall && Rd_is_ra && (jal || jalr));
+	// assign ras_pop  = (!PL_flush && !PL_stall && Rs1_is_ra && jalr);
+	// assign ras_push = (!PL_flush && !PL_stall && Rd_is_ra && (jal || jalr));
 	
-	assign ras_rollback_pop = (PL_flush && Rd_is_ra_id && (jal_id || jalr_id));
-	assign ras_rollback_push = (PL_flush && Rs1_is_ra_id && jalr_id);
+	// assign ras_rollback_pop  = (PL_flush && Rd_is_ra_id && (jal_id || jalr_id));
+	// assign ras_rollback_push = (PL_flush && Rs1_is_ra_id && jalr_id);
+
+	assign PL_stall_inner     = jalr &&  Rd_is_ra && (Rs1_hazard_ex_noload || Rs1_hazard_mem_load);
+	assign jalr_prediction_en = jalr && !Rd_is_ra && (Rs1_hazard_id || Rs1_hazard_ex || Rs1_hazard_mem_load);
+
+	assign ras_pop  = !PL_flush && !PL_stall && !Rd_is_ra && jalr;
+	assign ras_push = !PL_flush && !PL_stall &&  Rd_is_ra && (jal || jalr);
+	
+	assign ras_rollback_pop_id  = PL_flush &&  Rd_is_ra_id && (jal_id || jalr_id);
+	assign ras_rollback_push_id = PL_flush && !Rd_is_ra_id && jalr_id;
+
+	assign ras_rollback_push_ex = PL_flush && jalr_ex;
 
 ////////////////////////////////////////////////////////////////////////////////////
 
-	assign Rs1_hazard_id=  RegWrite_id && (Rd_id==Rs1);
-	assign Rs1_hazard_ex=  RegWrite_ex && (Rd_ex==Rs1);
-	assign Rs1_hazard_mem= RegWrite_mem && (Rd_mem==Rs1);
-	assign Rs1_hazard_wb=  RegWrite_wb && (Rd_wb==Rs1);	
+	assign Rs1_hazard_id  = RegWrite_id && (Rd_id==Rs1);
+	assign Rs1_hazard_ex  = RegWrite_ex && (Rd_ex==Rs1);
+	assign Rs1_hazard_mem = RegWrite_mem && (Rd_mem==Rs1);
+	assign Rs1_hazard_wb  = RegWrite_wb && (Rd_wb==Rs1);	
 
-	assign Rs2_hazard_id=  RegWrite_id && (Rd_id==Rs2);
-	assign Rs2_hazard_ex=  RegWrite_ex && (Rd_ex==Rs2);
-	assign Rs2_hazard_mem= RegWrite_mem && (Rd_mem==Rs2);
-	assign Rs2_hazard_wb=  RegWrite_wb && (Rd_wb==Rs2);	
+	assign Rs2_hazard_id  = RegWrite_id && (Rd_id==Rs2);
+	assign Rs2_hazard_ex  = RegWrite_ex && (Rd_ex==Rs2);
+	assign Rs2_hazard_mem = RegWrite_mem && (Rd_mem==Rs2);
+	assign Rs2_hazard_wb  = RegWrite_wb && (Rd_wb==Rs2);	
 
 	assign Rs1_hazard_ex_noload  = (!MemRead_ex) && Rs1_hazard_ex;
 
