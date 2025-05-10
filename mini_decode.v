@@ -3,9 +3,12 @@
 module mini_decode(
  	input [31:0]instr,
 	
+ 	output B_type,  
+	output R_type,
+	output I_type, 
+
  	output jal,
  	output jalr, 	
- 	output B_type,  
   output beq, 
   output bne, 
   output blt,
@@ -33,6 +36,8 @@ module mini_decode(
  	assign jal   = (opcode==`jal);
  	assign jalr  = (opcode==`jalr);
  	assign B_type= (opcode==`B_type);
+	assign R_type= (opcode==`R_type);
+	assign I_type= (opcode==`I_type);
 
 	assign beq = B_type && (func3==3'b000);
 	assign bne = B_type && (func3==3'b001);

@@ -85,9 +85,12 @@ module if_stage(
     wire bge;
     wire bltu;
     wire bgeu;
+    wire [4:0]Rd;
     wire [2:0]func3;
     wire [31:0]imme;
 
+    wire [4:0]ras_ra_track;
+    wire WR_ra_track_en;
     wire ras_pop;
     wire ras_push;
     wire ras_rollback_pop_id;
@@ -203,7 +206,10 @@ module if_stage(
         .ras_rollback_pop_id(ras_rollback_pop_id),
         .ras_rollback_push_id(ras_rollback_push_id),
         .ras_rollback_push_ex(ras_rollback_push_ex),
+        .WR_ra_track_en(WR_ra_track_en),
+        .ras_ra_track(ras_ra_track),
 
+        .Rd(Rd),
         .pc_add_4(pc_add_4),
         .imme(imme),
 
@@ -241,14 +247,18 @@ module if_stage(
 ////////////////////////////////////////////////////////////////////////
     
     //mini decode
-    wire [4:0] Rd; 
+    wire R_type;
+    wire I_type;
 
     mini_decode mini_decode_inst(
         .instr(instr_if_i),	
 
+        .B_type(B_type),
+        .R_type(R_type),
+        .I_type(I_type),
+
         .jal(jal),
         .jalr(jalr),
-        .B_type(B_type),
         .beq(beq),
         .bne(bne),
         .blt(blt),
@@ -269,6 +279,9 @@ module if_stage(
     wire [1:0]Rs2_forward_signal;
 
     mini_control mini_control_inst(
+        .clk(clk),
+        .rst_n(rst_n),
+
         .Rs1(regs_Rs1_if_o),
         .Rs2(regs_Rs2_if_o),
 
@@ -293,17 +306,21 @@ module if_stage(
         .B_type_prediction_en(B_type_prediction_en),
 
 
+        .R_type(R_type),
+        .I_type(I_type),
         .jal(jal),
         .jalr(jalr),             
         .jal_id(jal_id_o),
         .jalr_id(jalr_id_o),
         .jalr_ex(jalr_branch_failed),     
         .PL_flush(PL_flush),
-        .PL_stall(PL_stall || PL_stall_inner),
+        .PL_stall(PL_stall),
 
         .Rd(Rd),      
         .Rs1_id(Rs1_id_o),
+        .ras_ra_track(ras_ra_track),
 
+        .WR_ra_track_en(WR_ra_track_en),
         .ras_pop(ras_pop),
         .ras_push(ras_push),
         .ras_rollback_pop_id(ras_rollback_pop_id),

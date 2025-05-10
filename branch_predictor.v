@@ -15,7 +15,10 @@ module branch_predictor(
 	input  ras_rollback_pop_id, 
 	input  ras_rollback_push_id,
 	input  ras_rollback_push_ex,
+	input  WR_ra_track_en,
+	output [4:0]ras_ra_track,
 
+	input  [4:0]Rd,
 	input  [31:0]pc_add_4,
 	input  [31:0]imme,
 
@@ -414,6 +417,10 @@ module branch_predictor(
 		.rollback_push_ex(ras_rollback_push_ex),
 		
 		.pc_add_4(pc_add_4),
-		.jalr_pc_prediction(jalr_pc_prediction)
+		.jalr_pc_prediction(jalr_pc_prediction),
+
+		.WR_ra_track_en(WR_ra_track_en),
+		.Rd(Rd),
+		.ra_track(ras_ra_track)
 	);
 endmodule

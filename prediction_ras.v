@@ -13,11 +13,11 @@ module RAS #(
 	input  rollback_push_ex,
 
 	input  [31:0]pc_add_4,
-	output [31:0]jalr_pc_prediction
+	output [31:0]jalr_pc_prediction,
 
-	// input  
-	// input  [4:0]Rid_addr_track_i,
-	// output [4:0]Rid_addr_track_o
+	input  WR_ra_track_en,
+	input  [4:0]Rd,
+	output [4:0]ra_track
 );
 
 	localparam STACK_ADDR_WIDTH_UB = STACK_ADDR_WIDTH - 1;
@@ -25,45 +25,17 @@ module RAS #(
 	wire [STACK_ADDR_WIDTH_UB:0]offset;
 	wire en, rollback_en_id, rollback_en_ex;
 
+	reg [4:0]ra_track_reg;
 	reg [31:0]jalr_pc_prediction_reg;
 
-	circular_stack #(
-		.WIDTH(32),
-		.STACK_ADDR_WIDTH(STACK_ADDR_WIDTH)
-	) addr_stack_inst(
-		.clk(clk),
-		.rst_n(rst_n),
-
-		.WR_data_en(push || (rollback_pop_id && rollback_push_ex)),
-		.din(push ? pc_add_4 : jalr_pc_prediction_reg),
-
-		.WR_offset_en(en || rollback_en_id || rollback_en_ex),
-		.offset(offset),
-
-		.dout(jalr_pc_prediction)
-	);	
-
-	// circular_stack #(
-	// 	.WIDTH(5),
-	// 	.STACK_ADDR_WIDTH(STACK_ADDR_WIDTH)
-	// ) addr_track_stack_inst(
-	// 	.clk(clk),
-	// 	.rst_n(rst_n),
-
-	// 	.WR_data_en(push || rollback_push),
-	// 	.din(addr_track),
-		
-	// 	.WR_offset_en((push != pop) || (rollback_push != rollback_pop)),
-	// 	.offset(offset),
-				
-	// 	.dout(jalr_pc_prediction)
-	// );	
-
 	always @(posedge clk) begin
-		if(!rst_n) 
+		if(!rst_n) begin
+			ra_track_reg <= `ra;
 			jalr_pc_prediction_reg <= `zeroword;
-		else if(pop)
+		end	else if(pop) begin
+			ra_track_reg <= ra_track;
 			jalr_pc_prediction_reg <= jalr_pc_prediction;
+		end
 	end
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -93,12 +65,53 @@ module RAS #(
 		.signal({ZERO_signal, N_ONE_signal, P_ONE_signal, P_TWO_signal}),
 		.dout(offset)
 	);
+
+/////////////////////////////////////////////////////////////////////////////////////
+
+	wire WR_addr_data_en, WR_ra_data_en;
+	assign WR_addr_data_en = push || (rollback_pop_id && rollback_push_ex);
+	assign WR_ra_data_en   = WR_ra_track_en || WR_addr_data_en;
+
+	circular_stack #(
+		.WIDTH(32),
+		.STACK_ADDR_WIDTH(STACK_ADDR_WIDTH),
+		.INIT_VALUE(`zeroword)
+	) addr_stack_inst(
+		.clk(clk),
+		.rst_n(rst_n),
+
+		.WR_data_en(WR_addr_data_en),
+		.din(push ? pc_add_4 : jalr_pc_prediction_reg),
+
+		.WR_offset_en(en || rollback_en_id || rollback_en_ex),
+		.offset(offset),
+
+		.dout(jalr_pc_prediction)
+	);	
+
+	circular_stack #(
+		.WIDTH(5),
+		.STACK_ADDR_WIDTH(STACK_ADDR_WIDTH),
+		.INIT_VALUE(`ra)
+	) ra_track_stack_inst(
+		.clk(clk),
+		.rst_n(rst_n),
+
+		.WR_data_en(WR_ra_data_en),
+		.din(WR_ra_track_en ? Rd : push ? `ra : ra_track_reg),
+
+		.WR_offset_en(en || rollback_en_id || rollback_en_ex),
+		.offset(offset),
+
+		.dout(ra_track)
+	);	
 endmodule
 
 
 module circular_stack #(
 	parameter WIDTH = 32,
-	parameter STACK_ADDR_WIDTH = 4
+	parameter STACK_ADDR_WIDTH = 4,
+	parameter INIT_VALUE = `zeroword
 )(
 	input clk,
 	input rst_n,
@@ -124,7 +137,7 @@ module circular_stack #(
 		genvar i;
 		for(i = 0; i < STACK_DEPTH; i = i + 1) begin
 			always @(posedge clk) begin
-				if (!rst_n) regs[i] <= `zeroword;
+				if (!rst_n) regs[i] <= INIT_VALUE;
 			end
 		end
 	endgenerate
