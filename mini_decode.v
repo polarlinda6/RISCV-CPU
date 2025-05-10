@@ -2,13 +2,13 @@
 
 module mini_decode(
  	input [31:0]instr,
-	
- 	output B_type,  
-	output R_type,
-	output I_type, 
 
- 	output jal,
- 	output jalr, 	
+	output mv, 	
+	output sw,	
+	output jal,
+ 	output jalr, 		
+
+	output B_type,   	
   output beq, 
   output bne, 
   output blt,
@@ -33,12 +33,6 @@ module mini_decode(
 	wire [6:0]opcode;
 	assign opcode=instr[6:0];
 
- 	assign jal   = (opcode==`jal);
- 	assign jalr  = (opcode==`jalr);
- 	assign B_type= (opcode==`B_type);
-	assign R_type= (opcode==`R_type);
-	assign I_type= (opcode==`I_type);
-
 	assign beq = B_type && (func3==3'b000);
 	assign bne = B_type && (func3==3'b001);
 	assign blt = B_type && (func3==3'b100);
@@ -48,10 +42,9 @@ module mini_decode(
 
 
   wire [31:0]jal_imme, jalr_imme, B_imme;
- 	assign jal_imme=  {{12{instr[31]}},instr[19:12],instr[20],instr[30:21],1'b0};   
- 	assign jalr_imme= {{20{instr[31]}},instr[31:20]}; 
- 	assign B_imme=    {{20{instr[31]}},instr[7],instr[30:25],instr[11:8],1'b0};
-
+ 	assign jal_imme  = {{12{instr[31]}},instr[19:12],instr[20],instr[30:21],1'b0};   
+ 	assign jalr_imme = {{20{instr[31]}},instr[31:20]}; 
+ 	assign B_imme    = {{20{instr[31]}},instr[7],instr[30:25],instr[11:8],1'b0};
  	
 	parallel_mux #(
 		.WIDTH(32),
@@ -61,4 +54,57 @@ module mini_decode(
 		.signal({jal, jalr, B_type}),
  		.dout(imme)
  	);
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+	parallel_unsig_comparator_eq #(
+		.WIDTH(7)
+	) jal_comparator_inst(
+		.data1(opcode),
+		.data2(`jal),
+		.compare_result(jal)
+	);
+	parallel_unsig_comparator_eq #(
+		.WIDTH(7)
+	) jalr_comparator_inst(
+		.data1(opcode),
+		.data2(`jalr),
+		.compare_result(jalr)
+	);
+	parallel_unsig_comparator_eq #(
+		.WIDTH(7)
+	) B_type_comparator_inst(
+		.data1(opcode),
+		.data2(`B_type),
+		.compare_result(B_type)
+	);
+
+////////////////////////////////////////////////////////////////////////////
+
+	wire I_type, S_type, no_zero_imme;
+	assign mv = I_type && (func3==3'b000) && (!no_zero_imme); //addi rd, rs, 0
+	assign sw = S_type && (func3==3'b010);
+
+	large_fan_in_or #(
+		.WIDTH(1),
+		.OR_QUANTITY(12)
+	) no_zero_imme_inst(
+		.din(instr[31:20]),
+		.dout(no_zero_imme)
+	);
+	parallel_unsig_comparator_eq #(
+		.WIDTH(7)
+	) S_type_comparator_inst(
+		.data1(opcode),
+		.data2(`S_type),
+		.compare_result(S_type)
+	);	
+	parallel_unsig_comparator_eq #(
+		.WIDTH(7)
+	) I_type_comparator_inst(
+		.data1(opcode),
+		.data2(`I_type),
+		.compare_result(I_type)
+	);
+
 endmodule

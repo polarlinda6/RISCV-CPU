@@ -16,7 +16,7 @@ module RAS #(
 	output [31:0]jalr_pc_prediction,
 
 	input  WR_ra_track_en,
-	input  [4:0]Rd,
+	input  [4:0]WR_ra_track_data,
 	output [4:0]ra_track
 );
 
@@ -98,7 +98,7 @@ module RAS #(
 		.rst_n(rst_n),
 
 		.WR_data_en(WR_ra_data_en),
-		.din(WR_ra_track_en ? Rd : push ? `ra : ra_track_reg),
+		.din(WR_ra_track_en ? WR_ra_track_data : push ? `ra : ra_track_reg),
 
 		.WR_offset_en(en || rollback_en_id || rollback_en_ex),
 		.offset(offset),

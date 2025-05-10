@@ -117,11 +117,9 @@ module datapath(
 	//wire bltu_id_o;
 	//wire bgeu_id_o;
     //wire jalr_id_o;
-    wire jalr_id_ex_o;
     wire [31:0]jalr_pc_jump_or_pc_if_id_o;
     wire B_type_result_if_id_o;
     //wire [4:0]Rd_id_o;
-    //wire [4:0]Rs1_id_o;
 
 	
     wire [31:0]instr_if_o;
@@ -145,10 +143,8 @@ module datapath(
         .B_type_result(B_type_result_if_o),
 
         .pc_rollback(pc_rollback_ex_o),
-        .Rs1_id_o(Rs1_id_o),
         .jal_id_o(jal),
         .jalr_id_o(jalr),  
-        .jalr_branch_failed(jalr_id_ex_o),
  
         .B_type_id_o(B_type),  
         .beq_id_o(beq),
@@ -285,6 +281,7 @@ module datapath(
     wire ALU_DA_imme_signal_id_ex_o;    
 	wire [3:0]ALUctl_id_ex_o;
     wire jal_id_ex_o;
+    wire jalr_id_ex_o;
     wire [4:0]Rs1_id_ex_o;
     wire MemWrite_id_ex_o;
     wire ecall_id_ex_o;
