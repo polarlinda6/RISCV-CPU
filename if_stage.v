@@ -86,14 +86,14 @@ module if_stage(
     wire [2:0]func3;
     wire [31:0]imme;
 
-    wire [4:0]ras_ra_track;
+    wire [4:0]RAS_ra_track;
     wire WR_ra_track_en;
     wire [4:0]WR_ra_track_data;    
-    wire ras_pop;
-    wire ras_push;
-    wire ras_rollback_pop_id;
-    wire ras_rollback_push_id;
-    wire ras_rollback_push_ex;
+    wire RAS_pop;
+    wire RAS_push;
+    wire RAS_rollback_pop_id;
+    wire RAS_rollback_push_id;
+    wire RAS_rollback_push_ex;
     wire jalr_prediction_en;
     wire B_type_prediction_en;
 
@@ -199,15 +199,15 @@ module if_stage(
         .B_type_prediction_result(B_type_prediction_result),
         .jalr_prediction_result(jalr_prediction_result),
       
-        .ras_pop(ras_pop),
-        .ras_push(ras_push),
-        .ras_rollback_pop_id(ras_rollback_pop_id),
-        .ras_rollback_push_id(ras_rollback_push_id),
-        .ras_rollback_push_ex(ras_rollback_push_ex),
+        .RAS_pop(RAS_pop),
+        .RAS_push(RAS_push),
+        .RAS_rollback_pop_id(RAS_rollback_pop_id),
+        .RAS_rollback_push_id(RAS_rollback_push_id),
+        .RAS_rollback_push_ex(RAS_rollback_push_ex),
    
         .WR_ra_track_en(WR_ra_track_en),
         .WR_ra_track_data(WR_ra_track_data),
-        .ras_ra_track(ras_ra_track),   
+        .RAS_ra_track(RAS_ra_track),   
 
         .pc_add_4(pc_add_4),
         .imme(imme),
@@ -322,15 +322,15 @@ module if_stage(
         .Rd(Rd),      
         .forwardA_data_eq_jalr_prediction_result(forwardA_data_eq_jalr_prediction_result),
 
-        .ras_ra_track(ras_ra_track), 
+        .RAS_ra_track(RAS_ra_track), 
         .WR_ra_track_en(WR_ra_track_en),
         .WR_ra_track_data(WR_ra_track_data),
 
-        .ras_pop(ras_pop),
-        .ras_push(ras_push),
-        .ras_rollback_pop_id(ras_rollback_pop_id),
-        .ras_rollback_push_id(ras_rollback_push_id),
-        .ras_rollback_push_ex(ras_rollback_push_ex),
+        .RAS_pop(RAS_pop),
+        .RAS_push(RAS_push),
+        .RAS_rollback_pop_id(RAS_rollback_pop_id),
+        .RAS_rollback_push_id(RAS_rollback_push_id),
+        .RAS_rollback_push_ex(RAS_rollback_push_ex),
 
         .jalr_prediction_en(jalr_prediction_en),        
         .PL_stall_inner(PL_stall_inner)

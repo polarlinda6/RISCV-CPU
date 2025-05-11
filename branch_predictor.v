@@ -10,15 +10,15 @@ module branch_predictor(
 	output [31:0]jalr_prediction_result,
 	output B_type_prediction_result,
 
-	input  ras_pop, 
-	input  ras_push,
-	input  ras_rollback_pop_id, 
-	input  ras_rollback_push_id,
-	input  ras_rollback_push_ex,
+	input  RAS_pop, 
+	input  RAS_push,
+	input  RAS_rollback_pop_id, 
+	input  RAS_rollback_push_id,
+	input  RAS_rollback_push_ex,
 
 	input  WR_ra_track_en,
 	input  [4:0]WR_ra_track_data,
-	output [4:0]ras_ra_track,
+	output [4:0]RAS_ra_track,
 
 	input  [4:0]Rd,
 	input  [31:0]pc_add_4,
@@ -408,21 +408,21 @@ module branch_predictor(
 
 	RAS #(
 		.STACK_ADDR_WIDTH(RAS_STACK_ADDR_WIDTH)
-	) ras_inst(
+	) RAS_inst(
 		.clk(clk),
 		.rst_n(rst_n),
 
-		.pop(ras_pop),
-		.push(ras_push),
-		.rollback_pop_id(ras_rollback_pop_id),	
-		.rollback_push_id(ras_rollback_push_id),
-		.rollback_push_ex(ras_rollback_push_ex),
+		.pop(RAS_pop),
+		.push(RAS_push),
+		.rollback_pop_id(RAS_rollback_pop_id),	
+		.rollback_push_id(RAS_rollback_push_id),
+		.rollback_push_ex(RAS_rollback_push_ex),
 		
 		.pc_add_4(pc_add_4),
 		.jalr_prediction_result(jalr_prediction_result),
 
 		.WR_ra_track_en(WR_ra_track_en),
 		.WR_ra_track_data(WR_ra_track_data),
-		.ra_track(ras_ra_track)
+		.ra_track(RAS_ra_track)
 	);
 endmodule

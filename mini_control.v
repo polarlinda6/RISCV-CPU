@@ -39,15 +39,15 @@ module mini_control(
 	input  [4:0]Rd,
 	input  forwardA_data_eq_jalr_prediction_result,
 
-	input  [4:0]ras_ra_track,
+	input  [4:0]RAS_ra_track,
 	output WR_ra_track_en,
 	output [4:0]WR_ra_track_data,
 
-	output ras_pop, 
-	output ras_push,
-	output ras_rollback_pop_id,
-	output ras_rollback_push_id,
-	output ras_rollback_push_ex,
+	output RAS_pop, 
+	output RAS_push,
+	output RAS_rollback_pop_id,
+	output RAS_rollback_push_id,
+	output RAS_rollback_push_ex,
 
 	output jalr_prediction_en,	
 	output PL_stall_inner
@@ -99,55 +99,57 @@ module mini_control(
 	assign Rs2_hazard_mem_noload = (!MemRead_mem) && Rs2_hazard_mem;
 
 /////////////////////////////////////////////////////////////////////////////////////
+
+	wire RAS_hit;
+	assign PL_stall_inner     = jalr && !RAS_hit && !Rs1_hazard_id && (Rs1_hazard_ex_noload || Rs1_hazard_mem_load);
+	assign jalr_prediction_en = jalr &&  RAS_hit && (Rs1_hazard_id || Rs1_hazard_ex || Rs1_hazard_mem_load);	
 	
-	wire PL_allow;
-	wire Rd_is_ra, Rd_is_ra_id; 
-	reg  ras_pop_reg_id, ras_pop_reg_ex;
-
-	wire Rs1_is_ra, Rs1_hit_ra_track;	
-
-	assign PL_stall_inner     = jalr && !(Rs1_is_ra || Rs1_hit_ra_track) && !Rs1_hazard_id && (Rs1_hazard_ex_noload || Rs1_hazard_mem_load);
-	assign jalr_prediction_en = jalr &&  (Rs1_is_ra || Rs1_hit_ra_track) && (Rs1_hazard_id || Rs1_hazard_ex || Rs1_hazard_mem_load);
-
-	assign ras_pop  = PL_allow && (jalr_prediction_en || forwardA_data_eq_jalr_prediction_result) && jalr;
-	assign ras_push = PL_allow && Rd_is_ra && (jal || jalr);
-	
-	assign ras_rollback_pop_id  = PL_flush && Rd_is_ra_id && (jal_id || jalr_id);
-	assign ras_rollback_push_id = PL_flush && ras_pop_reg_id;
-
-	assign ras_rollback_push_ex = PL_flush && ras_pop_reg_ex;
-
-////////////////////////////////////////////////////////////////////////////////////////
-
-	wire ras_track_mv, ras_track_sw;
-	assign ras_track_mv = mv && Rs1_is_ra && (Rd  != `zeroreg);  //mv Rd, ra
-	assign ras_track_sw = sw && Rd_is_ra  && (Rs1 == `sp);			 //sw ra, imme, sp
-
-	assign WR_ra_track_en   = ras_track_mv || ras_track_sw;
-	assign WR_ra_track_data = ras_track_sw ? `zeroreg : Rd;
-
 
 	wire mv_hit_ra_track, sw_hit_ra_track;
-	assign mv_hit_ra_track = Rs1 == ras_ra_track;
-	assign sw_hit_ra_track = (ras_ra_track == `zeroreg) && (Rs1_hazard_id_load || Rs1_hazard_ex_load || Rs1_hazard_mem_load);
+	assign mv_hit_ra_track = Rs1 == RAS_ra_track;
+	assign sw_hit_ra_track = (RAS_ra_track == `zeroreg) && (Rs1_hazard_id_load || Rs1_hazard_ex_load || Rs1_hazard_mem_load);
 
-	assign Rs1_hit_ra_track = mv_hit_ra_track || sw_hit_ra_track;
+	wire Rs1_is_ra;	
+	assign Rs1_is_ra = Rs1 == `ra;
+	assign RAS_hit   = Rs1_is_ra || mv_hit_ra_track || sw_hit_ra_track;
+	
+///////////////////////////////////////////////////////////////////////////////////////	
+	
+	reg  RAS_pop_reg_id, RAS_pop_reg_ex;	
+
+	wire PL_allow;
+	wire Rd_is_ra, Rd_is_ra_id; 
+
+	assign RAS_pop  = PL_allow && (jalr_prediction_en || forwardA_data_eq_jalr_prediction_result) && jalr;
+	assign RAS_push = PL_allow && Rd_is_ra && (jal || jalr);
+	
+	assign RAS_rollback_pop_id  = PL_flush && Rd_is_ra_id && (jal_id || jalr_id);
+	assign RAS_rollback_push_id = PL_flush && RAS_pop_reg_id;
+
+	assign RAS_rollback_push_ex = PL_flush && RAS_pop_reg_ex;
 
 ////////////////////////////////////////////////////////////////////////////////////////
 
-	assign PL_allow = !PL_flush && !PL_stall && !PL_stall_inner;
+	wire RAS_track_mv, RAS_track_sw;
+	assign RAS_track_mv = mv && Rs1_is_ra && (Rd  != `zeroreg);  //mv Rd, ra
+	assign RAS_track_sw = sw && Rd_is_ra  && (Rs1 == `sp);			 //sw ra, imme, sp
 
-	assign Rd_is_ra        = Rd == `ra;
-	assign Rd_is_ra_id     = Rd_id == `ra;
-	assign Rs1_is_ra       = Rs1 == `ra;
+	assign WR_ra_track_en   = RAS_track_mv || RAS_track_sw;
+	assign WR_ra_track_data = RAS_track_sw ? `zeroreg : Rd;
+
+////////////////////////////////////////////////////////////////////////////////////////
+
+	assign Rd_is_ra    = Rd == `ra;
+	assign Rd_is_ra_id = Rd_id == `ra;
+	assign PL_allow    = !PL_flush && !PL_stall && !PL_stall_inner;
 
 	always @(posedge clk) begin
 		if(!rst_n) begin
-			ras_pop_reg_id <= `zero;
-			ras_pop_reg_ex <= `zero;
+			RAS_pop_reg_id <= `zero;
+			RAS_pop_reg_ex <= `zero;
 		end else if(!PL_stall) begin
-			ras_pop_reg_id <= ras_pop;
-			ras_pop_reg_ex <= ras_pop_reg_id;
+			RAS_pop_reg_id <= RAS_pop;
+			RAS_pop_reg_ex <= RAS_pop_reg_id;
 		end
 	end
 endmodule
