@@ -98,21 +98,6 @@ module mini_control(
 	assign Rs2_hazard_mem_load   = MemRead_mem && Rs2_hazard_mem;
 	assign Rs2_hazard_mem_noload = (!MemRead_mem) && Rs2_hazard_mem;
 
-/////////////////////////////////////////////////////////////////////////////////////
-
-	wire RAS_hit;
-	assign PL_stall_inner     = jalr && !RAS_hit && !Rs1_hazard_id && (Rs1_hazard_ex_noload || Rs1_hazard_mem_load);
-	assign jalr_prediction_en = jalr &&  RAS_hit && (Rs1_hazard_id || Rs1_hazard_ex || Rs1_hazard_mem_load);	
-	
-
-	wire mv_hit_ra_track, sw_hit_ra_track;
-	assign mv_hit_ra_track = Rs1 == RAS_ra_track;
-	assign sw_hit_ra_track = (RAS_ra_track == `zeroreg) && (Rs1_hazard_id_load || Rs1_hazard_ex_load || Rs1_hazard_mem_load);
-
-	wire Rs1_is_ra;	
-	assign Rs1_is_ra = Rs1 == `ra;
-	assign RAS_hit   = Rs1_is_ra || mv_hit_ra_track || sw_hit_ra_track;
-	
 ///////////////////////////////////////////////////////////////////////////////////////	
 	
 	reg  RAS_pop_reg_id, RAS_pop_reg_ex;	
@@ -130,15 +115,6 @@ module mini_control(
 
 ////////////////////////////////////////////////////////////////////////////////////////
 
-	wire RAS_track_mv, RAS_track_sw;
-	assign RAS_track_mv = mv && Rs1_is_ra && (Rd  != `zeroreg);  //mv Rd, ra
-	assign RAS_track_sw = sw && Rd_is_ra  && (Rs1 == `sp);			 //sw ra, imme, sp
-
-	assign WR_ra_track_en   = RAS_track_mv || RAS_track_sw;
-	assign WR_ra_track_data = RAS_track_sw ? `zeroreg : Rd;
-
-////////////////////////////////////////////////////////////////////////////////////////
-
 	assign Rd_is_ra    = Rd == `ra;
 	assign Rd_is_ra_id = Rd_id == `ra;
 	assign PL_allow    = !PL_flush && !PL_stall && !PL_stall_inner;
@@ -152,4 +128,28 @@ module mini_control(
 			RAS_pop_reg_ex <= RAS_pop_reg_id;
 		end
 	end
+
+/////////////////////////////////////////////////////////////////////////////////////
+	
+	wire mv_hit_ra_track, sw_hit_ra_track;
+	assign mv_hit_ra_track = Rs1 == RAS_ra_track;
+	assign sw_hit_ra_track = (RAS_ra_track == `zeroreg) && (Rs1_hazard_id_load || Rs1_hazard_ex_load || Rs1_hazard_mem_load);
+
+	wire Rs1_is_ra, RAS_hit;	
+	assign Rs1_is_ra = Rs1 == `ra;
+	assign RAS_hit   = Rs1_is_ra || mv_hit_ra_track || sw_hit_ra_track;
+
+	
+	assign PL_stall_inner     = jalr && !RAS_hit && !Rs1_hazard_id && (Rs1_hazard_ex_noload || Rs1_hazard_mem_load);
+	assign jalr_prediction_en = jalr &&  RAS_hit && (Rs1_hazard_id || Rs1_hazard_ex || Rs1_hazard_mem_load);
+
+////////////////////////////////////////////////////////////////////////////////////////
+
+	wire RAS_track_mv, RAS_track_sw;
+	assign RAS_track_mv = mv && Rs1_is_ra && (Rd  != `zeroreg);  //mv Rd, ra
+	assign RAS_track_sw = sw && Rd_is_ra  && (Rs1 == `sp);			 //sw ra, imme, sp
+
+
+	assign WR_ra_track_en   = RAS_track_mv || RAS_track_sw;
+	assign WR_ra_track_data = RAS_track_sw ? `zeroreg : Rd;	
 endmodule
