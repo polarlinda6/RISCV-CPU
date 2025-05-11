@@ -4,8 +4,10 @@
 `define   true      1'b1
 `define   false     1'b0
 
-`define   ra        5'b00001
-`define   zeroreg   5'b00000
+`define   zeroreg   5'd0
+`define   ra        5'd1
+`define   sp        5'd2
+`define   gp        5'd3
 
 `define   nop       32'h00000013  //addi x0, x0, 0
 `define   ecall     32'h00000073 

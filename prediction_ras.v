@@ -13,7 +13,7 @@ module RAS #(
 	input  rollback_push_ex,
 
 	input  [31:0]pc_add_4,
-	output [31:0]jalr_pc_prediction,
+	output [31:0]jalr_prediction_result,
 
 	input  WR_ra_track_en,
 	input  [4:0]WR_ra_track_data,
@@ -26,15 +26,15 @@ module RAS #(
 	wire en, rollback_en_id, rollback_en_ex;
 
 	reg [4:0]ra_track_reg;
-	reg [31:0]jalr_pc_prediction_reg;
+	reg [31:0]jalr_prediction_result_reg;
 
 	always @(posedge clk) begin
 		if(!rst_n) begin
 			ra_track_reg <= `ra;
-			jalr_pc_prediction_reg <= `zeroword;
+			jalr_prediction_result_reg <= `zeroword;
 		end	else if(pop) begin
 			ra_track_reg <= ra_track;
-			jalr_pc_prediction_reg <= jalr_pc_prediction;
+			jalr_prediction_result_reg <= jalr_prediction_result;
 		end
 	end
 
@@ -81,12 +81,12 @@ module RAS #(
 		.rst_n(rst_n),
 
 		.WR_data_en(WR_addr_data_en),
-		.din(push ? pc_add_4 : jalr_pc_prediction_reg),
+		.din(push ? pc_add_4 : jalr_prediction_result_reg),
 
 		.WR_offset_en(en || rollback_en_id || rollback_en_ex),
 		.offset(offset),
 
-		.dout(jalr_pc_prediction)
+		.dout(jalr_prediction_result)
 	);	
 
 	circular_stack #(

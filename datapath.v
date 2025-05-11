@@ -120,7 +120,7 @@ module datapath(
     wire [31:0]jalr_pc_jump_or_pc_if_id_o;
     wire B_type_result_if_id_o;
     //wire [4:0]Rd_id_o;
-
+    //wire MemRead_id_o;
 	
     wire [31:0]instr_if_o;
     wire [31:0]pc_add_imme_if_o;
@@ -184,6 +184,7 @@ module datapath(
         .RegWrite_ex_mem_o(RegWrite_ex_mem_o),
         .RegWrite_mem_wb_o(RegWrite_mem_wb_o),
 
+        .MemRead_id_o(MemRead),
         .MemRead_ex_mem_o(MemRead_ex_mem_o),
         .MemRead_id_ex_o(MemRead_id_ex_o),
 

@@ -57,6 +57,7 @@ module if_stage(
 	input  RegWrite_ex_mem_o,
 	input  RegWrite_mem_wb_o,
 
+    input  MemRead_id_o,
 	input  MemRead_id_ex_o,
 	input  MemRead_ex_mem_o,
 
@@ -67,7 +68,7 @@ module if_stage(
     );
     
     wire [31:0]pc;
-    wire [31:0]jalr_pc_prediction;	
+    wire [31:0]jalr_prediction_result;	
 
 	assign rom_addr = pc;
     assign instr_if_o = PL_stall_inner ? `nop : instr_if_i;
@@ -107,7 +108,7 @@ module if_stage(
 
     wire [31:0]A;
     mux3 adderA_mux3_inst(
-        .din1(jalr_pc_prediction),
+        .din1(jalr_prediction_result),
         .din2(forwardA_data),
         .din3(pc),
         .signal({jalr_prediction_en, jalr}),
@@ -196,7 +197,7 @@ module if_stage(
         .PL_stall_inner(PL_stall_inner),
  
         .B_type_prediction_result(B_type_prediction_result),
-        .jalr_pc_prediction(jalr_pc_prediction),
+        .jalr_prediction_result(jalr_prediction_result),
       
         .ras_pop(ras_pop),
         .ras_push(ras_push),
@@ -274,6 +275,9 @@ module if_stage(
     );
 
     //mini control
+    wire forwardA_data_eq_jalr_prediction_result;
+
+
     wire [1:0]Rs1_forward_signal;
     wire [1:0]Rs2_forward_signal;
 
@@ -294,6 +298,7 @@ module if_stage(
         .RegWrite_mem(RegWrite_ex_mem_o),
         .RegWrite_wb(RegWrite_mem_wb_o),
 
+        .MemRead_id(MemRead_id_o),
         .MemRead_ex(MemRead_id_ex_o),
         .MemRead_mem(MemRead_ex_mem_o),
 
@@ -315,7 +320,8 @@ module if_stage(
         .PL_stall(PL_stall),
 
         .Rd(Rd),      
- 
+        .forwardA_data_eq_jalr_prediction_result(forwardA_data_eq_jalr_prediction_result),
+
         .ras_ra_track(ras_ra_track), 
         .WR_ra_track_en(WR_ra_track_en),
         .WR_ra_track_data(WR_ra_track_data),
@@ -348,5 +354,14 @@ module if_stage(
         .din3(regs_Rs2_data_if_i),
         .signal(Rs2_forward_signal),
         .dout(forwardB_data)
+    );
+
+    //forwardA_data_eq_jalr_prediction_result
+    parallel_unsig_comparator_eq #(
+        .WIDTH(32)
+    ) forwardA_data_eq_jalr_prediction_result_inst(
+        .data1(forwardA_data),
+        .data2(jalr_prediction_result),
+        .compare_result(forwardA_data_eq_jalr_prediction_result)
     );
 endmodule

@@ -7,7 +7,7 @@ module branch_predictor(
 	input  PL_stall,
 	input  PL_stall_inner, 
 
-	output [31:0]jalr_pc_prediction,
+	output [31:0]jalr_prediction_result,
 	output B_type_prediction_result,
 
 	input  ras_pop, 
@@ -419,7 +419,7 @@ module branch_predictor(
 		.rollback_push_ex(ras_rollback_push_ex),
 		
 		.pc_add_4(pc_add_4),
-		.jalr_pc_prediction(jalr_pc_prediction),
+		.jalr_prediction_result(jalr_prediction_result),
 
 		.WR_ra_track_en(WR_ra_track_en),
 		.WR_ra_track_data(WR_ra_track_data),

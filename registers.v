@@ -27,8 +27,8 @@ module registers(
 		if(!rst_n)
 		begin
 			regs[1]  <= `zeroword;
-			regs[2]  <= 32'h7ffffff0;  //sp
-			regs[3]  <= 32'h10000000;  //gp
+			regs[`sp]  <= 32'h7ffffff0;
+			regs[`gp]  <= 32'h10000000;
 			regs[4]  <= `zeroword;
 			regs[5]  <= `zeroword;
 			regs[6]  <= `zeroword;
