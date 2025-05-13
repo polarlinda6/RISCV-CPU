@@ -106,5 +106,4 @@ module mini_decode(
 		.data2(`I_type),
 		.compare_result(I_type)
 	);
-
 endmodule
