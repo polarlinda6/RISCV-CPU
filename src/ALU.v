@@ -230,10 +230,10 @@ endmodule
 
 
 module Adder(
-  input [31:0] A,
-  input [31:0] B,
+  input [31:0]A,
+  input [31:0]B,
   input Cin,
-  input [3:0] ALU_CTL,
+  input [3:0]ALU_CTL,
   output ADD_carry,
   output ADD_OverFlow,
   output ADD_zero,
