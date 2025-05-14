@@ -24,7 +24,7 @@ module forward_unit(
 
 	output forward_load,
 	output PL_stall_ex
-    );
+  );
 	
 	assign forwardA[1]= RegWrite_ex_mem_o && (Rd_ex_mem_o==Rs1_id_ex_o);
 	assign forwardA[0]= RegWrite_mem_wb_o && (Rd_mem_wb_o==Rs1_id_ex_o);

@@ -128,15 +128,24 @@ module main_control(
 	
 	assign RW_type=func3;
 	
-	
-	//enable
-	assign MemRead= load;
-	assign MemWrite= store;
-	assign RegWrite= Rd && (lui || auipc || jal || jalr || load || I_type || R_type);
-	
 	//MUX
 	assign ALU_DA_pc_signal   = auipc;
-	assign ALU_DA_imme_signal = lui || auipc || jalr || load || store || I_type;  //select imme
+	assign ALU_DA_imme_signal = lui || auipc || jalr || load || store || I_type;  //select imme	
+
+	//enable
+	wire RegWrite_instr_or;
+	assign RegWrite= Rd && RegWrite_instr_or;	
+	assign MemRead= load;
+	assign MemWrite= store;
+
+	large_fan_in_or #(
+		.WIDTH(1),
+		.OR_QUANTITY(7)
+	) RegWrite_instr_or_inst(
+		.din({lui, auipc, jal, jalr, load, I_type, R_type}),
+		.dout(RegWrite_instr_or)
+	);
+
 endmodule
 
 
