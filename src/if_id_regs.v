@@ -20,7 +20,7 @@ module if_id_regs(
 	output reg [31:0]instr_if_id_o,
 	
 	
-	input PL_stall,
+	input PL_stall_ex,
 	input PL_flush
   );
 	
@@ -34,7 +34,7 @@ module if_id_regs(
 				B_type_result_if_id_o<=`zero;
 				instr_if_id_o<=`nop;
 		end
-		else if(!PL_stall)
+		else if(!PL_stall_ex)
 		begin
 				pc_add_imme_if_id_o<=pc_add_imme_if_id_i;
 				pc_add_4_if_id_o<=pc_add_4_if_id_i;

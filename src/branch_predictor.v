@@ -4,8 +4,8 @@ module branch_predictor(
 	input  clk,
 	input  rst_n,
 	input  PL_flush,	
-	input  PL_stall,
-	input  PL_stall_inner, 
+	input  PL_stall_ex,
+	input  PL_stall_if, 
 
 	output [31:0]jalr_prediction_result,
 	output B_type_prediction_result,
@@ -120,7 +120,7 @@ module branch_predictor(
 
 
 	wire corrected_en, rollback_en_id, rollback_en_ex;
-	assign corrected_en   = B_type && !PL_stall && !PL_stall_inner;
+	assign corrected_en   = B_type && !PL_stall_ex && !PL_stall_if;
 	assign rollback_en_id = B_type_id && PL_flush;
 	assign rollback_en_ex = B_type_branch_failed && PL_flush;
 
@@ -137,7 +137,7 @@ module branch_predictor(
 	) MP_inst(
 		.clk(clk),
 		.rst_n(rst_n),
-		.PL_stall(PL_stall),
+		.PL_stall_ex(PL_stall_ex),
 
 		.corrected_result(corrected_result),
 		.jump_result_id(B_type_result_id),
@@ -206,7 +206,7 @@ module branch_predictor(
 	static_predictor SP_inst(
 		.clk(clk),
 		.rst_n(rst_n),
-		.PL_stall(PL_stall),
+		.PL_stall_ex(PL_stall_ex),
 
 		.imme_sig(imme[31]),
 		.SP_prediction_result(SP_prediction_result),
@@ -224,7 +224,7 @@ module branch_predictor(
 	) GHP_inst(
 		.clk(clk),
 		.rst_n(rst_n),
-		.PL_stall(PL_stall),
+		.PL_stall_ex(PL_stall_ex),
 
 		.corrected_result(corrected_result),
 
@@ -251,11 +251,11 @@ module branch_predictor(
 	) LHP_beq_inst(
 		.clk(clk),
 		.rst_n(rst_n),
-		.PL_stall(PL_stall),
+		.PL_stall_ex(PL_stall_ex),
 
 		.corrected_result(corrected_result),
 
-		.corrected_en(beq && !PL_stall && !PL_stall_inner),
+		.corrected_en(beq && !PL_stall_ex && !PL_stall_if),
 		.rollback_en_id(beq_id && PL_flush),
 		.rollback_en_ex(beq_branch_failed && PL_flush),
 
@@ -278,11 +278,11 @@ module branch_predictor(
 	) LHP_bne_inst(
 		.clk(clk),
 		.rst_n(rst_n),
-		.PL_stall(PL_stall),
+		.PL_stall_ex(PL_stall_ex),
 
 		.corrected_result(corrected_result),
 
-		.corrected_en(bne && !PL_stall && !PL_stall_inner),
+		.corrected_en(bne && !PL_stall_ex && !PL_stall_if),
 		.rollback_en_id(bne_id && PL_flush),
 		.rollback_en_ex(bne_branch_failed && PL_flush),
 
@@ -305,11 +305,11 @@ module branch_predictor(
 	) LHP_blt_inst(
 		.clk(clk),
 		.rst_n(rst_n),
-		.PL_stall(PL_stall),
+		.PL_stall_ex(PL_stall_ex),
 
 		.corrected_result(corrected_result),
 
-		.corrected_en(blt && !PL_stall && !PL_stall_inner),
+		.corrected_en(blt && !PL_stall_ex && !PL_stall_if),
 		.rollback_en_id(blt_id && PL_flush),
 		.rollback_en_ex(blt_branch_failed && PL_flush),
 
@@ -332,11 +332,11 @@ module branch_predictor(
 	) LHP_bge_inst(
 		.clk(clk),
 		.rst_n(rst_n),
-		.PL_stall(PL_stall),
+		.PL_stall_ex(PL_stall_ex),
 
 		.corrected_result(corrected_result),
 
-		.corrected_en(bge && !PL_stall && !PL_stall_inner),
+		.corrected_en(bge && !PL_stall_ex && !PL_stall_if),
 		.rollback_en_id(bge_id && PL_flush),
 		.rollback_en_ex(bge_branch_failed && PL_flush),
 
@@ -359,11 +359,11 @@ module branch_predictor(
 	) LHP_bltu_inst(
 		.clk(clk),
 		.rst_n(rst_n),
-		.PL_stall(PL_stall),
+		.PL_stall_ex(PL_stall_ex),
 
 		.corrected_result(corrected_result),
 
-		.corrected_en(bltu && !PL_stall && !PL_stall_inner),
+		.corrected_en(bltu && !PL_stall_ex && !PL_stall_if),
 		.rollback_en_id(bltu_id && PL_flush),
 		.rollback_en_ex(bltu_branch_failed && PL_flush),
 
@@ -386,11 +386,11 @@ module branch_predictor(
 	) LHP_bgeu_inst(
 		.clk(clk),
 		.rst_n(rst_n),
-		.PL_stall(PL_stall),
+		.PL_stall_ex(PL_stall_ex),
 
 		.corrected_result(corrected_result),
 
-		.corrected_en(bgeu && !PL_stall && !PL_stall_inner),
+		.corrected_en(bgeu && !PL_stall_ex && !PL_stall_if),
 		.rollback_en_id(bgeu_id && PL_flush),
 		.rollback_en_ex(bgeu_branch_failed && PL_flush),
 

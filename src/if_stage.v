@@ -61,17 +61,17 @@ module if_stage(
 	input  MemRead_id_ex_o,
 	input  MemRead_ex_mem_o,
 
-	input  PL_stall,
+	input  PL_stall_ex,
     input  PL_flush,
 
-    output PL_stall_inner
+    output PL_stall_if
     );
     
     wire [31:0]pc;
     wire [31:0]jalr_prediction_result;	
 
 	assign rom_addr = pc;
-    assign instr_if_o = PL_stall_inner ? `nop : instr_if_i;
+    assign instr_if_o = PL_stall_if ? `nop : instr_if_i;
 
 
     wire jal;
@@ -156,7 +156,7 @@ module if_stage(
         .clk(clk), 
         .rst_n(rst_n),
 
-        .PL_stall(PL_stall || PL_stall_inner),       
+        .PL_stall_ex(PL_stall_ex || PL_stall_if),       
         .pc_new(pc_new), 
         .pc_out(pc)
     );
@@ -192,8 +192,8 @@ module if_stage(
         .clk(clk), 
         .rst_n(rst_n),
         .PL_flush(PL_flush),
-        .PL_stall(PL_stall),
-        .PL_stall_inner(PL_stall_inner),
+        .PL_stall_ex(PL_stall_ex),
+        .PL_stall_if(PL_stall_if),
  
         .B_type_prediction_result(B_type_prediction_result),
         .jalr_prediction_result(jalr_prediction_result),
@@ -316,7 +316,7 @@ module if_stage(
         .jal_id(jal_id_o),
         .jalr_id(jalr_id_o),
         .PL_flush(PL_flush),
-        .PL_stall(PL_stall),
+        .PL_stall_ex(PL_stall_ex),
 
         .Rd(Rd),      
         .forwardA_data_eq_jalr_prediction_result(forwardA_data_eq_jalr_prediction_result),
@@ -332,7 +332,7 @@ module if_stage(
         .RAS_rollback_push_ex(RAS_rollback_push_ex),
 
         .jalr_prediction_en(jalr_prediction_en),        
-        .PL_stall_inner(PL_stall_inner)
+        .PL_stall_if(PL_stall_if)
     );
 
     //forward

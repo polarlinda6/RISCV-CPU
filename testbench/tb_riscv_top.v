@@ -12,8 +12,8 @@ module tb_riscv_top;
 	wire stat_jal;
 	wire stat_jalr;
 	wire stat_PL_flush;
-	wire stat_PL_stall;
-	wire stat_PL_stall_inner;
+	wire stat_PL_stall_if;	
+    wire stat_PL_stall_ex;
 	wire stat_ecall;
 	wire Rd_x_warning_ram;
     wire unknown_instr_warning_main_decode;
@@ -31,8 +31,8 @@ module tb_riscv_top;
         .stat_jal(stat_jal),
         .stat_jalr(stat_jalr),
         .stat_PL_flush(stat_PL_flush),
-        .stat_PL_stall(stat_PL_stall),
-        .stat_PL_stall_inner(stat_PL_stall_inner),
+        .stat_PL_stall_if(stat_PL_stall_if),
+        .stat_PL_stall_ex(stat_PL_stall_ex),
         .stat_ecall(stat_ecall),
         
         .Rd_x_warning_ram(Rd_x_warning_ram),
@@ -54,23 +54,23 @@ module tb_riscv_top;
     reg ecall_reg;
     integer clk_total;
     integer instr_total;    
-    integer stall_id_total;
+    integer stall_if_total;
     integer stall_ex_total;
     always @(posedge clk) begin
         if (!rst_n) begin            
             ecall_reg      = 0;
             clk_total      = 0;
             instr_total    = 0;
-            stall_id_total = 0;
+            stall_if_total = 0;
             stall_ex_total = 0;
         end else begin 
             if(ecall_reg || stat_ecall)
                 ecall_reg = 1;
             else begin
-                clk_total = clk_total + 1;
-                stall_ex_total = stall_ex_total + (stat_PL_stall ? 1 : 0);
-                stall_id_total = stall_id_total + (stat_PL_stall_inner ? 1 : 0);
-                instr_total = instr_total + (stat_PL_stall || stat_PL_stall_inner ? 0 : stat_PL_flush ? -2 : 1); 
+                clk_total = clk_total + 1;                
+                stall_if_total = stall_if_total + (stat_PL_stall_if ? 1 : 0);
+                stall_ex_total = stall_ex_total + (stat_PL_stall_ex ? 1 : 0);
+                instr_total = instr_total + (stat_PL_stall_if || stat_PL_stall_ex ? 0 : stat_PL_flush ? -2 : 1); 
             end 
         end
     end

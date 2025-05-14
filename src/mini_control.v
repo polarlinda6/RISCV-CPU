@@ -34,7 +34,7 @@ module mini_control(
 	input  jal_id,
 	input  jalr_id,
 	input  PL_flush,
-	input  PL_stall,
+	input  PL_stall_ex,
 
 	input  [4:0]Rd,
 	input  forwardA_data_eq_jalr_prediction_result,
@@ -50,7 +50,7 @@ module mini_control(
 	output RAS_rollback_push_ex,
 
 	output jalr_prediction_en,	
-	output PL_stall_inner
+	output PL_stall_if
 	);
 
   wire Rs1_hazard_id, Rs1_hazard_ex, Rs1_hazard_mem, Rs1_hazard_wb;
@@ -117,13 +117,13 @@ module mini_control(
 
 	assign Rd_is_ra    = Rd == `ra;
 	assign Rd_is_ra_id = Rd_id == `ra;
-	assign PL_allow    = !PL_flush && !PL_stall && !PL_stall_inner;
+	assign PL_allow    = !PL_flush && !PL_stall_ex && !PL_stall_if;
 
 	always @(posedge clk) begin
 		if(!rst_n) begin
 			RAS_pop_reg_id <= `zero;
 			RAS_pop_reg_ex <= `zero;
-		end else if(!PL_stall) begin
+		end else if(!PL_stall_ex) begin
 			RAS_pop_reg_id <= RAS_pop;
 			RAS_pop_reg_ex <= RAS_pop_reg_id;
 		end
@@ -140,7 +140,7 @@ module mini_control(
 	assign RAS_hit   = Rs1_is_ra || mv_hit_ra_track || sw_hit_ra_track;
 
 	
-	assign PL_stall_inner     = jalr && !RAS_hit && !Rs1_hazard_id && (Rs1_hazard_ex_noload || Rs1_hazard_mem_load);
+	assign PL_stall_if     = jalr && !RAS_hit && !Rs1_hazard_id && (Rs1_hazard_ex_noload || Rs1_hazard_mem_load);
 	assign jalr_prediction_en = jalr &&  RAS_hit && (Rs1_hazard_id || Rs1_hazard_ex || Rs1_hazard_mem_load);
 
 ////////////////////////////////////////////////////////////////////////////////////////

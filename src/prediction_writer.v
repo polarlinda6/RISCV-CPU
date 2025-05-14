@@ -6,7 +6,7 @@ module prediction_writer #(
 )(
   input  clk,
   input  rst_n,
-  input  PL_stall, 
+  input  PL_stall_ex, 
 
   input  corrected_result,
   input  jump_result_id,
@@ -131,7 +131,7 @@ module prediction_writer #(
       end
     else
       begin
-        if(!PL_stall)
+        if(!PL_stall_ex)
         begin
           SP_trend_count_reg_id  <= SP_trend_count;
           SP_trend_count_reg_ex  <= SP_trend_count_reg_id;

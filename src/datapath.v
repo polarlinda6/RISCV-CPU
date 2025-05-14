@@ -49,8 +49,8 @@ module datapath(
     output stat_jalr,
     output stat_PL_flush,
 
-    output stat_PL_stall,
-    output stat_PL_stall_inner,
+    output stat_PL_stall_if,
+    output stat_PL_stall_ex,
     output stat_ecall
     );
 
@@ -77,7 +77,7 @@ module datapath(
     //wire MemWrite_id_o; //MemWrite
     wire MemWrite_ex_mem_o;
 
-	wire PL_stall;
+	wire PL_stall_ex;
 	wire PL_flush;
 
     //write read memory
@@ -192,10 +192,10 @@ module datapath(
         .load_or_result_mem_wb_o(load_or_result_mem_wb_o),
 
 
-        .PL_stall(PL_stall),
+        .PL_stall_ex(PL_stall_ex),
         .PL_flush(PL_flush),
 
-        .PL_stall_inner(stat_PL_stall_inner)
+        .PL_stall_if(stat_PL_stall_if)
         );
     
     
@@ -224,7 +224,7 @@ module datapath(
         .instr_if_id_i(instr_if_o), 
         .instr_if_id_o(instr_if_id_o),
         
-        .PL_stall(PL_stall),
+        .PL_stall_ex(PL_stall_ex),
         .PL_flush(PL_flush)
         );
     
@@ -352,7 +352,7 @@ module datapath(
         .RW_type_id_ex_o(RW_type_id_ex_o), 
         .ecall_id_ex_o(ecall_id_ex_o),
         
-        .PL_stall(PL_stall),
+        .PL_stall_ex(PL_stall_ex),
         .PL_flush(PL_flush)
         );
         
@@ -422,7 +422,7 @@ module datapath(
 
         .forward_load(forward_load_ex_o),
         .PL_flush(PL_flush),
-        .PL_stall(PL_stall)
+        .PL_stall_ex(PL_stall_ex)
         );
             
 
@@ -497,7 +497,7 @@ module datapath(
     assign stat_jalr     = jalr_id_ex_o;
     assign stat_PL_flush = PL_flush;
 
-    assign stat_PL_stall = PL_stall;
-    //assign stat_PL_stall_inner = PL_stall_inner;
+    //assign stat_PL_stall_if = PL_stall_if;
+    assign stat_PL_stall_ex = PL_stall_ex;
     assign stat_ecall = ecall_id_ex_o;
 endmodule

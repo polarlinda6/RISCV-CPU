@@ -3,7 +3,7 @@
 module static_predictor(
 	input clk,
 	input rst_n,
-	input PL_stall,
+	input PL_stall_ex,
 
 	input imme_sig,
 	output SP_prediction_result, 
@@ -21,7 +21,7 @@ module static_predictor(
 			end
 		else
 			begin
-				if(!PL_stall)
+				if(!PL_stall_ex)
 				begin
 					prediciont_result_reg_id <= SP_prediction_result;
 					prediciont_result_reg_ex <= prediciont_result_reg_id;

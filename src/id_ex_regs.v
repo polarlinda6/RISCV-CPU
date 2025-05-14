@@ -66,12 +66,12 @@ module id_ex_regs(
 	output reg ecall_id_ex_o,
 
 	input PL_flush,
-	input PL_stall
+	input PL_stall_ex
     );
 
     always@(posedge clk)
     begin
-        if(!rst_n || PL_flush || PL_stall)
+        if(!rst_n || PL_flush || PL_stall_ex)
         begin 
             //non-standard nop: add x0, x0, x0
             pc_add_imme_id_ex_o<=`zeroword;

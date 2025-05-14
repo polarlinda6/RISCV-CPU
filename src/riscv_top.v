@@ -11,8 +11,8 @@ module riscv_top(
         output stat_jal,
         output stat_jalr,
         output stat_PL_flush,
-        output stat_PL_stall,
-        output stat_PL_stall_inner,
+        output stat_PL_stall_if,
+        output stat_PL_stall_ex,
         output stat_ecall,
 
         output Rd_x_warning_ram,
@@ -51,8 +51,8 @@ module riscv_top(
         .stat_jal(stat_jal),
         .stat_jalr(stat_jalr),
         .stat_PL_flush(stat_PL_flush),
-        .stat_PL_stall(stat_PL_stall),
-        .stat_PL_stall_inner(stat_PL_stall_inner),
+        .stat_PL_stall_if(stat_PL_stall_if),
+        .stat_PL_stall_ex(stat_PL_stall_ex),
         .stat_ecall(stat_ecall),
 
         .unknown_instr_warning_main_decode(unknown_instr_warning_main_decode)

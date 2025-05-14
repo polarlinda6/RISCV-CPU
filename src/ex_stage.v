@@ -58,7 +58,7 @@ module ex_stage(
 	input  [31:0]load_or_result_mem_wb_o,
 
 	output forward_load,
-	output PL_stall,
+	output PL_stall_ex,
 	output PL_flush
     );
 
@@ -71,7 +71,7 @@ module ex_stage(
     end
 
     wire PL_stall_inner;
-    assign PL_stall = ecall_reg || ecall || PL_stall_inner;
+    assign PL_stall_ex = ecall_reg || ecall || PL_stall_inner;
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
@@ -136,7 +136,7 @@ module ex_stage(
         .MemWrite_id_ex_o(MemWrite_id_ex_o), 
 
         .forward_load(forward_load),
-        .PL_stall(PL_stall_inner)
+        .PL_stall_ex(PL_stall_inner)
         );
     mux3 mux3_forwardA (
         .din1(result_ex_mem_o), 

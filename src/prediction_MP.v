@@ -9,7 +9,7 @@ module meta_predictor #(
 )(
   input  clk,
   input  rst_n,
-  input  PL_stall,
+  input  PL_stall_ex,
   
   input  corrected_result,
   input  jump_result_id,
@@ -229,7 +229,7 @@ module meta_predictor #(
   ) prediction_writer_inst(
     .clk(clk),
     .rst_n(rst_n),
-    .PL_stall(PL_stall),
+    .PL_stall_ex(PL_stall_ex),
 
     .corrected_result(corrected_result),    
     .jump_result_id(jump_result_id),

@@ -6,7 +6,7 @@ module history_predictor #(
 )(
   input  clk,
   input  rst_n,  
-  input  PL_stall,
+  input  PL_stall_ex,
 
   input  corrected_result,
 
@@ -54,7 +54,7 @@ module history_predictor #(
     end
     else
     begin
-      if(!PL_stall) 
+      if(!PL_stall_ex) 
       begin   
         count_reg_id <= HP_count;
         count_reg_ex <= count_reg_id;

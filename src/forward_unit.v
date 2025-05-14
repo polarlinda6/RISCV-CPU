@@ -23,7 +23,7 @@ module forward_unit(
 	input MemWrite_id_ex_o,
 
 	output forward_load,
-	output PL_stall
+	output PL_stall_ex
     );
 	
 	assign forwardA[1]= RegWrite_ex_mem_o && (Rd_ex_mem_o==Rs1_id_ex_o);
@@ -39,7 +39,7 @@ module forward_unit(
 	
 	
 	//use after load
-	assign PL_stall= MemRead_id_ex_o && RegWrite_id_ex_o &&
+	assign PL_stall_ex= MemRead_id_ex_o && RegWrite_id_ex_o &&
                    ((!MemWrite_id_o && ((Rd_id_ex_o==Rs1_id_ex_i) || (Rd_id_ex_o==Rs2_id_ex_i))) || 
                    (MemWrite_id_o && (Rd_id_ex_o==Rs1_id_ex_i)));
 endmodule
