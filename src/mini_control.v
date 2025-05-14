@@ -140,7 +140,7 @@ module mini_control(
 	assign RAS_hit   = Rs1_is_ra || mv_hit_ra_track || sw_hit_ra_track;
 
 	
-	assign PL_stall_if     = jalr && !RAS_hit && !Rs1_hazard_id && (Rs1_hazard_ex_noload || Rs1_hazard_mem_load);
+	assign PL_stall_if        = jalr && !RAS_hit && !Rs1_hazard_id && (Rs1_hazard_ex_noload || Rs1_hazard_mem_load);
 	assign jalr_prediction_en = jalr &&  RAS_hit && (Rs1_hazard_id || Rs1_hazard_ex || Rs1_hazard_mem_load);
 
 ////////////////////////////////////////////////////////////////////////////////////////
