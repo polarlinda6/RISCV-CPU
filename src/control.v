@@ -100,7 +100,7 @@ module main_control(
 	output I_type,
 
 	output unknown_instr_warning_main_decode
-  );
+);
 
 	wire lui, auipc;
 	wire load, store;
@@ -141,7 +141,7 @@ endmodule
 
 
 module ALU_control(
-    input  B_type,
+  input  B_type,
 	input  R_type,
 	input  I_type,
 	
@@ -149,7 +149,7 @@ module ALU_control(
 	input  func7,
 	
 	output [3:0]ALUctl
-    );
+);
 	
 	wire [3:0]branchop;
 	reg  [3:0]RIop;
