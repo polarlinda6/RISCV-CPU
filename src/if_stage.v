@@ -135,7 +135,6 @@ module if_stage(
         .dout(pc_jump)
     );
 
-
    //jalr_pc_jump_or_pc
     mux jalr_pc_jump_or_pc_mux_inst(
         .din1(pc_jump),
