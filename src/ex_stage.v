@@ -85,13 +85,13 @@ module ex_stage(
         .din2(A), 
         .signal(ALU_DA_pc_signal), 
         .dout(ALU_DA)
-        );
+    );
     mux ALU_DB_mux (
         .din1(imme_ex_i), 
         .din2(B), 
         .signal(ALU_DA_imme_signal), 
         .dout(ALU_DB)
-        );
+    );
 	ALU ALU_inst (
         .ALU_DA(ALU_DA), 
         .ALU_DB(ALU_DB), 
@@ -99,7 +99,7 @@ module ex_stage(
         .ALU_ZERO(zero), 
         .ALU_OverFlow(), 
         .ALU_DC(ALU_result)
-        );
+    );
 
 
     mux result_mux_inst(
@@ -137,21 +137,21 @@ module ex_stage(
 
         .forward_load(forward_load),
         .PL_stall_ex(PL_stall_inner)
-        );
+    );
     mux3 mux3_forwardA (
         .din1(result_ex_mem_o), 
         .din2(load_or_result_mem_wb_o), 
         .din3(Rs1_data_ex_i), 
         .signal(forwardA), 
         .dout(A)
-        );
+    );
     mux3 mux3_forwardB (
         .din1(result_ex_mem_o), 
         .din2(load_or_result_mem_wb_o), 
         .din3(Rs2_data_ex_i), 
         .signal(forwardB), 
         .dout(B)
-        );
+    );
 
 
     wire [31:0] jalr_pc_jump_actual;
@@ -174,7 +174,7 @@ module ex_stage(
         .jalr_pc_jump(jalr_pc_jump_or_pc_ex_i),
 
         .PL_flush(PL_flush)
-        );
+    );
     mux3 branch_failed_mux3_inst(
         .din1(jalr_pc_jump_actual),
         .din2(pc_add_4_ex_i),
