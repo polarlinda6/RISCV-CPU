@@ -145,7 +145,6 @@ module main_control(
 		.din({lui, auipc, jal, jalr, load, I_type, R_type}),
 		.dout(RegWrite_instr_or)
 	);
-
 endmodule
 
 
