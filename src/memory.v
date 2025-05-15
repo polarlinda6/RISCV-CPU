@@ -90,10 +90,13 @@ module RAM(
     output Rd_x_warning_ram
 );
 
-    //A read-after-write to the same address returns the old data.
-    //lui x1, 0xfffff;
-    //sw x1, x0, 0xfff;
-    //lw x2, x0, 0xfff;
+    // A read-after-write to the same address returns the old data.
+    // sw x0, 0xfff, x0
+    // nop
+    // lui x1, 0xfffff
+    // sw x1, 0xfff, x0
+    // lw x2, 0xfff, x0
+    // ecall
 
     //write throuth
     reg [31:0]write_through_addr_reg;
