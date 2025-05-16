@@ -61,6 +61,10 @@ module if_stage(
 	input  MemRead_id_ex_o,
 	input  MemRead_ex_mem_o,
 
+    input [2:0]RW_type_id_o,
+    input [2:0]RW_type_id_ex_o,
+    input [2:0]RW_type_ex_mem_o,
+
 	input  PL_stall_ex,
     input  PL_flush,
 
@@ -317,6 +321,10 @@ module if_stage(
         .jalr_id(jalr_id_o),
         .PL_flush(PL_flush),
         .PL_stall_ex(PL_stall_ex),
+
+        .RW_type_id(RW_type_id_o),
+        .RW_type_ex(RW_type_id_ex_o),
+        .RW_type_mem(RW_type_ex_mem_o),
 
         .Rd(Rd),      
         .forwardA_data_eq_jalr_prediction_result(forwardA_data_eq_jalr_prediction_result),

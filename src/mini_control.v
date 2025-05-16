@@ -36,6 +36,10 @@ module mini_control(
 	input  PL_flush,
 	input  PL_stall_ex,
 
+	input [2:0]RW_type_id,
+	input [2:0]RW_type_ex,
+	input [2:0]RW_type_mem,
+
 	input  [4:0]Rd,
 	input  forwardA_data_eq_jalr_prediction_result,
 
@@ -131,9 +135,14 @@ module mini_control(
 
 /////////////////////////////////////////////////////////////////////////////////////
 	
+	wire Rs1_hazard_id_lw, Rs1_hazard_ex_lw, Rs1_hazard_mem_lw;
+	assign Rs1_hazard_id_lw  = Rs1_hazard_id_load && (RW_type_id == 3'b010);
+	assign Rs1_hazard_ex_lw  = Rs1_hazard_ex_load && (RW_type_ex == 3'b010);
+	assign Rs1_hazard_mem_lw = Rs1_hazard_mem_load && (RW_type_mem == 3'b010);
+
 	wire mv_hit_ra_track, sw_hit_ra_track;
 	assign mv_hit_ra_track = Rs1 == RAS_ra_track;
-	assign sw_hit_ra_track = (RAS_ra_track == `zeroreg) && (Rs1_hazard_id_load || Rs1_hazard_ex_load || Rs1_hazard_mem_load);
+	assign sw_hit_ra_track = (RAS_ra_track == `zeroreg) && (Rs1_hazard_id_lw || Rs1_hazard_ex_lw || Rs1_hazard_mem_lw);
 
 	wire Rs1_is_ra, RAS_hit;	
 	assign Rs1_is_ra = Rs1 == `ra;

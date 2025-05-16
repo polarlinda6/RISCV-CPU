@@ -7,7 +7,7 @@ module riscv(
 	
 	output W_en,
 	output R_en,
-	output [2:0]RW_type,
+	output [2:0]RW_type_mem,
 	output [31:0]ram_addr,		
 	input  [31:0]load_data,
 	output [31:0]store_data,
@@ -105,7 +105,7 @@ module riscv(
         
         .R_en(R_en), 
         .W_en(W_en),  
-        .RW_type(RW_type),  
+        .RW_type_mem(RW_type_mem),  
 
         .rom_addr(rom_addr), 
         .ram_addr(ram_addr),

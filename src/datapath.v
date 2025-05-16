@@ -27,7 +27,7 @@ module datapath(
 	
 	output R_en,
 	output W_en,
-	output [2:0]RW_type,
+	output [2:0]RW_type_mem,
 	
 	output [31:0]rom_addr,
 	output [31:0]ram_addr,
@@ -88,7 +88,7 @@ module datapath(
 
     assign R_en=MemRead_ex_mem_o;
     assign W_en=MemWrite_ex_mem_o;
-    assign RW_type=RW_type_ex_mem_o;
+    assign RW_type_mem=RW_type_ex_mem_o;
     assign ram_addr=result_ex_mem_o;
 
 ////////////////////////////////////////////////////////////////////
@@ -121,7 +121,11 @@ module datapath(
     wire B_type_result_if_id_o;
     //wire [4:0]Rd_id_o;
     //wire MemRead_id_o;
-	
+    // wire [2:0]RW_type_id_o;
+    wire [2:0]RW_type_id_ex_o;
+    //wire [2:0]RW_type_ex_mem_o;
+
+
     wire [31:0]instr_if_o;
     wire [31:0]pc_add_imme_if_o;
     wire [31:0]pc_add_4_if_o;
@@ -167,13 +171,15 @@ module datapath(
         .pc_branch_filled(jalr_pc_jump_or_pc_id_ex_o),
         .B_type_result_branch_failed(B_type_result_id_ex_o),
    
-
         .regs_Rs1_if_o(prediction_Rs1_if_o),
         .regs_Rs2_if_o(prediction_Rs2_if_o),
         .regs_Rs1_data_if_i(prediction_Rs1_data_id_o),
         .regs_Rs2_data_if_i(prediction_Rs2_data_id_o),
 
-        //forward
+        .result_ex_mem_o(result_ex_mem_o),
+        .load_or_result_mem_wb_o(load_or_result_mem_wb_o),
+        
+        //mini_control
         .Rd_id_o(Rd), 
         .Rd_id_ex_o(Rd_id_ex_o),
         .Rd_ex_mem_o(Rd_ex_mem_o),
@@ -188,8 +194,9 @@ module datapath(
         .MemRead_ex_mem_o(MemRead_ex_mem_o),
         .MemRead_id_ex_o(MemRead_id_ex_o),
 
-        .result_ex_mem_o(result_ex_mem_o),
-        .load_or_result_mem_wb_o(load_or_result_mem_wb_o),
+        .RW_type_id_o(RW_type_id),
+        .RW_type_id_ex_o(RW_type_id_ex_o),
+        .RW_type_ex_mem_o(RW_type_ex_mem_o),
 
 
         .PL_stall_ex(PL_stall_ex),
@@ -265,9 +272,6 @@ module datapath(
         .ecall_id_o(ecall_id_o)
         );
     
-
-    wire [2:0]RW_type_id_ex_o;
-
     
     wire [31:0]pc_add_imme_id_ex_o;
     wire [31:0]pc_add_4_id_ex_o;

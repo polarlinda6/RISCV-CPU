@@ -37,7 +37,7 @@ module riscv_top(
         
         .W_en(W_en), 
         .R_en(R_en),   
-        .RW_type(RW_type),
+        .RW_type_mem(RW_type),
         .ram_addr(ram_addr),
         .load_data(load_data), 
         .store_data(store_data),
