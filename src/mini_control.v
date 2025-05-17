@@ -152,10 +152,10 @@ module mini_control(
 
 	wire mv, sw;
 	assign sw = S_type && (func3==3'b010);
-	assign mv = I_type && I_imme_is_zero && (func3==3'b000); //addi rd, rs, 0
+	assign mv = I_type && (func3==3'b000) && I_imme_is_zero; //addi Rd, Rs1, 0
 
-	assign RAS_track_mv = mv && Rs1_is_ra;                //mv Rd, ra
-	assign RAS_track_sw = sw && Rd_is_ra && (Rs1 == `sp);	//sw ra, imme, sp
+	assign RAS_track_mv = mv && Rs1_is_ra;                   //mv Rd, ra
+	assign RAS_track_sw = sw && Rd_is_ra && (Rs1 == `sp);	   //sw ra, imme, sp
 
 
 	wire Rs1_hazard_id_lw, Rs1_hazard_ex_lw, Rs1_hazard_mem_lw;
@@ -166,7 +166,7 @@ module mini_control(
 	wire mv_hit_ra_track, sw_hit_ra_track, compliant_return;	
 	assign mv_hit_ra_track  = (Rs1 == RAS_ra_track) && Rs1_no_ra;
 	assign sw_hit_ra_track  = (RAS_ra_track == `zeroreg) && (Rs1_hazard_id_lw || Rs1_hazard_ex_lw || Rs1_hazard_mem_lw);
-	assign compliant_return = I_imme_is_zero && Rs1_is_ra && (Rd == `zeroreg);           //jalr x0, ra, 0
+	assign compliant_return = (Rd == `zeroreg) && Rs1_is_ra && I_imme_is_zero; //jalr x0, ra, 0
 
 	assign RAS_hit = compliant_return || mv_hit_ra_track || sw_hit_ra_track;
 
