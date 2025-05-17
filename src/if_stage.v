@@ -249,17 +249,17 @@ module if_stage(
 ////////////////////////////////////////////////////////////////////////
     
     //mini decode
-    wire mv;
-    wire sw;
+    wire I_type;    
+    wire S_tyepS_tyep;
     wire [4:0]Rd;
 
     mini_decode mini_decode_inst(
         .instr(instr_if_i),	
 
-        .mv(mv),
-        .sw(sw),
         .jal(jal),
         .jalr(jalr),
+        .I_type(I_type),       
+        .S_type(S_type),
 
         .B_type(B_type),
         .beq(beq),
@@ -313,8 +313,6 @@ module if_stage(
         .B_type_prediction_en(B_type_prediction_en),
 
 
-        .mv(mv),
-        .sw(sw),
         .jal(jal),
         .jalr(jalr),             
         .jal_id(jal_id_o),
@@ -326,7 +324,11 @@ module if_stage(
         .RW_type_ex(RW_type_id_ex_o),
         .RW_type_mem(RW_type_ex_mem_o),
 
-        .Rd(Rd),      
+        .Rd(Rd),       
+        .func3(func3),       
+        .imme(imme),        
+        .I_type(I_type),        
+        .S_type(S_type),
         .forwardA_data_eq_jalr_prediction_result(forwardA_data_eq_jalr_prediction_result),
 
         .RAS_ra_track(RAS_ra_track), 

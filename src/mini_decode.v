@@ -2,11 +2,11 @@
 
 module mini_decode(
  	input [31:0]instr,
-
-	output mv, 	
-	output sw,	
+	
 	output jal,
  	output jalr, 		
+	output I_type,
+	output S_type,	
 
 	output B_type,   	
   output beq, 
@@ -77,20 +77,6 @@ module mini_decode(
 		.data1(opcode),
 		.data2(`B_type),
 		.compare_result(B_type)
-	);
-
-////////////////////////////////////////////////////////////////////////////
-
-	wire I_type, S_type, no_zero_imme;
-	assign mv = I_type && (func3==3'b000) && (!no_zero_imme); //addi rd, rs, 0
-	assign sw = S_type && (func3==3'b010);
-
-	large_fan_in_or #(
-		.WIDTH(1),
-		.OR_QUANTITY(12)
-	) no_zero_imme_inst(
-		.din(instr[31:20]),
-		.dout(no_zero_imme)
 	);
 	parallel_unsig_comparator_eq #(
 		.WIDTH(7)
