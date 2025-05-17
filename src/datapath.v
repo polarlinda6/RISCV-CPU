@@ -121,9 +121,6 @@ module datapath(
     wire B_type_result_if_id_o;
     //wire [4:0]Rd_id_o;
     //wire MemRead_id_o;
-    // wire [2:0]RW_type_id_o;
-    wire [2:0]RW_type_id_ex_o;
-    //wire [2:0]RW_type_ex_mem_o;
 
 
     wire [31:0]instr_if_o;
@@ -193,11 +190,6 @@ module datapath(
         .MemRead_id_o(MemRead),
         .MemRead_ex_mem_o(MemRead_ex_mem_o),
         .MemRead_id_ex_o(MemRead_id_ex_o),
-
-        .RW_type_id_o(RW_type_id),
-        .RW_type_id_ex_o(RW_type_id_ex_o),
-        .RW_type_ex_mem_o(RW_type_ex_mem_o),
-
 
         .PL_stall_ex(PL_stall_ex),
         .PL_flush(PL_flush),
@@ -271,7 +263,9 @@ module datapath(
 
         .ecall_id_o(ecall_id_o)
         );
-    
+       
+    wire [2:0]RW_type_id_ex_o;
+
     
     wire [31:0]pc_add_imme_id_ex_o;
     wire [31:0]pc_add_4_id_ex_o;

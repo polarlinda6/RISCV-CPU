@@ -6,7 +6,6 @@ module mini_decode(
 	output jal,
  	output jalr, 		
 	output I_type,
-	output S_type,	
 
 	output B_type,   	
   output beq, 
@@ -78,13 +77,6 @@ module mini_decode(
 		.data2(`B_type),
 		.compare_result(B_type)
 	);
-	parallel_unsig_comparator_eq #(
-		.WIDTH(7)
-	) S_type_comparator_inst(
-		.data1(opcode),
-		.data2(`S_type),
-		.compare_result(S_type)
-	);	
 	parallel_unsig_comparator_eq #(
 		.WIDTH(7)
 	) I_type_comparator_inst(

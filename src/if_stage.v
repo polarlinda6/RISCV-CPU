@@ -61,10 +61,6 @@ module if_stage(
 	input  MemRead_id_ex_o,
 	input  MemRead_ex_mem_o,
 
-    input [2:0]RW_type_id_o,
-    input [2:0]RW_type_id_ex_o,
-    input [2:0]RW_type_ex_mem_o,
-
 	input  PL_stall_ex,
     input  PL_flush,
 
@@ -250,7 +246,6 @@ module if_stage(
     
     //mini decode
     wire I_type;    
-    wire S_tyepS_tyep;
     wire [4:0]Rd;
 
     mini_decode mini_decode_inst(
@@ -259,7 +254,6 @@ module if_stage(
         .jal(jal),
         .jalr(jalr),
         .I_type(I_type),       
-        .S_type(S_type),
 
         .B_type(B_type),
         .beq(beq),
@@ -320,15 +314,10 @@ module if_stage(
         .PL_flush(PL_flush),
         .PL_stall_ex(PL_stall_ex),
 
-        .RW_type_id(RW_type_id_o),
-        .RW_type_ex(RW_type_id_ex_o),
-        .RW_type_mem(RW_type_ex_mem_o),
-
         .Rd(Rd),       
         .func3(func3),       
         .imme(imme),        
         .I_type(I_type),        
-        .S_type(S_type),
         .forwardA_data_eq_jalr_prediction_result(forwardA_data_eq_jalr_prediction_result),
 
         .RAS_ra_track(RAS_ra_track), 
