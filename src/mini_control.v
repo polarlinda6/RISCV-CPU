@@ -132,30 +132,29 @@ module mini_control(
 
 /////////////////////////////////////////////////////////////////////////////////////
 
+	wire I_imme_is_zero;	
+	wire Rs1_no_ra,	Rs1_is_ra;
+
+
 	wire RAS_hit;	
 	assign PL_stall_if        = jalr && !RAS_hit && !Rs1_hazard_id && (Rs1_hazard_ex_noload || Rs1_hazard_mem_load);
 	assign jalr_prediction_en = jalr &&  RAS_hit && (Rs1_hazard_id || Rs1_hazard_ex || Rs1_hazard_mem_load);
 
-	wire RAS_track_mv;	
+	wire compliant_return, hit_track_mv;		
+	assign compliant_return = (Rd == `zeroreg) && Rs1_is_ra && I_imme_is_zero; //jalr x0, ra, 0          
+	assign hit_track_mv     = (Rs1 == RAS_ra_track) && Rs1_no_ra;              //jalr Rd, RAS_ra_track, imme
+	assign RAS_hit          = compliant_return || hit_track_mv;
+
+
+	wire RAS_track_mv;
 	assign WR_ra_track_en   = RAS_track_mv;
 	assign WR_ra_track_data = Rd;	
 
-////////////////////////////////////////////////////////////////////////////////////////
-
-	wire I_imme_is_zero;	
-	wire Rs1_no_ra,	Rs1_is_ra;
-
 	wire mv;
-	assign mv = I_type && (func3==3'b000) && I_imme_is_zero; //addi Rd, Rs1, 0
-	assign RAS_track_mv = mv && Rs1_is_ra;  //mv Rd, ra
+	assign mv           = I_type && (func3==3'b000) && I_imme_is_zero; //addi Rd, Rs1, 0
+	assign RAS_track_mv = mv && Rs1_is_ra;                             //mv Rd, ra
 
-
-	wire mv_hit_ra_track, compliant_return;		
-	assign mv_hit_ra_track  = (Rs1 == RAS_ra_track) && Rs1_no_ra;              //jalr Rd, RAS_ra_track, imme
-	assign compliant_return = (Rd == `zeroreg) && Rs1_is_ra && I_imme_is_zero; //jalr x0, ra, 0          
-
-	assign RAS_hit = compliant_return || mv_hit_ra_track;
-
+/////////////////////////////////////////////////////////////////////////////////////////
 
 	wire I_imme_no_zero;
 	assign I_imme_is_zero = !I_imme_no_zero;
