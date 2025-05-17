@@ -148,14 +148,14 @@ module mini_control(
 ////////////////////////////////////////////////////////////////////////////////////////
 
 	wire I_imme_is_zero;	
-	wire Rs1_no_ra,	Rs1_is_ra;
+	wire Rs1_no_ra,	Rs1_is_ra, Rs2_is_ra;
 
 	wire mv, sw;
 	assign sw = S_type && (func3==3'b010);
 	assign mv = I_type && (func3==3'b000) && I_imme_is_zero; //addi Rd, Rs1, 0
 
 	assign RAS_track_mv = mv && Rs1_is_ra;                   //mv Rd, ra
-	assign RAS_track_sw = sw && Rd_is_ra && (Rs1 == `sp);	   //sw ra, imme, sp
+	assign RAS_track_sw = sw && Rs2_is_ra && (Rs1 == `sp);	   //sw ra, imme, sp
 
 
 	wire Rs1_hazard_id_lw, Rs1_hazard_ex_lw, Rs1_hazard_mem_lw;
@@ -183,4 +183,5 @@ module mini_control(
 	
 	assign Rs1_no_ra = Rs1 != `ra;
 	assign Rs1_is_ra = !Rs1_no_ra;
+	assign Rs2_is_ra = Rs2 == `ra;
 endmodule
