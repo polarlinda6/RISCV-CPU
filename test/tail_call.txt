@@ -7,19 +7,16 @@
 11111111110111111111000001101111
 11111111110111111111000001101111
 
-jal ra func4
-mv x27 x10
-ecall
-
+main:
+  jal ra func4
+  mv x27 x10
+  ecall
 func1:
-addi x10 x0 0
-jalr x0 ra 0
-
+  addi x10 x0 0
+  jalr x0 ra 0
 func2:
-jal x0 func1
-
+  jal x0 func1
 func3:
-jal x0 func2
-
+  jal x0 func2
 func4:
-jal x0 func3
+  jal x0 func3
