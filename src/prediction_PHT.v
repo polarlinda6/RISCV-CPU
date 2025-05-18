@@ -27,23 +27,17 @@ module PHT #(
   reg [JUMP_STATUS_COUNTER_WIDTH_UB:0]regs[TABLE_DEPTH_UB:0];  
   assign RD_count = regs[RD_index];
 
-
   generate
     genvar i;
-    for (i = 0; i < TABLE_DEPTH; i = i + 1) 
-    begin
-      always @(posedge clk)
-      begin
+    for (i = 0; i < TABLE_DEPTH; i = i + 1) begin
+      always @(posedge clk) begin
         if(!rst_n) regs[i] <= JUMP_STATUS_COUNTER_INIT_VALUE;
       end
     end
   endgenerate
 
-
-  always @(posedge clk)
-  begin
-    if(rst_n)
-    begin
+  always @(posedge clk) begin
+    if(rst_n) begin
       if(WR_en1) regs[WR_index1] <= WR_count1;
       if(WR_en2) regs[WR_index2] <= WR_count2;
     end

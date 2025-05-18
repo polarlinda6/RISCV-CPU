@@ -44,18 +44,13 @@ module history_predictor #(
   wire [HR_DEPTH_UB:0]history_ex = history_reg >> rollback_en_id;
   assign prediction_result_branch_failed = history_ex[0];
 
-  always @(posedge clk)
-  begin
-    if (!rst_n)
-    begin
+  always @(posedge clk) begin
+    if (!rst_n) begin
       count_reg_id <= JUMP_STATUS_COUNTER_INIT_VALUE;
       count_reg_ex <= JUMP_STATUS_COUNTER_INIT_VALUE;
       history_reg  <= {HR_DEPTH{1'b0}};
-    end
-    else
-    begin
-      if(!PL_stall_ex) 
-      begin   
+    end else begin
+      if(!PL_stall_ex) begin   
         count_reg_id <= HP_count;
         count_reg_ex <= count_reg_id;
       end
