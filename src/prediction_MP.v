@@ -70,7 +70,6 @@ module meta_predictor #(
   input  [JUMP_STATUS_COUNTER_WIDTH - 1:0]LHP_bltu_count_ex,
   input  [JUMP_STATUS_COUNTER_WIDTH - 1:0]LHP_bgeu_count_ex,
 
-
   output prediction_result
 );
 
@@ -97,7 +96,7 @@ module meta_predictor #(
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  localparam SP_TREND_STAT_COUNTER_INIT_VALUE = {3'b000, SP_STAT_COUNTER_INIT_VALUE};
+  localparam SP_TREND_STAT_COUNTER_INIT_VALUE  = {3'b000, SP_STAT_COUNTER_INIT_VALUE};
   localparam LHP_TREND_STAT_COUNTER_INIT_VALUE = {3'b000, LHP_STAT_COUNTER_INIT_VALUE};
   localparam GHP_TREND_STAT_COUNTER_INIT_VALUE = {3'b000, GHP_STAT_COUNTER_INIT_VALUE};
 
