@@ -101,10 +101,8 @@ module meta_predictor #(
   localparam LHP_TREND_STAT_COUNTER_INIT_VALUE = {3'b000, LHP_STAT_COUNTER_INIT_VALUE};
   localparam GHP_TREND_STAT_COUNTER_INIT_VALUE = {3'b000, GHP_STAT_COUNTER_INIT_VALUE};
 
-   always @(posedge clk) 
-  begin 
-    if(!rst_n)
-    begin  
+  always @(posedge clk) begin 
+    if(!rst_n) begin  
       SP_trend_stat_counter_regs[5][1] <= SP_TREND_STAT_COUNTER_INIT_VALUE;
       SP_trend_stat_counter_regs[5][0] <= SP_TREND_STAT_COUNTER_INIT_VALUE;
       SP_trend_stat_counter_regs[4][1] <= SP_TREND_STAT_COUNTER_INIT_VALUE;
@@ -122,14 +120,10 @@ module meta_predictor #(
   
   generate
     genvar i, j;
-    for (i = 0; i < 6; i = i + 1)
-    begin
-      for(j = 0; j < JUMP_STATUS_COUNTER_CAPACITY; j = j + 1) 
-      begin
-        always @(posedge clk)
-        begin
-          if(!rst_n)
-          begin
+    for (i = 0; i < 6; i = i + 1) begin
+      for(j = 0; j < JUMP_STATUS_COUNTER_CAPACITY; j = j + 1) begin
+        always @(posedge clk) begin
+          if(!rst_n) begin
             LHP_trend_stat_counter_regs[i][j] <= LHP_TREND_STAT_COUNTER_INIT_VALUE;
             GHP_trend_stat_counter_regs[i][j] <= GHP_TREND_STAT_COUNTER_INIT_VALUE;
           end
@@ -163,12 +157,9 @@ module meta_predictor #(
   localparam STAT_COUNTER_CLEAR_BITS_UB = STAT_COUNTER_CLEAR_BITS - 1;
   localparam [STAT_COUNTER_CLEAR_BITS_UB:0]ZERO = {STAT_COUNTER_CLEAR_BITS{1'b0}};
 
-  always @(posedge clk)
-  begin
-    if(rst_n)
-    begin 
-      if(clear_en1)
-      begin
+  always @(posedge clk) begin
+    if(rst_n) begin 
+      if(clear_en1) begin
         SP_trend_stat_counter_regs[WR_addr1][1][STAT_COUNTER_CLEAR_BITS_UB:0]  <= ZERO;
         SP_trend_stat_counter_regs[WR_addr1][0][STAT_COUNTER_CLEAR_BITS_UB:0]  <= ZERO;
         LHP_trend_stat_counter_regs[WR_addr1][3][STAT_COUNTER_CLEAR_BITS_UB:0] <= ZERO;
@@ -179,16 +170,13 @@ module meta_predictor #(
         GHP_trend_stat_counter_regs[WR_addr1][2][STAT_COUNTER_CLEAR_BITS_UB:0] <= ZERO;
         GHP_trend_stat_counter_regs[WR_addr1][1][STAT_COUNTER_CLEAR_BITS_UB:0] <= ZERO;
         GHP_trend_stat_counter_regs[WR_addr1][0][STAT_COUNTER_CLEAR_BITS_UB:0] <= ZERO;
-      end
-      else
-      begin
+      end else begin
         if(WR_SP_stat_en1)  SP_trend_stat_counter_regs[WR_addr1][WR_SP_index1][STAT_COUNTER_CLEAR_BITS_UB:0]   <= WR_SP_stat_count1[STAT_COUNTER_CLEAR_BITS_UB:0];
         if(WR_LHP_stat_en1) LHP_trend_stat_counter_regs[WR_addr1][WR_LHP_index1][STAT_COUNTER_CLEAR_BITS_UB:0] <= WR_LHP_stat_count1[STAT_COUNTER_CLEAR_BITS_UB:0];
         if(WR_GHP_stat_en1) GHP_trend_stat_counter_regs[WR_addr1][WR_GHP_index1][STAT_COUNTER_CLEAR_BITS_UB:0] <= WR_GHP_stat_count1[STAT_COUNTER_CLEAR_BITS_UB:0];
       end
 
-      if(clear_en2)
-      begin
+      if(clear_en2) begin
         SP_trend_stat_counter_regs[WR_addr2][1][STAT_COUNTER_CLEAR_BITS_UB:0]  <= ZERO;
         SP_trend_stat_counter_regs[WR_addr2][0][STAT_COUNTER_CLEAR_BITS_UB:0]  <= ZERO;
         LHP_trend_stat_counter_regs[WR_addr2][3][STAT_COUNTER_CLEAR_BITS_UB:0] <= ZERO;
@@ -199,9 +187,7 @@ module meta_predictor #(
         GHP_trend_stat_counter_regs[WR_addr2][2][STAT_COUNTER_CLEAR_BITS_UB:0] <= ZERO;
         GHP_trend_stat_counter_regs[WR_addr2][1][STAT_COUNTER_CLEAR_BITS_UB:0] <= ZERO;
         GHP_trend_stat_counter_regs[WR_addr2][0][STAT_COUNTER_CLEAR_BITS_UB:0] <= ZERO;
-      end
-      else 
-      begin
+      end else begin
         if(WR_SP_stat_en2)  SP_trend_stat_counter_regs[WR_addr2][WR_SP_index2][STAT_COUNTER_CLEAR_BITS_UB:0]   <= WR_SP_stat_count2[STAT_COUNTER_CLEAR_BITS_UB:0];
         if(WR_LHP_stat_en2) LHP_trend_stat_counter_regs[WR_addr2][WR_LHP_index2][STAT_COUNTER_CLEAR_BITS_UB:0] <= WR_LHP_stat_count2[STAT_COUNTER_CLEAR_BITS_UB:0];
         if(WR_GHP_stat_en2) GHP_trend_stat_counter_regs[WR_addr2][WR_GHP_index2][STAT_COUNTER_CLEAR_BITS_UB:0] <= WR_GHP_stat_count2[STAT_COUNTER_CLEAR_BITS_UB:0];

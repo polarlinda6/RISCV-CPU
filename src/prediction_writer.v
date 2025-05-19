@@ -118,29 +118,24 @@ module prediction_writer #(
 
   localparam ZERO = 3'b000;
 
-  always @(posedge clk)
-  begin
-    if (!rst_n)
-      begin  
-        SP_trend_count_reg_id  <= ZERO;
-        SP_trend_count_reg_ex  <= ZERO;
-        LHP_trend_count_reg_id <= ZERO;
-        LHP_trend_count_reg_ex <= ZERO;
-        GHP_trend_count_reg_id <= ZERO;
-        GHP_trend_count_reg_ex <= ZERO;
+  always @(posedge clk) begin
+    if (!rst_n) begin  
+      SP_trend_count_reg_id  <= ZERO;
+      SP_trend_count_reg_ex  <= ZERO;
+      LHP_trend_count_reg_id <= ZERO;
+      LHP_trend_count_reg_ex <= ZERO;
+      GHP_trend_count_reg_id <= ZERO;
+      GHP_trend_count_reg_ex <= ZERO;
+    end else begin
+      if(!PL_stall_ex) begin
+        SP_trend_count_reg_id  <= SP_trend_count;
+        SP_trend_count_reg_ex  <= SP_trend_count_reg_id;
+        LHP_trend_count_reg_id <= LHP_trend_count;
+        LHP_trend_count_reg_ex <= LHP_trend_count_reg_id;
+        GHP_trend_count_reg_id <= GHP_trend_count;
+        GHP_trend_count_reg_ex <= GHP_trend_count_reg_id;
       end
-    else
-      begin
-        if(!PL_stall_ex)
-        begin
-          SP_trend_count_reg_id  <= SP_trend_count;
-          SP_trend_count_reg_ex  <= SP_trend_count_reg_id;
-          LHP_trend_count_reg_id <= LHP_trend_count;
-          LHP_trend_count_reg_ex <= LHP_trend_count_reg_id;
-          GHP_trend_count_reg_id <= GHP_trend_count;
-          GHP_trend_count_reg_ex <= GHP_trend_count_reg_id;
-        end
-      end
+    end
   end
 
 /////////////////////////////////////////////////////////////////////////////////////
