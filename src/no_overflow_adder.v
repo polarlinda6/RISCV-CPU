@@ -37,8 +37,8 @@ module no_overflow_unsig_adder #(
   input  [WIDTH - 1:0]A,
   input  [WIDTH - 1:0]B,
 
-  output PO,
-  output NO,
+  output OF,
+  output UF,
   output [WIDTH - 1:0]result
 );
   
@@ -60,13 +60,13 @@ module no_overflow_unsig_adder #(
     .lt_result(ltu)
   );
 
-  assign PO = !B[UB] && ltu;
-  assign NO = B[UB] && !ltu;
+  assign OF = !B[UB] && ltu;
+  assign UF = B[UB] && !ltu;
 
   generate
   if(ALLOW_PO && ALLOW_NO) assign result = result_inner;
-  if(ALLOW_PO && !ALLOW_NO) assign result = NO ? ZERO : result_inner;
-  if(!ALLOW_PO && ALLOW_NO) assign result = PO ? P_MAX : result_inner;
-  if(!ALLOW_PO && !ALLOW_NO) assign result = PO ? P_MAX : (NO ? ZERO : result_inner);
+  if(ALLOW_PO && !ALLOW_NO) assign result = UF ? ZERO : result_inner;
+  if(!ALLOW_PO && ALLOW_NO) assign result = OF ? P_MAX : result_inner;
+  if(!ALLOW_PO && !ALLOW_NO) assign result = OF ? P_MAX : (UF ? ZERO : result_inner);
   endgenerate
 endmodule

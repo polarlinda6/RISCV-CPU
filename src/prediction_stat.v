@@ -17,8 +17,8 @@ module stat_counter_operator #(
   ) adder_inst(
     .A(A),
     .B({{SUB{B[2]}}, B}),
-    .PO(OF),
-    .NO(),
+    .OF(OF),
+    .UF(),
     .result(result)
   );
 endmodule 
