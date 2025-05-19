@@ -3,7 +3,7 @@
 `define high_confidence (count == 3'b011)
 `define upward_trend    (count == 3'b000) || (count == 3'b010)
 `define downward_trend  (count == 3'b001) || (count == 3'b111) || (count == 3'b101)
-`define no_confidence   (count == 3'b100)
+`define low_confidence   (count == 3'b100)
 
 module trend_counter_decoder(
   input  [2:0]count,   
@@ -13,7 +13,7 @@ module trend_counter_decoder(
   assign count_decode[3] = `high_confidence;
   assign count_decode[2] = `upward_trend;
   assign count_decode[1] = `downward_trend;
-  assign count_decode[0] = `no_confidence;
+  assign count_decode[0] = `low_confidence;
 endmodule 
 
 
