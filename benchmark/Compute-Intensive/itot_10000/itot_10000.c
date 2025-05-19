@@ -15,11 +15,11 @@
  * By: Linda6
  * Date: 2025-05-07
  *
+ * Benchmark results/details: https://godbolt.org/z/66vn8xdYr
+ * 
  * Purpose: Create a clean benchmark version from pi.c for performance evaluation
  *          of the RISC-V CPU. This version removes debug outputs and standardizes
  *          the iteration count to 10000.
- *
- * Benchmark results/details: https://godbolt.org/z/98azEs6vK
  *
  * Summary of changes from pi.c:
  * - Removed all printf statements for cleaner benchmarking.

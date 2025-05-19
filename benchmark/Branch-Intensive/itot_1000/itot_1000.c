@@ -23,7 +23,7 @@ Original Author: Shay Gal-on
  * Modified by: Linda6
  * Date: 2023-05-08
  *
- * Benchmark results/details: https://godbolt.org/z/dnxEThYMx
+ * Benchmark results/details: https://godbolt.org/z/GTK64Ysa7
  *
  * Description:
  * This file is a modified version of the original core_state.c from the EEMBC
