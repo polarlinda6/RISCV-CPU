@@ -169,11 +169,15 @@ module index_hash #(
   input  [HR_WIDTH - 1:0]hr,
   output [INDEX_WIDTH - 1:0]index
 );
+
   localparam HR_WIDTH_UB = HR_WIDTH - 1;
   localparam INDEX_WIDTH_UB = INDEX_WIDTH - 1;
 
   generate
-  if(HR_WIDTH >= INDEX_WIDTH) begin
+  if(HR_WIDTH < INDEX_WIDTH) begin
+    localparam INDEX_PC_TOP_POSITION = INDEX_WIDTH - HR_WIDTH + 1;
+    assign index = {pc[INDEX_PC_TOP_POSITION: 2], hr[HR_WIDTH_UB: 0]};
+  end else begin
     wire [HR_WIDTH_UB:0]once_result;
     assign once_result = hr ^ pc[HR_WIDTH + 1:2];
 
@@ -193,9 +197,6 @@ module index_hash #(
         assign double_result[ub:lb] = once_result[ub:lb] ^ once_result[HR_WIDTH_UB:HR_WIDTH_UB - SUB + 1];
       end
     end
-  end else begin
-    localparam INDEX_PC_TOP_POSITION = INDEX_WIDTH - HR_WIDTH + 1;
-    assign index = {pc[INDEX_PC_TOP_POSITION: 2], hr[HR_WIDTH_UB: 0]};
   end
   endgenerate
 endmodule
