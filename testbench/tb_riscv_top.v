@@ -93,40 +93,40 @@ module tb_riscv_top;
       prediction_total[0] = 0; prediction_failed[0] = 0; // jalr
     end else begin
       if (stat_beq || stat_bne || stat_blt || stat_bge || stat_bltu || stat_bgeu || stat_jal || stat_jalr) begin 
-          prediction_total[8] = prediction_total[8] + 1;
-          if (stat_PL_flush) prediction_failed[8] = prediction_failed[8] + 1;
+        prediction_total[8] = prediction_total[8] + 1;
+        if (stat_PL_flush) prediction_failed[8] = prediction_failed[8] + 1;
       end
       if (stat_beq) begin
-          prediction_total[7] = prediction_total[7] + 1;
-          if (stat_PL_flush) prediction_failed[7] = prediction_failed[7] + 1;
+        prediction_total[7] = prediction_total[7] + 1;
+        if (stat_PL_flush) prediction_failed[7] = prediction_failed[7] + 1;
       end
       if (stat_bne) begin
-          prediction_total[6] = prediction_total[6] + 1;
-          if (stat_PL_flush) prediction_failed[6] = prediction_failed[6] + 1;
+        prediction_total[6] = prediction_total[6] + 1;
+        if (stat_PL_flush) prediction_failed[6] = prediction_failed[6] + 1;
       end
       if (stat_blt) begin
-          prediction_total[5] = prediction_total[5] + 1;
-          if (stat_PL_flush) prediction_failed[5] = prediction_failed[5] + 1;
+        prediction_total[5] = prediction_total[5] + 1;
+        if (stat_PL_flush) prediction_failed[5] = prediction_failed[5] + 1;
       end
       if (stat_bge) begin
-          prediction_total[4] = prediction_total[4] + 1;
-          if (stat_PL_flush) prediction_failed[4] = prediction_failed[4] + 1;
+        prediction_total[4] = prediction_total[4] + 1;
+        if (stat_PL_flush) prediction_failed[4] = prediction_failed[4] + 1;
       end
       if (stat_bltu) begin
-          prediction_total[3] = prediction_total[3] + 1;
-          if (stat_PL_flush) prediction_failed[3] = prediction_failed[3] + 1;
+        prediction_total[3] = prediction_total[3] + 1;
+        if (stat_PL_flush) prediction_failed[3] = prediction_failed[3] + 1;
       end
       if (stat_bgeu) begin
-          prediction_total[2] = prediction_total[2] + 1;
-          if (stat_PL_flush) prediction_failed[2] = prediction_failed[2] + 1;
+        prediction_total[2] = prediction_total[2] + 1;
+        if (stat_PL_flush) prediction_failed[2] = prediction_failed[2] + 1;
       end
       if (stat_jal) begin
-          prediction_total[1] = prediction_total[1] + 1;
-          if (stat_PL_flush) prediction_failed[1] = prediction_failed[1] + 1;
+        prediction_total[1] = prediction_total[1] + 1;
+        if (stat_PL_flush) prediction_failed[1] = prediction_failed[1] + 1;
       end
       if (stat_jalr) begin
-          prediction_total[0] = prediction_total[0] + 1;
-          if (stat_PL_flush) prediction_failed[0] = prediction_failed[0] + 1;
+        prediction_total[0] = prediction_total[0] + 1;
+        if (stat_PL_flush) prediction_failed[0] = prediction_failed[0] + 1;
       end
     end
   end
