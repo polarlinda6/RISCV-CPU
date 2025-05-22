@@ -100,10 +100,10 @@ module RAM(
   reg [31:0]write_through_addr_reg;
   reg [31:0]write_throuth_data_reg;
   always @(posedge clk) begin
-      if (W_en) begin
-          write_through_addr_reg <= ram_addr;
-          write_throuth_data_reg <= din;
-      end
+    if (W_en) begin
+      write_through_addr_reg <= ram_addr;
+      write_throuth_data_reg <= din;
+    end
   end
 
   wire [31:0]Rd_data, ram_data;
