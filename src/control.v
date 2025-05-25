@@ -32,44 +32,44 @@ module control(
 	wire I_type;
 	
 	main_control main_control_inst(
-		    .Rd(Rd),
-        .opcode(opcode),
-        .func3(func3),
-        
-				.RegWrite(RegWrite),
-        .MemRead(MemRead),
-        .MemWrite(MemWrite),
-        .ALU_DA_imme_signal(ALU_DA_imme_signal),
-        .ALU_DA_pc_signal(ALU_DA_pc_signal),
-        
-        .beq(beq),
-        .bne(bne),
-        .blt(blt),
-        .bge(bge),
-        .bltu(bltu),
-        .bgeu(bgeu),
-        .jal(jal),
-        .jalr(jalr),
-        
-        .RW_type(RW_type),
-        
-        .B_type(B_type),
-        .R_type(R_type),
-        .I_type(I_type),
+		.Rd(Rd),
+		.opcode(opcode),
+		.func3(func3),
+		
+		.RegWrite(RegWrite),
+		.MemRead(MemRead),
+		.MemWrite(MemWrite),
+		.ALU_DA_imme_signal(ALU_DA_imme_signal),
+		.ALU_DA_pc_signal(ALU_DA_pc_signal),
+		
+		.beq(beq),
+		.bne(bne),
+		.blt(blt),
+		.bge(bge),
+		.bltu(bltu),
+		.bgeu(bgeu),
+		.jal(jal),
+		.jalr(jalr),
+		
+		.RW_type(RW_type),
+		
+		.B_type(B_type),
+		.R_type(R_type),
+		.I_type(I_type),
 
-				.unknown_instr_warning_main_decode(unknown_instr_warning_main_decode)
-        );
+		.unknown_instr_warning_main_decode(unknown_instr_warning_main_decode)
+		);
 	
 	ALU_control ALU_control_inst(
-        .B_type(B_type),
-        .R_type(R_type),
-        .I_type(I_type),
-        
-        .func3(func3),
-        .func7(func7),
-        
-        .ALUctl(ALUctl)
-        );
+		.B_type(B_type),
+		.R_type(R_type),
+		.I_type(I_type),
+		
+		.func3(func3),
+		.func7(func7),
+		
+		.ALUctl(ALUctl)
+		);
 	
 endmodule
 
@@ -162,8 +162,7 @@ module ALU_control(
 	wire [3:0]branchop;
 	reg  [3:0]RIop;
 	
-	always@(*)
-	begin
+	always@(*) begin
 		case(func3)
 			3'b000: RIop= (R_type & func7) ? `SUB : `ADD;
 			3'b001: RIop= `SLL;
