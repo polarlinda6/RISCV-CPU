@@ -10,8 +10,7 @@ module large_fan_in_and #(
 	localparam BASE_FAN_IN = 3;
 
 	generate
-	if(AND_QUANTITY <= BASE_FAN_IN)
-	begin             
+	if(AND_QUANTITY <= BASE_FAN_IN) begin             
 		localparam lb1 = 0;
 		localparam ub1 = lb1 + WIDTH_UB;
 		localparam lb2 = ub1 + 1;
@@ -25,9 +24,7 @@ module large_fan_in_and #(
 			assign dout = din[ub1:lb1] & din[ub2:lb2];
 		else if(AND_QUANTITY == 1)
 			assign dout = din;
-	end
-	else if(AND_QUANTITY == 4)
-	begin
+	end else if(AND_QUANTITY == 4) begin
 		localparam lb1 = 0;
 		localparam ub1 = lb1 + WIDTH * 2 - 1;
 		localparam lb2 = ub1 + 1;
@@ -50,9 +47,7 @@ module large_fan_in_and #(
 		);
 
 		assign dout = result1 & result2;
-	end
-	else 
-	begin
+	end else begin
 		localparam SPLIT_QUANTITY = AND_QUANTITY / BASE_FAN_IN + (AND_QUANTITY % BASE_FAN_IN ? 1 : 0);
 		localparam REMAING_QUANTITY = AND_QUANTITY - SPLIT_QUANTITY * 2;
 
@@ -117,8 +112,7 @@ module large_fan_in_or #(
 	localparam BASE_FAN_IN = 3;
 
 	generate
-	if(OR_QUANTITY <= BASE_FAN_IN)
-	begin 				
+	if(OR_QUANTITY <= BASE_FAN_IN) begin 				
 		localparam lb1 = 0;
 		localparam ub1 = lb1 + WIDTH_UB;
 		localparam lb2 = ub1 + 1;
@@ -132,9 +126,7 @@ module large_fan_in_or #(
 			assign dout = din[ub1:lb1] | din[ub2:lb2];
 		else if(OR_QUANTITY == 1)
 			assign dout = din;
-	end
-	else if(OR_QUANTITY == 4)
-	begin
+	end else if(OR_QUANTITY == 4) begin
 		localparam lb1 = 0;
 		localparam ub1 = lb1 + WIDTH * 2 - 1;
 		localparam lb2 = ub1 + 1;
@@ -157,9 +149,7 @@ module large_fan_in_or #(
 		);
 
 		assign dout = result1 | result2;
-	end
-	else 
-	begin
+	end else begin
 		localparam SPLIT_QUANTITY = OR_QUANTITY / BASE_FAN_IN + (OR_QUANTITY % BASE_FAN_IN ? 1 : 0);
 		localparam REMAING_QUANTITY = OR_QUANTITY - SPLIT_QUANTITY * 2;
 

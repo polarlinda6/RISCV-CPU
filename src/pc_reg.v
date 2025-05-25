@@ -8,10 +8,8 @@ module pc_reg(
 	input [31:0]pc_new,
 	output reg [31:0]pc_out
   );
-
 	
-	always@(posedge clk)
-	begin
+	always@(posedge clk) begin
 		if(!rst_n)
 			pc_out <= `zeroword;
 		else if(!PL_stall_ex)

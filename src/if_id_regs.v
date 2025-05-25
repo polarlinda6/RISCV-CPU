@@ -24,23 +24,19 @@ module if_id_regs(
 	input PL_flush
   );
 	
-	always@(posedge clk)
-	begin
-		if(!rst_n || PL_flush)				
-		begin
-				pc_add_imme_if_id_o<=`zeroword;
-				pc_add_4_if_id_o<=`zeroword;
-				jalr_pc_jump_or_pc_if_id_o<=`zeroword;
-				B_type_result_if_id_o<=`zero;
-				instr_if_id_o<=`nop;
-		end
-		else if(!PL_stall_ex)
-		begin
-				pc_add_imme_if_id_o<=pc_add_imme_if_id_i;
-				pc_add_4_if_id_o<=pc_add_4_if_id_i;
-				jalr_pc_jump_or_pc_if_id_o<=jalr_pc_jump_or_pc_if_id_i;
-				B_type_result_if_id_o<=B_type_result_if_id_i;
-				instr_if_id_o<=instr_if_id_i;
+	always@(posedge clk) begin
+		if(!rst_n || PL_flush) begin
+			pc_add_imme_if_id_o<=`zeroword;
+			pc_add_4_if_id_o<=`zeroword;
+			jalr_pc_jump_or_pc_if_id_o<=`zeroword;
+			B_type_result_if_id_o<=`zero;
+			instr_if_id_o<=`nop;
+		end else if(!PL_stall_ex) begin
+			pc_add_imme_if_id_o<=pc_add_imme_if_id_i;
+			pc_add_4_if_id_o<=pc_add_4_if_id_i;
+			jalr_pc_jump_or_pc_if_id_o<=jalr_pc_jump_or_pc_if_id_i;
+			B_type_result_if_id_o<=B_type_result_if_id_i;
+			instr_if_id_o<=instr_if_id_i;
 		end
 	end
 endmodule
