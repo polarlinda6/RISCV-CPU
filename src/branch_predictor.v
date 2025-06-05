@@ -20,7 +20,6 @@ module branch_predictor(
 	input  [4:0]WR_ra_track_data,
 	output [4:0]RAS_ra_track,
 
-	input  [4:0]Rd,
 	input  [31:0]pc_add_4,
 	input  [31:0]imme,
 
@@ -57,15 +56,14 @@ module branch_predictor(
 
 	localparam RAS_STACK_ADDR_WIDTH = 4;
 
-	localparam STAT_COUNTER_CLEAR_BITS = 2;
-	localparam UPWARD_TREND_OR_VALUE = {(STAT_COUNTER_WIDTH - 2){1'b1}};
-
 	localparam STAT_COUNTER_WIDTH = 6;
 	localparam [STAT_COUNTER_WIDTH - 1:0]SP_STAT_COUNTER_INIT_VALUE  = 0;
 	localparam [STAT_COUNTER_WIDTH - 1:0]LHP_STAT_COUNTER_INIT_VALUE = 0;
 	localparam [STAT_COUNTER_WIDTH - 1:0]GHP_STAT_COUNTER_INIT_VALUE = 0;
 	
-
+	localparam STAT_COUNTER_CLEAR_BITS = 2;
+	localparam UPWARD_TREND_OR_VALUE = {(STAT_COUNTER_WIDTH - 2){1'b1}};
+	
 	localparam GHP_HR_WIDTH    = 10; 
 	localparam GHP_INDEX_WIDTH = 13;
 
