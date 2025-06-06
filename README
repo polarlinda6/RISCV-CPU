@@ -1,0 +1,5 @@
+# RISCV-CPU
+## 目标
+Based on the RV32I ISA, aiming to implement the complete functions of the CPU without considering timing and latency.
+
+## 
