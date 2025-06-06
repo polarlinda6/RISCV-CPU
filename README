@@ -3,3 +3,4 @@
 Based on the RV32I ISA, aiming to implement the complete functions of the CPU without considering timing and latency.
 
 ## 
+[](doc/image/RV32I Base  Instruction Set.png)
