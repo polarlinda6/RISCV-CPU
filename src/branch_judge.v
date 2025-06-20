@@ -30,9 +30,9 @@ module branch_judge(
 	assign PL_flush= (jalr && ne_result) 
 	                 || 
                    (B_type && (B_type_result ^ ((beq  && zero)||
-																													 (bne  && (!zero))||
-																													 (blt  && slt_result)||
-																													 (bge  && (!slt_result))||
-																													 (bltu && slt_result)||
-																													 (bgeu && (!slt_result)))));
+																								(bne  && (!zero))||
+																								(blt  && slt_result)||
+																								(bge  && (!slt_result))||
+																								(bltu && slt_result)||
+																								(bgeu && (!slt_result)))));
 endmodule
